@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
+import LoginStyles from '../../styles/Login/LoginStyles';
 
 const LoginScreen = ({navigation}: {navigation: any}) => {
   const [username, setUsername] = useState('');
@@ -8,54 +9,60 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const handleLogin = () => {
     if (username === 'user' && password === 'password') {
       Alert.alert('Success', 'You are logged in!');
-      navigation.navigate('Home'); // 로그인 후 홈 화면으로 이동
+      navigation.navigate('Home');
     } else {
       Alert.alert('Error', 'Invalid username or password');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <View style={LoginStyles.container}>
+      <View style={LoginStyles.logoContainer}>
+        <View style={LoginStyles.logoPlaceholder} />
+        <Text style={LoginStyles.logoText}>MEDIKO</Text>
+      </View>
+
       <TextInput
-        style={styles.input}
-        placeholder="Username"
+        style={LoginStyles.input}
+        placeholder="아이디 입력"
         value={username}
         onChangeText={setUsername}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Password"
+        style={LoginStyles.input}
+        placeholder="비밀번호 입력"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} />
+
+      <TouchableOpacity style={LoginStyles.loginButton} onPress={handleLogin}>
+        <Text style={LoginStyles.loginButtonText}>로그인</Text>
+      </TouchableOpacity>
+
+      <View style={LoginStyles.linkContainer}>
+        <Text style={LoginStyles.link}>아이디 찾기</Text>
+        <Text style={LoginStyles.separator}> | </Text>
+        <Text style={LoginStyles.link}>비밀번호 찾기</Text>
+        <Text style={LoginStyles.separator}> | </Text>
+        <Text style={LoginStyles.link}>회원가입</Text>
+      </View>
+
+      <Text style={LoginStyles.snsText}>SNS 계정으로 로그인</Text>
+
+      <View style={LoginStyles.snsContainer}>
+        <View style={LoginStyles.snsButton}>
+          <Text style={LoginStyles.snsButtonText}>Google</Text>
+        </View>
+        <View style={LoginStyles.snsButton}>
+          <Text style={LoginStyles.snsButtonText}>Kakao</Text>
+        </View>
+        <View style={LoginStyles.snsButton}>
+          <Text style={LoginStyles.snsButtonText}>Naver</Text>
+        </View>
+      </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-});
 
 export default LoginScreen;
