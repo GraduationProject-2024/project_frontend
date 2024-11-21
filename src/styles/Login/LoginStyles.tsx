@@ -28,7 +28,7 @@ const LoginStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 12,
-    padding: 12,
+    padding: 10,
     marginBottom: 15,
     fontSize: 16,
   },
