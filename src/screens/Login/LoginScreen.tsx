@@ -1,6 +1,20 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image,
+  Text,
+} from 'react-native';
 import LoginStyles from '../../styles/Login/LoginStyles';
+
+// 이미지 import
+import MedikoImage from '../../img/LoginScreen/MEDIKO.png';
+import MedikoLogo from '../../img/LoginScreen/MedikoLogo.png';
+import GoogleLoginLogo from '../../img/LoginScreen/GoogleLoginLogo.png';
+import KakaoLoginLogo from '../../img/LoginScreen/KakaoLoginLogo.png';
+import NaverLoginLogo from '../../img/LoginScreen/NaverLoginLogo.png';
 
 const LoginScreen = ({navigation}: {navigation: any}) => {
   const [username, setUsername] = useState('');
@@ -15,13 +29,19 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
+  const handleSNSLogin = (platform: string) => {
+    Alert.alert(`${platform} 로그인`, `${platform} 로그인 기능 준비 중입니다.`);
+  };
+
   return (
     <View style={LoginStyles.container}>
+      {/* 로고 및 메인 이미지 */}
       <View style={LoginStyles.logoContainer}>
-        <View style={LoginStyles.logoPlaceholder} />
-        <Text style={LoginStyles.logoText}>MEDIKO</Text>
+        <Image source={MedikoLogo} style={LoginStyles.logoImage} />
+        <Image source={MedikoImage} style={LoginStyles.medikoImage} />
       </View>
 
+      {/* 입력 필드 */}
       <TextInput
         style={LoginStyles.input}
         placeholder="아이디 입력"
@@ -36,30 +56,51 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         secureTextEntry
       />
 
+      {/* 로그인 버튼 */}
       <TouchableOpacity style={LoginStyles.loginButton} onPress={handleLogin}>
         <Text style={LoginStyles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
+      {/* 링크 */}
       <View style={LoginStyles.linkContainer}>
-        <Text style={LoginStyles.link}>아이디 찾기</Text>
+        <TouchableOpacity>
+          <Text style={LoginStyles.link}>아이디 찾기</Text>
+        </TouchableOpacity>
         <Text style={LoginStyles.separator}> | </Text>
-        <Text style={LoginStyles.link}>비밀번호 찾기</Text>
+        <TouchableOpacity>
+          <Text style={LoginStyles.link}>비밀번호 찾기</Text>
+        </TouchableOpacity>
         <Text style={LoginStyles.separator}> | </Text>
-        <Text style={LoginStyles.link}>회원가입</Text>
+        <TouchableOpacity>
+          <Text style={LoginStyles.link}>회원가입</Text>
+        </TouchableOpacity>
       </View>
 
-      <Text style={LoginStyles.snsText}>SNS 계정으로 로그인</Text>
-
+      {/* SNS 계정 로그인 */}
+      <View style={LoginStyles.snsTextContainer}>
+        <View style={LoginStyles.horizontalLine} />
+        <Text style={LoginStyles.snsText}>SNS 계정으로 로그인</Text>
+        <View style={LoginStyles.horizontalLine} />
+      </View>
       <View style={LoginStyles.snsContainer}>
-        <View style={LoginStyles.snsButton}>
-          <Text style={LoginStyles.snsButtonText}>Google</Text>
-        </View>
-        <View style={LoginStyles.snsButton}>
-          <Text style={LoginStyles.snsButtonText}>Kakao</Text>
-        </View>
-        <View style={LoginStyles.snsButton}>
-          <Text style={LoginStyles.snsButtonText}>Naver</Text>
-        </View>
+        <TouchableOpacity
+          style={LoginStyles.snsItem}
+          onPress={() => handleSNSLogin('Google')}>
+          <Image source={GoogleLoginLogo} style={LoginStyles.snsLogo} />
+          <Text style={LoginStyles.snsLabel}>Google</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={LoginStyles.snsItem}
+          onPress={() => handleSNSLogin('Kakao')}>
+          <Image source={KakaoLoginLogo} style={LoginStyles.snsLogo} />
+          <Text style={LoginStyles.snsLabel}>Kakao</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={LoginStyles.snsItem}
+          onPress={() => handleSNSLogin('Naver')}>
+          <Image source={NaverLoginLogo} style={LoginStyles.snsLogo} />
+          <Text style={LoginStyles.snsLabel}>Naver</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
