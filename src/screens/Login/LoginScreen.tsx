@@ -9,12 +9,11 @@ import {
 } from 'react-native';
 import LoginStyles from '../../styles/Login/LoginStyles';
 
-// 이미지 import
-import MedikoImage from '../../img/LoginScreen/MEDIKO.png';
-import MedikoLogo from '../../img/LoginScreen/MedikoLogo.png';
-import GoogleLoginLogo from '../../img/LoginScreen/GoogleLoginLogo.png';
-import KakaoLoginLogo from '../../img/LoginScreen/KakaoLoginLogo.png';
-import NaverLoginLogo from '../../img/LoginScreen/NaverLoginLogo.png';
+import MedikoImage from '../../img/Login/MEDIKO.png';
+import MedikoLogo from '../../img/Login/MedikoLogo.png';
+import GoogleLoginLogo from '../../img/Login/GoogleLoginLogo.png';
+import KakaoLoginLogo from '../../img/Login/KakaoLoginLogo.png';
+import NaverLoginLogo from '../../img/Login/NaverLoginLogo.png';
 
 const LoginScreen = ({navigation}: {navigation: any}) => {
   const [username, setUsername] = useState('');
@@ -71,7 +70,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
           <Text style={LoginStyles.link}>비밀번호 찾기</Text>
         </TouchableOpacity>
         <Text style={LoginStyles.separator}> | </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={LoginStyles.link}>회원가입</Text>
         </TouchableOpacity>
       </View>
