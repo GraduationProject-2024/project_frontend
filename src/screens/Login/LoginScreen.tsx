@@ -70,7 +70,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
           <Text style={LoginStyles.link}>비밀번호 찾기</Text>
         </TouchableOpacity>
         <Text style={LoginStyles.separator}> | </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+        <TouchableOpacity onPress={() => navigation.navigate('ChooseLanguage')}>
           <Text style={LoginStyles.link}>회원가입</Text>
         </TouchableOpacity>
       </View>

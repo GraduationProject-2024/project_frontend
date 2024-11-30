@@ -5,7 +5,7 @@ const SignupStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingVertical: 30,
+    paddingVertical: 4,
   },
   label: {
     fontSize: 16,
@@ -49,7 +49,7 @@ const SignupStyles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 80,
+    marginTop: 100,
   },
   signupButtonText: {
     color: '#ffffff',
