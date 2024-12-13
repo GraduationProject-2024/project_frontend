@@ -6,10 +6,11 @@ import SplashScreen from '../screens/Splash/SplashScreen';
 import LoginScreen from '../screens/Login/LoginScreen';
 import SignupScreen from '../screens/Signup/SignupScreen';
 import ChooseLanguageScreen from '../screens/ChooseLanguage/ChooseLanguageScreen';
-import MedicalInformation from '../screens/MedicalInformation/MedicalInformationScreen';
-import PastMedicalHistory from '../screens/MedicalInformation/PastMedicalHistoryScreen';
-import FamilyMedicalHistory from '../screens/MedicalInformation/FamilyMedicalHistoryScreen';
-import MedicineInformation from '../screens/MedicalInformation/MedicineInformationScreen';
+import MedicalInformationScreen from '../screens/MedicalInformation/MedicalInformationScreen';
+import PastMedicalHistoryScreen from '../screens/MedicalInformation/PastMedicalHistoryScreen';
+import FamilyMedicalHistoryScreen from '../screens/MedicalInformation/FamilyMedicalHistoryScreen';
+import MedicineInformationScreen from '../screens/MedicalInformation/MedicineInformationScreen';
+import HomeScreen from '../screens/Home/HomeScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -69,30 +70,37 @@ const AppNavigator = () => {
         />
         <Stack.Screen
           name="MedicalInformation"
-          component={MedicalInformation}
+          component={MedicalInformationScreen}
           options={{
             title: '건강 정보',
           }}
         />
         <Stack.Screen
           name="PastMedicalHistory"
-          component={PastMedicalHistory}
+          component={PastMedicalHistoryScreen}
           options={{
             title: '과거 병력',
           }}
         />
         <Stack.Screen
           name="FamilyMedicalHistory"
-          component={FamilyMedicalHistory}
+          component={FamilyMedicalHistoryScreen}
           options={{
             title: '가족력',
           }}
         />
         <Stack.Screen
           name="MedicineInformation"
-          component={MedicineInformation}
+          component={MedicineInformationScreen}
           options={{
             title: '복용하는 약',
+          }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

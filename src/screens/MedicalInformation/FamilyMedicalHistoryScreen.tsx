@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import styles from '../../styles/MedicalInformation/FamilyMedicalHistoryStyles';
 
-const PastMedicalHistoryScreen = () => {
+const FamilyMedicalHistoryScreen = () => {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const navigation = useNavigation();
 
@@ -70,4 +70,4 @@ const PastMedicalHistoryScreen = () => {
   );
 };
 
-export default PastMedicalHistoryScreen;
+export default FamilyMedicalHistoryScreen;
