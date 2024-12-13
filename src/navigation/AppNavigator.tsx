@@ -9,6 +9,7 @@ import ChooseLanguageScreen from '../screens/ChooseLanguage/ChooseLanguageScreen
 import MedicalInformation from '../screens/MedicalInformation/MedicalInformationScreen';
 import PastMedicalHistory from '../screens/MedicalInformation/PastMedicalHistoryScreen';
 import FamilyMedicalHistory from '../screens/MedicalInformation/FamilyMedicalHistoryScreen';
+import MedicineInformation from '../screens/MedicalInformation/MedicineInformationScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -85,6 +86,13 @@ const AppNavigator = () => {
           component={FamilyMedicalHistory}
           options={{
             title: '가족력',
+          }}
+        />
+        <Stack.Screen
+          name="MedicineInformation"
+          component={MedicineInformation}
+          options={{
+            title: '복용하는 약',
           }}
         />
       </Stack.Navigator>
