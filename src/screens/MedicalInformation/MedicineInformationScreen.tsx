@@ -1,20 +1,24 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import styles from '../../styles/MedicalInformation/FamilyMedicalHistoryStyles';
+import styles from '../../styles/MedicalInformation/MedicineInformationStyles';
 
 const PastMedicalHistoryScreen = () => {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const navigation = useNavigation();
 
   const medicalConditions = [
-    '당뇨',
-    '고혈압',
-    '간질병증',
-    '결핵',
-    '위암',
-    '대장암',
-    '가족샘종폴립종',
+    '혈압약',
+    '심장질환약',
+    '간견병증',
+    '당뇨약(혈당강하제)',
+    '항생제',
+    '비스테로이드성 진통 소염제',
+    '경구 스테로이드',
+    '음주',
+    '한약',
+    '최근 한약제 복용',
+    '항암제제',
   ];
 
   const toggleCondition = (condition: string) => {
@@ -26,13 +30,13 @@ const PastMedicalHistoryScreen = () => {
   };
 
   const handleNext = () => {
-    console.log('선택된 가족력:', selectedConditions);
-    navigation.navigate('MedicineInformation');
+    console.log('선택된 복용하는 약:', selectedConditions);
+    navigation.navigate('FamilyMedicalHistory');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>가족력을 모두 선택해주세요</Text>
+      <Text style={styles.title}>복용하는 약을 모두 선택해주세요</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {medicalConditions.map(condition => (
           <TouchableOpacity

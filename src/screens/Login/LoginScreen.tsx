@@ -20,7 +20,12 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    if (username === 'user' && password === 'password') {
+    // 디버깅 출력
+    console.log('Entered Username:', username);
+    console.log('Entered Password:', password);
+
+    // 공백 제거 후 비교
+    if (username.trim() === 'testUser' && password.trim() === '1234') {
       Alert.alert('Success', 'You are logged in!');
       navigation.navigate('Home');
     } else {
@@ -45,13 +50,13 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         style={LoginStyles.input}
         placeholder="아이디 입력"
         value={username}
-        onChangeText={setUsername}
+        onChangeText={text => setUsername(text)} // 공백 포함 확인
       />
       <TextInput
         style={LoginStyles.input}
         placeholder="비밀번호 입력"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={text => setPassword(text)} // 공백 포함 확인
         secureTextEntry
       />
 
