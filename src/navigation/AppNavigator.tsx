@@ -5,7 +5,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import SplashScreen from '../screens/Splash/SplashScreen';
 import LoginScreen from '../screens/Login/LoginScreen';
 import SignupScreen from '../screens/Signup/SignupScreen';
-import ChooseLanguageScreen from '../screens/ChooseLanguage/ChooseLanguageScreen'; // 언어 선택 화면 추가
+import ChooseLanguageScreen from '../screens/ChooseLanguage/ChooseLanguageScreen';
+import MedicalInformation from '../screens/MedicalInformation/MedicalInformationScreen';
+import PastMedicalHistory from '../screens/MedicalInformation/PastMedicalHistoryScreen';
+import FamilyMedicalHistory from '../screens/MedicalInformation/FamilyMedicalHistoryScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -61,6 +64,27 @@ const AppNavigator = () => {
           component={SignupScreen}
           options={{
             title: '회원 가입',
+          }}
+        />
+        <Stack.Screen
+          name="MedicalInformation"
+          component={MedicalInformation}
+          options={{
+            title: '건강 정보',
+          }}
+        />
+        <Stack.Screen
+          name="PastMedicalHistory"
+          component={PastMedicalHistory}
+          options={{
+            title: '과거 병력',
+          }}
+        />
+        <Stack.Screen
+          name="FamilyMedicalHistory"
+          component={FamilyMedicalHistory}
+          options={{
+            title: '가족력',
           }}
         />
       </Stack.Navigator>
