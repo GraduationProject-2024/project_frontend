@@ -20,11 +20,9 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // 디버깅 출력
     console.log('Entered Username:', username);
     console.log('Entered Password:', password);
 
-    // 공백 제거 후 비교
     if (username.trim() === 'testUser' && password.trim() === '1234') {
       Alert.alert('Success', 'You are logged in!');
       navigation.navigate('Home');
