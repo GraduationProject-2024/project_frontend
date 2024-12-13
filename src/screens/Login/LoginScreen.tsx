@@ -62,8 +62,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
 
       {/* 링크 */}
       <View style={LoginStyles.linkContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('MedicalInformation')}>
+        <TouchableOpacity>
           <Text style={LoginStyles.link}>아이디 찾기</Text>
         </TouchableOpacity>
         <Text style={LoginStyles.separator}> | </Text>
