@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import styles from '../../styles/MedicalInformation/MedicineInformationStyles';
 
-const PastMedicalHistoryScreen = () => {
+const MedicineInformationScreen = () => {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const navigation = useNavigation();
 
@@ -18,7 +18,7 @@ const PastMedicalHistoryScreen = () => {
     '음주',
     '한약',
     '최근 한약제 복용',
-    '항암제제',
+    '항암제',
   ];
 
   const toggleCondition = (condition: string) => {
@@ -31,7 +31,7 @@ const PastMedicalHistoryScreen = () => {
 
   const handleNext = () => {
     console.log('선택된 복용하는 약:', selectedConditions);
-    navigation.navigate('FamilyMedicalHistory');
+    navigation.navigate('HomeScreen');
   };
 
   return (
@@ -74,4 +74,4 @@ const PastMedicalHistoryScreen = () => {
   );
 };
 
-export default PastMedicalHistoryScreen;
+export default MedicineInformationScreen;

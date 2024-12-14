@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import styles from '../../styles/MedicalInformation/MedicalInformationStyles';
 
-const MedicalInformation = ({navigation}) => {
+const MedicalInformationScreen = ({navigation}) => {
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
@@ -60,4 +60,4 @@ const MedicalInformation = ({navigation}) => {
   );
 };
 
-export default MedicalInformation;
+export default MedicalInformationScreen;
