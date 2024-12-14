@@ -1,57 +1,56 @@
 import React, {useState} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import HomeStyles from '../../styles/Home/HomeStyles';
+import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
 const HomeScreen = () => {
-  const [selectedButton, setSelectedButton] = useState(null);
+  const [selectedButtons, setSelectedButtons] = useState([]);
 
   const handleButtonPress = label => {
-    setSelectedButton(label);
+    if (selectedButtons.includes(label)) {
+      setSelectedButtons(selectedButtons.filter(item => item !== label));
+    } else {
+      setSelectedButtons([...selectedButtons, label]);
+    }
   };
+
+  const handleStartPress = () => {
+    if (selectedButtons.length > 0) {
+      console.log('Selected sections:', selectedButtons);
+    }
+  };
+
+  const isStartButtonActive = selectedButtons.length > 0;
 
   return (
     <ScrollView style={HomeStyles.container}>
       {/* Header Section */}
       <View style={HomeStyles.header}>
         <Image
-          source={require('../../img/Login/MEDIKO.png')}
+          source={require('../../img/Home/MEDIKO.png')}
           style={HomeStyles.logo}
         />
-        <TouchableOpacity>
-          <Image
-            source={require('../../img/Home/notificationIcon.png')}
-            style={HomeStyles.notificationIcon}
-          />
-        </TouchableOpacity>
+        <View style={HomeStyles.iconContainer}>
+          <TouchableOpacity>
+            <Image
+              source={require('../../img/Home/notificationIcon.png')}
+              style={HomeStyles.notificationIcon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Image
+              source={require('../../img/Home/profileIcon.png')}
+              style={HomeStyles.notificationIcon}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Profile Section */}
-      <View style={HomeStyles.profileSection}>
-        <TouchableOpacity>
-          <Text style={HomeStyles.backButton}>&lt;</Text>
-        </TouchableOpacity>
-        <View style={HomeStyles.profileInfo}>
-          <Image
-            source={require('../../img/Home/profileImage.png')}
-            style={HomeStyles.profileImage}
-          />
-          <View>
-            <Text style={HomeStyles.profileText}>눈송이 님</Text>
-            <Text style={HomeStyles.profileSubText}>여성, 만 20세</Text>
-          </View>
-        </View>
-        <View style={HomeStyles.healthInfo}>
-          <Text style={HomeStyles.healthInfoText}>과거병력</Text>
-          <Text style={HomeStyles.healthInfoValue}>당뇨</Text>
-          <Text style={HomeStyles.healthInfoText}>가족력</Text>
-          <Text style={HomeStyles.healthInfoValue}>고혈압</Text>
-          <Text style={HomeStyles.healthInfoText}>복용하는 약</Text>
-          <Text style={HomeStyles.healthInfoValue}>당뇨약(혈당 강화제)</Text>
-        </View>
-      </View>
+      <HomeProfileScreen />
 
       {/* AI Pre-Diagnosis Section */}
-      <View style={HomeStyles.section}>
+      <View style={HomeStyles.diagnosisSection}>
         <Text style={HomeStyles.sectionTitle}>AI 사전 문진 바로 시작하기</Text>
         <Text style={HomeStyles.sectionSubtitle}>
           치료가 필요하신 부분을 선택해주세요
@@ -75,28 +74,41 @@ const HomeScreen = () => {
               key={index}
               style={[
                 HomeStyles.diagnosisButton,
-                selectedButton === label && HomeStyles.selectedButton,
+                selectedButtons.includes(label) && HomeStyles.selectedButton,
               ]}
               onPress={() => handleButtonPress(label)}>
               <Text
                 style={[
                   HomeStyles.diagnosisButtonText,
-                  selectedButton === label && HomeStyles.selectedButtonText,
+                  selectedButtons.includes(label) &&
+                    HomeStyles.selectedButtonText,
                 ]}>
                 {label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
+        <TouchableOpacity
+          style={[
+            HomeStyles.startButton,
+            !isStartButtonActive && HomeStyles.disabledButton,
+          ]}
+          onPress={handleStartPress}
+          disabled={!isStartButtonActive}>
+          <Text style={HomeStyles.startButtonText}>시작하기</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Menu Section */}
-      <View style={HomeStyles.section}>
+      <View style={HomeStyles.menuSection}>
         <Text style={HomeStyles.sectionTitle}>메뉴 바로 가기</Text>
+        <Text style={HomeStyles.sectionSubtitle}>
+          메디코의 서비스를 한 눈에 볼 수 있어요
+        </Text>
         <View style={HomeStyles.menuGrid}>
           {[
             {
-              icon: require('../../img/Home/aihistorytakingIcon.png'),
+              icon: require('../../img/Home/aidiagnosisIcon.png'),
               label: 'AI 사전 문진',
             },
             {
