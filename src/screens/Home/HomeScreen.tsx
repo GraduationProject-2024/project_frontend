@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import HomeStyles from '../../styles/Home/HomeStyles';
-<<<<<<< HEAD
 import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
 const HomeScreen = () => {
@@ -23,22 +22,11 @@ const HomeScreen = () => {
 
   const isStartButtonActive = selectedButtons.length > 0;
 
-=======
-
-const HomeScreen = () => {
-  const [selectedButton, setSelectedButton] = useState(null);
-
-  const handleButtonPress = label => {
-    setSelectedButton(label);
-  };
-
->>>>>>> 3e0f130 (feat: Home 개발발)
   return (
     <ScrollView style={HomeStyles.container}>
       {/* Header Section */}
       <View style={HomeStyles.header}>
         <Image
-<<<<<<< HEAD
           source={require('../../img/Home/MEDIKO.png')}
           style={HomeStyles.logo}
         />
@@ -63,46 +51,6 @@ const HomeScreen = () => {
 
       {/* AI Pre-Diagnosis Section */}
       <View style={HomeStyles.diagnosisSection}>
-=======
-          source={require('../../img/Login/MEDIKO.png')}
-          style={HomeStyles.logo}
-        />
-        <TouchableOpacity>
-          <Image
-            source={require('../../img/Home/notificationIcon.png')}
-            style={HomeStyles.notificationIcon}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Profile Section */}
-      <View style={HomeStyles.profileSection}>
-        <TouchableOpacity>
-          <Text style={HomeStyles.backButton}>&lt;</Text>
-        </TouchableOpacity>
-        <View style={HomeStyles.profileInfo}>
-          <Image
-            source={require('../../img/Home/profileImage.png')}
-            style={HomeStyles.profileImage}
-          />
-          <View>
-            <Text style={HomeStyles.profileText}>눈송이 님</Text>
-            <Text style={HomeStyles.profileSubText}>여성, 만 20세</Text>
-          </View>
-        </View>
-        <View style={HomeStyles.healthInfo}>
-          <Text style={HomeStyles.healthInfoText}>과거병력</Text>
-          <Text style={HomeStyles.healthInfoValue}>당뇨</Text>
-          <Text style={HomeStyles.healthInfoText}>가족력</Text>
-          <Text style={HomeStyles.healthInfoValue}>고혈압</Text>
-          <Text style={HomeStyles.healthInfoText}>복용하는 약</Text>
-          <Text style={HomeStyles.healthInfoValue}>당뇨약(혈당 강화제)</Text>
-        </View>
-      </View>
-
-      {/* AI Pre-Diagnosis Section */}
-      <View style={HomeStyles.section}>
->>>>>>> 3e0f130 (feat: Home 개발발)
         <Text style={HomeStyles.sectionTitle}>AI 사전 문진 바로 시작하기</Text>
         <Text style={HomeStyles.sectionSubtitle}>
           치료가 필요하신 부분을 선택해주세요
@@ -126,29 +74,20 @@ const HomeScreen = () => {
               key={index}
               style={[
                 HomeStyles.diagnosisButton,
-<<<<<<< HEAD
                 selectedButtons.includes(label) && HomeStyles.selectedButton,
-=======
-                selectedButton === label && HomeStyles.selectedButton,
->>>>>>> 3e0f130 (feat: Home 개발발)
               ]}
               onPress={() => handleButtonPress(label)}>
               <Text
                 style={[
                   HomeStyles.diagnosisButtonText,
-<<<<<<< HEAD
                   selectedButtons.includes(label) &&
                     HomeStyles.selectedButtonText,
-=======
-                  selectedButton === label && HomeStyles.selectedButtonText,
->>>>>>> 3e0f130 (feat: Home 개발발)
                 ]}>
                 {label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
-<<<<<<< HEAD
         <TouchableOpacity
           style={[
             HomeStyles.startButton,
@@ -163,24 +102,10 @@ const HomeScreen = () => {
       {/* Menu Section */}
       <View style={HomeStyles.menuSection}>
         <Text style={HomeStyles.sectionTitle}>메뉴 바로 가기</Text>
-        <Text style={HomeStyles.sectionSubtitle}>
-          메디코의 서비스를 한 눈에 볼 수 있어요
-        </Text>
         <View style={HomeStyles.menuGrid}>
           {[
             {
               icon: require('../../img/Home/aidiagnosisIcon.png'),
-=======
-      </View>
-
-      {/* Menu Section */}
-      <View style={HomeStyles.section}>
-        <Text style={HomeStyles.sectionTitle}>메뉴 바로 가기</Text>
-        <View style={HomeStyles.menuGrid}>
-          {[
-            {
-              icon: require('../../img/Home/aihistorytakingIcon.png'),
->>>>>>> 3e0f130 (feat: Home 개발발)
               label: 'AI 사전 문진',
             },
             {
