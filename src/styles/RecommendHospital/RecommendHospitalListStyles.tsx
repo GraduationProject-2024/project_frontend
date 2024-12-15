@@ -10,9 +10,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#2527BF',
+    marginBottom: 16,
   },
   tabs: {
     flexDirection: 'row',
@@ -63,11 +64,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   mapButton: {
-    height: 48,
-    backgroundColor: '#2E6FF2',
-    borderRadius: 8,
+    height: 50,
+    backgroundColor: '#2527BF',
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 8,
+    marginTop: 8,
   },
   mapButtonText: {
     fontSize: 16,

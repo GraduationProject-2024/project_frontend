@@ -1,97 +1,53 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import React from 'react';
+import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import styles from '../../styles/RecommendHospital/RecommendHospitalListStyles';
 
 const hospitalData = [
   {
     name: '하나이비인후과의원',
-    time: '2분',
-    distance: '100m',
-    address: '서울 용산구 청파로47길 66 중앙빌딩 1층 (청파동2가)',
-  },
-  {
-    name: '제일성모이비인후과의원',
-    time: '3분',
-    distance: '150m',
-    address: '서울 용산구 청파로47길 53 1층 (청파동3가)',
-  },
-  {
-    name: '연세맑은이비인후과의원 회현점',
-    time: '4분',
-    distance: '200m',
-    address: '서울 용산구 청파로47길 40 (청파동2가)',
+    time: '12분',
+    address: '서울 용산구 한강대로 297 2층 (갈월동)',
   },
   {
     name: '연세이비인후과의원',
-    time: '5분',
-    distance: '250m',
-    address: '서울 용산구 장문로93길 2 1층 (청파동2가)',
+    time: '15분',
+    address: '서울 용산구 만리재로 134 힐타워빌딩 4층 (서계동)',
+  },
+  {
+    name: '제일성모이비인후과의원',
+    time: '20분',
+    address: '서울 용산구 백범로 341 리첸시아 용산 A동 1층 128호',
   },
   {
     name: '보아스이비인후과의원',
-    time: '6분',
-    distance: '300m',
-    address: '서울 용산구 장문로93길 2층 201호 (후암동 288)',
+    time: '25분',
+    address: '서울 마포구 마포대로24길 56 보령빌딩 6층 (아현동)',
   },
   {
-    name: '서울센트럴이비인후과의원',
-    time: '2분',
-    distance: '100m',
-    address: '서울 용산구 청파로47길 66 중앙빌딩 1층 (청파동2가)',
+    name: '공덕연세이비인후과의원',
+    time: '30분',
+    address: '서울 마포구 마포대로 92 효성해링턴스퀘어 B동 5층 504호',
   },
   {
-    name: '열린이비인후과의원',
-    time: '3분',
-    distance: '150m',
-    address: '서울 용산구 청파로47길 53 1층 (청파동3가)',
+    name: '김이비인후과의원',
+    time: '30분',
+    address: '서울 마포구 만리재로 15 제일빌딩 303호 (공덕동)',
   },
   {
-    name: '열린이비인후과의원',
-    time: '4분',
-    distance: '200m',
-    address: '서울 용산구 청파로47길 40 (청파동2가)',
+    name: '연세소리이비인후과의원',
+    time: '35분',
+    address: '서울 마포구 백범로31길 8 공덕SK리더스뷰 2층 203-205호',
   },
 ];
 
-const RecommendHospitalListScreen = () => {
-  const [selectedTab, setSelectedTab] = useState('영업 중');
-
-  const handleTabPress = tab => {
-    setSelectedTab(tab);
-  };
-
+const RecommendHospitalListScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>병원 추천</Text>
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        {['영업 중', '휴일 영업', '야간 영업'].map((tab, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.tabButton,
-              selectedTab === tab && styles.activeTabButton,
-            ]}
-            onPress={() => handleTabPress(tab)}>
-            <Text
-              style={[
-                styles.tabButtonText,
-                selectedTab === tab && styles.activeTabButtonText,
-              ]}>
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        <Text style={styles.headerTitle}>
+          눈송이 님 위치 기반으로 추천해주는 병원입니다
+        </Text>
       </View>
 
       {/* Hospital List */}
@@ -99,16 +55,17 @@ const RecommendHospitalListScreen = () => {
         {hospitalData.map((hospital, index) => (
           <View key={index} style={styles.hospitalItem}>
             <Text style={styles.hospitalName}>{hospital.name}</Text>
-            <Text style={styles.hospitalDistance}>
-              {hospital.time} | {hospital.distance}
-            </Text>
+            <Text style={styles.hospitalDistance}>{hospital.time}</Text>
             <Text style={styles.hospitalAddress}>{hospital.address}</Text>
           </View>
         ))}
       </ScrollView>
 
       {/* Map Button */}
-      <TouchableOpacity style={styles.mapButton}>
+      <TouchableOpacity
+        style={styles.mapButton}
+        onPress={() => navigation.navigate('RecommendHospitalMap')} // Navigate to Map Screen
+      >
         <Text style={styles.mapButtonText}>지도로 보기</Text>
       </TouchableOpacity>
     </View>

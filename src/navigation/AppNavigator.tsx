@@ -13,6 +13,7 @@ import MedicineInformationScreen from '../screens/MedicalInformation/MedicineInf
 import HomeScreen from '../screens/Home/HomeScreen';
 import RecommendDepartmentScreen from '../screens/RecommendHospital/RecommendDepartmentScreen';
 import RecommendHospitalListScreen from '../screens/RecommendHospital/RecommendHospitalListScreen';
+import RecommendHospitalMapScreen from '../screens/RecommendHospital/RecommendHospitalMapScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -116,7 +117,14 @@ const AppNavigator = () => {
           name="RecommendHospitalList"
           component={RecommendHospitalListScreen}
           options={{
-            title: '병원 진료과 선택',
+            title: '병원 추천 목록으로 보기',
+          }}
+        />
+        <Stack.Screen
+          name="RecommendHospitalMap"
+          component={RecommendHospitalMapScreen}
+          options={{
+            title: '병원 추천 지도로 보기',
           }}
         />
       </Stack.Navigator>
