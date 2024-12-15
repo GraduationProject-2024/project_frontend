@@ -1,5 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, ScrollView, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import styles from '../../styles/RecommendHospital/RecommendDepartmentStyles';
 
 const departments = [
@@ -26,13 +27,22 @@ const departments = [
 ];
 
 const RecommendDepartmentScreen = () => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('RecommendHospitalList');
+  };
+
   return (
     <ScrollView style={styles.container}>
       {departments.map((department, index) => (
-        <View key={index} style={styles.departmentContainer}>
+        <TouchableOpacity
+          key={index}
+          style={styles.departmentContainer}
+          onPress={handlePress}>
           <Text style={styles.title}>{department.title}</Text>
           <Text style={styles.description}>{department.description}</Text>
-        </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
