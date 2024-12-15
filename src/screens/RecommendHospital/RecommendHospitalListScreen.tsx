@@ -43,13 +43,6 @@ const hospitalData = [
 const RecommendHospitalListScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>
-          눈송이 님 위치 기반으로 추천해주는 병원입니다
-        </Text>
-      </View>
-
       {/* Hospital List */}
       <ScrollView style={styles.hospitalList}>
         {hospitalData.map((hospital, index) => (
