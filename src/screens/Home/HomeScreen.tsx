@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import HomeStyles from '../../styles/Home/HomeStyles';
 import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
 const HomeScreen = () => {
   const [selectedButtons, setSelectedButtons] = useState([]);
+  const navigation = useNavigation();
 
   const handleButtonPress = label => {
     if (selectedButtons.includes(label)) {
@@ -111,6 +113,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/recommendhospitalIcon.png'),
               label: '병원 추천',
+              onPress: () => navigation.navigate('RecommendDepartment'),
             },
             {
               icon: require('../../img/Home/recommendpharmacyIcon.png'),
@@ -137,7 +140,10 @@ const HomeScreen = () => {
               label: '커뮤니티',
             },
           ].map((item, index) => (
-            <TouchableOpacity key={index} style={HomeStyles.menuItem}>
+            <TouchableOpacity
+              key={index}
+              style={HomeStyles.menuItem}
+              onPress={item.onPress}>
               <Image source={item.icon} style={HomeStyles.menuIcon} />
               <Text style={HomeStyles.menuText}>{item.label}</Text>
             </TouchableOpacity>

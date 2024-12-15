@@ -21,45 +21,19 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSignup = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+  const handleSignup = () => {
+    if (!email || !name || !nickname || !password || !confirmPassword) {
+      Alert.alert('Error', '모든 필드를 입력해주세요.');
       return;
     }
 
-    // 회원가입 API 요청 데이터
-    const signupData = {
-      loginId: email,
-      password: password,
-      email: email,
-      name: name,
-      nickname: nickname,
-    };
-
-    try {
-      const response = await fetch(
-        'http://192.168.48.1:8081/api/v1/member/sign-up',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(signupData),
-        },
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('Login'); // 회원가입 성공 후 로그인 화면으로 이동
-      } else {
-        Alert.alert('Error', result.message || 'Signup failed');
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      Alert.alert('Error', 'An unexpected error occurred.');
+    if (password !== confirmPassword) {
+      Alert.alert('Error', '비밀번호가 일치하지 않습니다.');
+      return;
     }
+
+    Alert.alert('Success', '회원가입 성공!');
+    navigation.navigate('MedicalInformation'); // Navigate to the MedicalInformation screen
   };
 
   return (
