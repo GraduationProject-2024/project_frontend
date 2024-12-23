@@ -31,7 +31,7 @@ const MedicineInformationScreen = () => {
 
   const handleNext = () => {
     console.log('선택된 복용하는 약:', selectedConditions);
-    navigation.navigate('HomeScreen');
+    navigation.navigate('Login');
   };
 
   return (
