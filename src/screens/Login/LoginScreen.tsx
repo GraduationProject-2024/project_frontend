@@ -23,7 +23,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
     console.log('Entered Username:', username);
     console.log('Entered Password:', password);
 
-    if (username.trim() === 'testUser' && password.trim() === '1234') {
+    if (username.trim() === 'noonsong' && password.trim() === '1234') {
       Alert.alert('Success', 'You are logged in!');
       navigation.navigate('Home');
     } else {
