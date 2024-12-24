@@ -118,6 +118,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/recommendpharmacyIcon.png'),
               label: '약국 추천',
+              onPress: () => navigation.navigate('RecommendPharmacyList'),
             },
             {
               icon: require('../../img/Home/recommendemergencyIcon.png'),
