@@ -53,9 +53,9 @@ const RecommendHospitalListScreen = ({navigation}: {navigation: any}) => {
       {/* Hospital List */}
       <ScrollView style={styles.hospitalList}>
         {hospitalData.map((hospital, index) => (
-          <View key={index} style={styles.hospitalItem}>
+          <View key={index} style={styles.hospitalContainer}>
             <Text style={styles.hospitalName}>{hospital.name}</Text>
-            <Text style={styles.hospitalDistance}>
+            <Text style={styles.hospitalInfo}>
               {hospital.time} | {hospital.distance}
             </Text>
             <Text style={styles.hospitalAddress}>{hospital.address}</Text>

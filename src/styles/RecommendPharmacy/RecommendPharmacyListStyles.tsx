@@ -19,13 +19,19 @@ const RecommendPharmacyListStyles = StyleSheet.create({
   },
   pharmacyName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#000000',
   },
   pharmacyInfo: {
     fontSize: 14,
-    color: '#000000',
-    marginTop: 5,
+    color: '#666666',
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  pharmacyAddress: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 4,
   },
   mapButton: {
     height: 50,

@@ -27,41 +27,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 4,
   },
-  activeTabButton: {
-    backgroundColor: '#2E6FF2',
-  },
   tabButtonText: {
     fontSize: 14,
-    color: '#666666',
-  },
-  activeTabButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: '#fffff',
   },
   hospitalList: {
     flex: 1,
     marginBottom: 16,
   },
-  hospitalItem: {
-    marginBottom: 16,
+  hospitalContainer: {
+    marginBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-    paddingBottom: 8,
+    borderBottomColor: '#eee',
+    paddingBottom: 10,
+    marginHorizontal: 4,
   },
   hospitalName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#000000',
   },
-  hospitalDistance: {
+  hospitalInfo: {
     fontSize: 14,
     color: '#666666',
     marginTop: 4,
+    marginBottom: 4,
   },
   hospitalAddress: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 4,
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 4,
   },
   mapButton: {
     height: 50,
