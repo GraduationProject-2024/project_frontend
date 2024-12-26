@@ -18,6 +18,7 @@ import RecommendPharmacyListScreen from '../screens/RecommendPharmacy/RecommendP
 import RecommendPharmacyMapScreen from '../screens/RecommendPharmacy/RecommendPharmacyMapScreen';
 import RecommendEmergencyListScreen from '../screens/RecommendEmergency/RecommendEmergencyListScreen';
 import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/RecommendEmergencyMapScreen';
+import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -157,6 +158,13 @@ const AppNavigator = () => {
           component={RecommendEmergencyMapScreen}
           options={{
             title: '응급실 추천 지도로 보기',
+          }}
+        />
+        <Stack.Screen
+          name="TranslateLanguage"
+          component={TranslateLanguageScreen}
+          options={{
+            title: '언어 변환',
           }}
         />
       </Stack.Navigator>

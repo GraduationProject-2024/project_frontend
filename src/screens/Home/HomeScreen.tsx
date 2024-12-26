@@ -128,6 +128,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/translatelanguageIcon.png'),
               label: '언어 변환',
+              onPress: () => navigation.navigate('ChooseLanguage'),
             },
             {
               icon: require('../../img/Home/recordtranslateIcon.png'),
