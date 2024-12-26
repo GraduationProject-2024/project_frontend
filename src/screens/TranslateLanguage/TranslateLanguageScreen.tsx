@@ -1,36 +1,14 @@
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity, Image} from 'react-native';
 import TranslateLanguageStyles from '../../styles/TranslateLanguage/TranslateLanguageStyles';
+import TranslateLanguageAlertScreen from '../../components/TranslateLanguage/TranslateLanguageAlertScreen';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
 const TranslateLanguageScreen = ({navigation}) => {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const languages = ['한국어', 'English', '中国人', 'Tiếng Việt', 'Монгол'];
-
-  const showConfirmationModal = () => {
-    if (selectedLanguage) {
-      Alert.alert(
-        '언어 변경',
-        `언어를 ${selectedLanguage}로 변경하시겠습니까?`,
-        [
-          {text: '취소', style: 'cancel'},
-          {
-            text: '변경',
-            onPress: () => navigation.navigate('Home'),
-          },
-        ],
-        {cancelable: true},
-      );
-    }
-  };
 
   const renderItem = ({item}) => (
     <TouchableOpacity
@@ -45,6 +23,11 @@ const TranslateLanguageScreen = ({navigation}) => {
       )}
     </TouchableOpacity>
   );
+
+  const handleConfirm = () => {
+    setModalVisible(false);
+    navigation.navigate('Home');
+  };
 
   return (
     <View style={TranslateLanguageStyles.container}>
@@ -64,10 +47,17 @@ const TranslateLanguageScreen = ({navigation}) => {
             },
           ]}
           disabled={!selectedLanguage}
-          onPress={showConfirmationModal}>
+          onPress={() => setModalVisible(true)}>
           <Text style={TranslateLanguageStyles.buttonText}>언어 변환</Text>
         </TouchableOpacity>
       </View>
+
+      <TranslateLanguageAlertScreen
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        onConfirm={handleConfirm}
+        selectedLanguage={selectedLanguage}
+      />
     </View>
   );
 };
