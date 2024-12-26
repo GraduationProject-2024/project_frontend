@@ -21,9 +21,9 @@ const departments = [
   {title: '재활의학과', description: '신체 회복, 물리 치료, 만성통증 등'},
   {title: '정신건강의학과', description: '수면장애, 스트레스, 중독 등'},
   {title: '정형외과', description: '관절염, 골반, 척추 통증 등'},
-  {title: '치의학', description: '치아치료, 외과질환, 턱관절 등'},
+  {title: '치의과', description: '치아치료, 외과질환, 턱관절 등'},
   {title: '피부과', description: '두드러기, 가려움증, 여드름 등'},
-  {title: '한의학', description: '한의원 진료, 다이어트, 침술 등'},
+  {title: '한방과', description: '한의원 진료, 다이어트, 침술 등'},
 ];
 
 const RecommendDepartmentScreen = () => {

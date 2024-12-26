@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   description: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#666666',
     marginTop: 4,
     marginBottom: 8,

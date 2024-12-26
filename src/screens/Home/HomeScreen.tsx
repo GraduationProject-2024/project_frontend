@@ -123,6 +123,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/recommendemergencyIcon.png'),
               label: '응급실 추천',
+              onPress: () => navigation.navigate('RecommendEmergencyList'),
             },
             {
               icon: require('../../img/Home/translatelanguageIcon.png'),

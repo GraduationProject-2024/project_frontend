@@ -1,13 +1,13 @@
 import React from 'react';
 import {View, Image, Text, TouchableOpacity} from 'react-native';
-import styles from '../../styles/RecommendPharmacy/RecommendPharmacyMapStyles';
+import styles from '../../styles/RecommendEmergency/RecommendEmergencyMapStyles';
 
 const RecommendHospitalMapScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.container}>
       {/* Map Image */}
       <Image
-        source={require('../../img/RecommendPharmacy/PharmacyMap.png')}
+        source={require('../../img/RecommendEmergency/EmergencyMap.png')}
         style={styles.mapImage}
         resizeMode="cover"
       />
@@ -15,7 +15,7 @@ const RecommendHospitalMapScreen = ({navigation}: {navigation: any}) => {
       {/* Overlay Button */}
       <TouchableOpacity
         style={styles.ListButton}
-        onPress={() => navigation.navigate('RecommendPharmacyList')}>
+        onPress={() => navigation.navigate('RecommendEmergencyList')}>
         <Text style={styles.ListButtonText}>목록으로 보기</Text>
       </TouchableOpacity>
     </View>
