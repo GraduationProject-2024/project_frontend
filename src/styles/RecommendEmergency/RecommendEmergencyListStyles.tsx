@@ -31,29 +31,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fffff',
   },
-  hospitalList: {
+  EmergencyList: {
     flex: 1,
     marginBottom: 16,
   },
-  hospitalContainer: {
+  EmergencyContainer: {
     marginBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     paddingBottom: 10,
     marginHorizontal: 4,
   },
-  hospitalName: {
+  EmergencyName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
   },
-  hospitalInfo: {
+  EmergencyNumber: {
+    fontSize: 18,
+    color: '#2527BF',
+    marginTop: 4,
+  },
+  EmergencyInfo: {
     fontSize: 15,
     color: '#666666',
     marginTop: 4,
     marginBottom: 4,
   },
-  hospitalAddress: {
+  EmergencyAddress: {
     fontSize: 15,
     color: '#666666',
     marginBottom: 4,

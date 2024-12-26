@@ -16,6 +16,8 @@ import RecommendHospitalListScreen from '../screens/RecommendHospital/RecommendH
 import RecommendHospitalMapScreen from '../screens/RecommendHospital/RecommendHospitalMapScreen';
 import RecommendPharmacyListScreen from '../screens/RecommendPharmacy/RecommendPharmacyListScreen';
 import RecommendPharmacyMapScreen from '../screens/RecommendPharmacy/RecommendPharmacyMapScreen';
+import RecommendEmergencyListScreen from '../screens/RecommendEmergency/RecommendEmergencyListScreen';
+import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/RecommendEmergencyMapScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -141,6 +143,20 @@ const AppNavigator = () => {
           component={RecommendPharmacyMapScreen}
           options={{
             title: '약국 추천 지도로 보기',
+          }}
+        />
+        <Stack.Screen
+          name="RecommendEmergencyList"
+          component={RecommendEmergencyListScreen}
+          options={{
+            title: '응급실 추천 목록으로 보기',
+          }}
+        />
+        <Stack.Screen
+          name="RecommendEmergencyMap"
+          component={RecommendEmergencyMapScreen}
+          options={{
+            title: '응급실 추천 지도로 보기',
           }}
         />
       </Stack.Navigator>
