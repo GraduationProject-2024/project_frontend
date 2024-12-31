@@ -48,13 +48,15 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
         },
       );
 
-      const result = await response.json();
+      const text = await response.text();
+
+      const result = text ? JSON.parse(text) : {};
 
       if (response.ok) {
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('Login'); // 회원가입 성공 후 로그인 화면으로 이동
+        navigation.navigate('MedicalInformation');
       } else {
-        Alert.alert('Error', result.message || 'Signup failed');
+        Alert.alert('Error', result.msg || 'Signup failed');
       }
     } catch (error) {
       console.error('Signup error:', error);
