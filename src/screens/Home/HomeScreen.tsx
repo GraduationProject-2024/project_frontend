@@ -60,17 +60,14 @@ const HomeScreen = () => {
         <View style={HomeStyles.buttonGrid}>
           {[
             '전신',
-            '머리',
-            '정신',
+            '머리/목',
             '얼굴',
-            '목',
             '가슴/등',
             '복부',
             '생식/비뇨기',
             '팔/손',
             '다리/발',
-            '뼈/근육',
-            '피부',
+            '기타',
           ].map((label, index) => (
             <TouchableOpacity
               key={index}
