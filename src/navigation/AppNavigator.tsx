@@ -19,6 +19,7 @@ import RecommendPharmacyMapScreen from '../screens/RecommendPharmacy/RecommendPh
 import RecommendEmergencyListScreen from '../screens/RecommendEmergency/RecommendEmergencyListScreen';
 import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/RecommendEmergencyMapScreen';
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
+import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -109,6 +110,13 @@ const AppNavigator = () => {
           component={HomeScreen}
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="SymptomOnsetTime"
+          component={SymptomOnsetTimeScreen}
+          options={{
+            title: '증상 발생 시기',
           }}
         />
         <Stack.Screen

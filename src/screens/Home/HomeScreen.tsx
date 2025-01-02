@@ -11,8 +11,10 @@ const HomeScreen = () => {
   const handleButtonPress = label => {
     if (selectedButtons.includes(label)) {
       setSelectedButtons(selectedButtons.filter(item => item !== label));
-    } else {
+    } else if (selectedButtons.length < 2) {
       setSelectedButtons([...selectedButtons, label]);
+    } else {
+      console.log('최대 두 개만 선택할 수 있습니다.');
     }
   };
 
@@ -138,6 +140,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/communityIcon.png'),
               label: '커뮤니티',
+              onPress: () => navigation.navigate('SymptomOnsetTime'),
             },
           ].map((item, index) => (
             <TouchableOpacity
