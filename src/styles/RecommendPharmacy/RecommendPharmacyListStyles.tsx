@@ -36,7 +36,7 @@ const RecommendPharmacyListStyles = StyleSheet.create({
   mapButton: {
     height: 50,
     backgroundColor: '#2527BF',
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
