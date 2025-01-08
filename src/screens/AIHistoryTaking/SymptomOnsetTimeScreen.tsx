@@ -36,20 +36,31 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
         initialScrollIndex={selectedIndex}
         onScrollEndDrag={handleScrollEnd}
         onMomentumScrollEnd={handleScrollEnd}
-        renderItem={({item, index}) => (
-          <View style={styles.wheelPickerItemContainer}>
-            <Text
-              style={[
-                styles.wheelPickerItem,
-                index === selectedIndex
-                  ? styles.selectedWheelPickerItem
-                  : styles.unselectedWheelPickerItem,
-                {position: 'absolute'},
-              ]}>
-              {item}
-            </Text>
-          </View>
-        )}
+        renderItem={({item, index}) => {
+          const distanceFromCenter = Math.abs(index - selectedIndex);
+          const opacity = 1 - distanceFromCenter * 0.1;
+          const scale = 1 - distanceFromCenter * 0.1;
+          return (
+            <View style={styles.wheelPickerItemContainer}>
+              <Text
+                style={[
+                  styles.wheelPickerItem,
+                  {
+                    opacity: opacity,
+                    transform: [
+                      {scale},
+                      {rotateX: `${distanceFromCenter * 15}deg`},
+                    ],
+                  },
+                  index === selectedIndex
+                    ? styles.selectedWheelPickerItem
+                    : styles.unselectedWheelPickerItem,
+                ]}>
+                {item}
+              </Text>
+            </View>
+          );
+        }}
       />
     </View>
   );
