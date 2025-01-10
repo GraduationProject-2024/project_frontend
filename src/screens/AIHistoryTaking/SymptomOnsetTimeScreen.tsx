@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, FlatList} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import styles from '../../styles/AIHistoryTaking/SymptomOnsetTimeStyles';
 
 const WheelPicker = ({options, selectedIndex, onChange}) => {
@@ -70,6 +71,7 @@ const SymptomOnsetTimeScreen = () => {
   const [selectedNumber, setSelectedNumber] = useState(1);
   const [selectedUnit, setSelectedUnit] = useState('초');
   const [isNextButtonActive, setIsNextButtonActive] = useState(false);
+  const navigation = useNavigation();
 
   const numbers = Array.from({length: 59}, (_, i) => (i + 1).toString());
   const units = ['초', '분', '시간', '일', '주', '달', '년'];
@@ -104,7 +106,8 @@ const SymptomOnsetTimeScreen = () => {
           styles.nextButton,
           {backgroundColor: isNextButtonActive ? '#2527BF' : '#B5B5B5'},
         ]}
-        disabled={!isNextButtonActive}>
+        disabled={!isNextButtonActive}
+        onPress={() => navigation.navigate('PainIntensity')}>
         <Text style={styles.nextButtonText}>다음</Text>
       </TouchableOpacity>
     </View>
