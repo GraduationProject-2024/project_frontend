@@ -12,6 +12,7 @@ import PainIntensityFaceEmoji_7 from '../../img/PainIntensity/PainIntensityFaceE
 import PainIntensityFaceEmoji_8 from '../../img/PainIntensity/PainIntensityFaceEmoji_8.png';
 import PainIntensityFaceEmoji_9 from '../../img/PainIntensity/PainIntensityFaceEmoji_9.png';
 import PainIntensityFaceEmoji_10 from '../../img/PainIntensity/PainIntensityFaceEmoji_10.png';
+import SliderThumb from '../../img/PainIntensity/SliderThumb.png';
 
 const painImages = [
   PainIntensityFaceEmoji_1,
@@ -87,8 +88,8 @@ const PainIntensityScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>통증의 강도를 선택해주세요</Text>
       <Text style={styles.instruction}>
-        통증의 강도에 가장 가까운 것을 선택해주세요. {'\n'}
-        숫자가 클수록 통증이 심한 것을 의미합니다.
+        통증의 강도에 가장 가까운 것을 선택해주세요. {'\n'} 숫자가 클수록 통증이
+        심한 것을 의미합니다.
       </Text>
       <Image source={painImages[painLevel - 1]} style={styles.emoji} />
       <Text style={styles.painLabel}>
@@ -98,14 +99,14 @@ const PainIntensityScreen = () => {
         {painDescriptions[painLevel - 1].description}
       </Text>
       <Slider
-        style={styles.slider}
+        style={[styles.slider, {transform: [{scaleY: 3}]}]}
         minimumValue={1}
         maximumValue={10}
         step={1}
         value={painLevel}
         minimumTrackTintColor="#2527BF"
         maximumTrackTintColor="#E5E5FF"
-        thumbTintColor="#2527BF"
+        thumbImage={require('../../img/PainIntensity/SliderThumb.png')}
         onValueChange={value => {
           setPainLevel(value);
           setIsSliderMoved(true);
