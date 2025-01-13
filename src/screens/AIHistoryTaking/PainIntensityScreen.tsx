@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import Slider from '@react-native-community/slider';
+import {useNavigation} from '@react-navigation/native';
 import styles from '../../styles/AIHistoryTaking/PainIntensityStyles';
 import PainIntensityFaceEmoji_1 from '../../img/PainIntensity/PainIntensityFaceEmoji_1.png';
 import PainIntensityFaceEmoji_2 from '../../img/PainIntensity/PainIntensityFaceEmoji_2.png';
@@ -30,6 +31,7 @@ const painImages = [
 const PainIntensityScreen = () => {
   const [painLevel, setPainLevel] = useState(1);
   const [isSliderMoved, setIsSliderMoved] = useState(false);
+  const navigation = useNavigation();
 
   const painDescriptions = [
     {
@@ -106,7 +108,7 @@ const PainIntensityScreen = () => {
         value={painLevel}
         minimumTrackTintColor="#2527BF"
         maximumTrackTintColor="#E5E5FF"
-        thumbImage={require('../../img/PainIntensity/SliderThumb.png')}
+        thumbImage={SliderThumb}
         onValueChange={value => {
           setPainLevel(value);
           setIsSliderMoved(true);
@@ -116,7 +118,8 @@ const PainIntensityScreen = () => {
         style={[
           styles.button,
           {backgroundColor: isSliderMoved ? '#2527BF' : '#B5B5B5'},
-        ]}>
+        ]}
+        onPress={() => navigation.navigate('PainDuration')}>
         <Text style={styles.buttonText}>다음</Text>
       </TouchableOpacity>
     </View>

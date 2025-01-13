@@ -21,6 +21,8 @@ import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/Recommend
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
 import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
+import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
+import AdditionalInformationScreen from '../screens/AIHistoryTaking/AdditionalInformationScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -125,6 +127,20 @@ const AppNavigator = () => {
           component={PainIntensityScreen}
           options={{
             title: '통증의 강도',
+          }}
+        />
+        <Stack.Screen
+          name="PainDuration"
+          component={PainDurationScreen}
+          options={{
+            title: '통증의 지속시간',
+          }}
+        />
+        <Stack.Screen
+          name="AdditionalInformation"
+          component={AdditionalInformationScreen}
+          options={{
+            title: '통증의 지속시간',
           }}
         />
         <Stack.Screen
