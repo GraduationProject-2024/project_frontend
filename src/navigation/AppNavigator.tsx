@@ -20,6 +20,7 @@ import RecommendEmergencyListScreen from '../screens/RecommendEmergency/Recommen
 import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/RecommendEmergencyMapScreen';
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
 import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
+import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -117,6 +118,13 @@ const AppNavigator = () => {
           component={SymptomOnsetTimeScreen}
           options={{
             title: '증상 발생 시기',
+          }}
+        />
+        <Stack.Screen
+          name="PainIntensity"
+          component={PainIntensityScreen}
+          options={{
+            title: '통증의 강도',
           }}
         />
         <Stack.Screen
