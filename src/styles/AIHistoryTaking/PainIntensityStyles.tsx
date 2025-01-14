@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 120,
   },
-  button: {
+  nextButton: {
     position: 'absolute',
     bottom: 30,
     left: 16,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonText: {
+  nextButtonText: {
     fontSize: 18,
     color: '#FFFFFF',
     fontWeight: 'bold',

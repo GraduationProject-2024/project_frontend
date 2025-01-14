@@ -140,7 +140,7 @@ const AppNavigator = () => {
           name="AdditionalInformation"
           component={AdditionalInformationScreen}
           options={{
-            title: '통증의 지속시간',
+            title: '추가 사항',
           }}
         />
         <Stack.Screen
