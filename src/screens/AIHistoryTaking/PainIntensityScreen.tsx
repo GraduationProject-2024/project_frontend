@@ -116,11 +116,12 @@ const PainIntensityScreen = () => {
       />
       <TouchableOpacity
         style={[
-          styles.button,
+          styles.nextButton,
           {backgroundColor: isSliderMoved ? '#2527BF' : '#B5B5B5'},
         ]}
+        disabled={!isSliderMoved}
         onPress={() => navigation.navigate('PainDuration')}>
-        <Text style={styles.buttonText}>다음</Text>
+        <Text style={styles.nextButtonText}>다음</Text>
       </TouchableOpacity>
     </View>
   );
