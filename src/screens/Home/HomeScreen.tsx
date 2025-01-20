@@ -132,6 +132,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/recordtranslateIcon.png'),
               label: '녹음 및 번역',
+              onPress: () => navigation.navigate('RecordAndTranslate'),
             },
             {
               icon: require('../../img/Home/rescuemessageIcon.png'),

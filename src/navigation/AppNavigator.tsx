@@ -19,6 +19,7 @@ import RecommendPharmacyMapScreen from '../screens/RecommendPharmacy/RecommendPh
 import RecommendEmergencyListScreen from '../screens/RecommendEmergency/RecommendEmergencyListScreen';
 import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/RecommendEmergencyMapScreen';
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
+import RecordAndTranslateScreen from '../screens/RecordAndTranslate/RecordAndTranslateScreen';
 import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
@@ -197,6 +198,13 @@ const AppNavigator = () => {
           component={TranslateLanguageScreen}
           options={{
             title: '언어 변환',
+          }}
+        />
+        <Stack.Screen
+          name="RecordAndTranslate"
+          component={RecordAndTranslateScreen}
+          options={{
+            title: '녹음 및 변환',
           }}
         />
       </Stack.Navigator>
