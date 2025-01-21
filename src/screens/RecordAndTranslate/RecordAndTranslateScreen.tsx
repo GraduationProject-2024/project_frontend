@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, FlatList, Image, TouchableOpacity} from 'react-native';
-import styles from '../../styles/RecordAndTranslate/RecordAndTranslateStyles';
+import RecordAndTranslateStyles from '../../styles/RecordAndTranslate/RecordAndTranslateStyles';
 
 const recordings = [
   {
@@ -37,35 +37,38 @@ const recordings = [
 
 const RecordAndTranslateScreen = () => {
   const renderItem = ({item}: {item: (typeof recordings)[0]}) => (
-    <View style={styles.itemContainer}>
+    <View style={RecordAndTranslateStyles.itemContainer}>
       <Image
         source={require('../../img/RecordAndTranslate/PlayButton.png')}
-        style={styles.icon}
+        style={RecordAndTranslateStyles.icon}
       />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle}>
-          {item.duration} \u00b7 {item.date}
-        </Text>
+      <View style={RecordAndTranslateStyles.textContainer}>
+        <Text style={RecordAndTranslateStyles.title}>{item.title}</Text>
+        <View style={RecordAndTranslateStyles.subtitleContainer}>
+          <Text style={RecordAndTranslateStyles.duration}>{item.duration}</Text>
+          <Text style={RecordAndTranslateStyles.date}>{item.date}</Text>
+        </View>
       </View>
       <Image
         source={require('../../img/RecordAndTranslate/MenuButton.png')}
-        style={styles.menuIcon}
+        style={RecordAndTranslateStyles.menuIcon}
       />
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>음성 녹음 목록</Text>
+    <View style={RecordAndTranslateStyles.container}>
+      <Text style={RecordAndTranslateStyles.header}>음성 녹음 목록</Text>
       <FlatList
         data={recordings}
         renderItem={renderItem}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
+        contentContainerStyle={RecordAndTranslateStyles.listContainer}
       />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>음성 녹음 시작하기</Text>
+      <TouchableOpacity style={RecordAndTranslateStyles.button}>
+        <Text style={RecordAndTranslateStyles.buttonText}>
+          음성 녹음 시작하기
+        </Text>
       </TouchableOpacity>
     </View>
   );

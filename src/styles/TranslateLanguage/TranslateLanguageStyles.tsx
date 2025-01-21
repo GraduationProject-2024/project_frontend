@@ -48,10 +48,11 @@ const ChooseLanguageStyles = StyleSheet.create({
   },
   button: {
     height: 50,
-    backgroundColor: '#d1d1d1',
-    borderRadius: 10,
-    justifyContent: 'center',
+    backgroundColor: '#2527BF',
+    borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
   },
   buttonText: {
     color: '#FFFFFF',

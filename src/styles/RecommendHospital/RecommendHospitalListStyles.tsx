@@ -59,13 +59,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   mapButton: {
+    position: 'absolute',
+    bottom: 30,
+    left: 16,
+    right: 16,
     height: 50,
     backgroundColor: '#2527BF',
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
-    marginTop: 8,
   },
   mapButtonText: {
     fontSize: 16,
