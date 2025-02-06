@@ -20,6 +20,7 @@ import RecommendEmergencyListScreen from '../screens/RecommendEmergency/Recommen
 import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/RecommendEmergencyMapScreen';
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
 import RecordAndTranslateScreen from '../screens/RecordAndTranslate/RecordAndTranslateScreen';
+import RescueTextScreen from '../screens/RescueText/RescueTextScreen';
 import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
@@ -204,7 +205,14 @@ const AppNavigator = () => {
           name="RecordAndTranslate"
           component={RecordAndTranslateScreen}
           options={{
-            title: '녹음 및 변환',
+            title: '녹음 및 번역',
+          }}
+        />
+        <Stack.Screen
+          name="RescueText"
+          component={RescueTextScreen}
+          options={{
+            title: '119 문자 신고',
           }}
         />
       </Stack.Navigator>

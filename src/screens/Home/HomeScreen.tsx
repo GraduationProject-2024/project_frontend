@@ -108,6 +108,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/aidiagnosisIcon.png'),
               label: 'AI 사전 문진',
+              onPress: () => navigation.navigate('SymptomOnsetTime'),
             },
             {
               icon: require('../../img/Home/recommendhospitalIcon.png'),
@@ -137,6 +138,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/rescuemessageIcon.png'),
               label: '119 문자 신고',
+              onPress: () => navigation.navigate('RescueText'),
             },
             {
               icon: require('../../img/Home/communityIcon.png'),
