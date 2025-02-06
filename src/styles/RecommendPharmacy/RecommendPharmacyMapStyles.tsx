@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   },
   ListButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 30,
     left: 16,
     right: 16,
     height: 50,
