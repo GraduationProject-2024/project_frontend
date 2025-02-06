@@ -6,55 +6,37 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFFFFF',
   },
-  headerText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#000000',
-  },
   labelText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 10,
   },
-  titleContainer: {
-    marginTop: 100,
+  helperText: {
+    fontSize: 14,
+    color: '#2527BF',
+    marginBottom: 20,
   },
-  titleInput: {
+  addressContainer: {
+    marginBottom: 30,
+  },
+  addressInput: {
     height: 50,
     backgroundColor: '#F6F6F6',
     borderRadius: 10,
     padding: 10,
-    fontSize: 18,
+    fontSize: 16,
     color: '#000000',
-    marginTop: 10,
+    marginBottom: 10,
   },
-  imageUploadContainer: {
-    marginTop: 30,
-  },
-  imageUploadButton: {
-    width: 80,
-    height: 80,
+  detailedAddressInput: {
+    height: 50,
+    backgroundColor: '#F6F6F6',
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  imageIcon: {
-    width: 70,
-    height: 70,
-    tintColor: '#B5B5B5',
-  },
-  uploadedImageContainer: {
-    position: 'relative',
-    marginRight: 10,
-    marginTop: 5,
-  },
-  uploadedImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
+    padding: 10,
+    fontSize: 16,
+    color: '#000000',
+    marginBottom: 10,
   },
   deleteButton: {
     position: 'absolute',
@@ -75,25 +57,22 @@ const styles = StyleSheet.create({
     top: -2,
   },
   additionalInfoContainer: {
-    marginTop: 50,
+    marginBottom: 20,
   },
   textInput: {
-    height: 200,
+    height: 150,
     backgroundColor: '#F6F6F6',
     borderRadius: 10,
     padding: 10,
-    fontSize: 18,
+    fontSize: 16,
     color: '#000000',
     textAlignVertical: 'top',
-    marginTop: 10,
-    marginBttom: 100,
   },
   characterCount: {
     textAlign: 'right',
-    marginTop: 5,
     color: '#B5B5B5',
   },
-  skipButton: {
+  submitButton: {
     position: 'absolute',
     bottom: 30,
     left: 16,
@@ -104,10 +83,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  skipButtonText: {
+  submitButtonText: {
     fontSize: 18,
     color: '#FFFFFF',
     fontWeight: 'bold',
+  },
+  inputWithIconAndCounterContainer: {
+    position: 'relative',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 10,
+  },
+  textInputWithIconAndCounter: {
+    height: 200,
+    padding: 10,
+    paddingLeft: 15,
+    paddingBottom: 30,
+    fontSize: 16,
+    color: '#000000',
+    textAlignVertical: 'top',
+  },
+  microphoneIconInside: {
+    position: 'absolute',
+    left: 10,
+    top: 140,
+    width: 40,
+    height: 40,
+  },
+  characterCountInside: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    fontSize: 16,
+    color: '#B5B5B5',
   },
 });
 
