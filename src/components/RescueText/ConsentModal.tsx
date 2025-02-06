@@ -40,8 +40,11 @@ const ConsentModal = ({visible, onClose}) => {
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
+        <View style={styles.bottomSheetContainer}>
           <Text style={styles.modalTitle}>약관 동의</Text>
+          <Text style={styles.modalSubtitle}>
+            * 약관에 동의하셔야 119 문자 신고가 가능합니다
+          </Text>
           <ScrollView>
             <TouchableOpacity style={styles.checkItem} onPress={handleAllCheck}>
               <Image
@@ -69,6 +72,10 @@ const ConsentModal = ({visible, onClose}) => {
               <Text style={styles.checkText}>
                 개인 정보 수집 및 이용 동의 (필수)
               </Text>
+              <Image
+                source={require('../../img/RescueText/RightIcon.png')}
+                style={styles.rightIcon}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -82,12 +89,26 @@ const ConsentModal = ({visible, onClose}) => {
                 }
                 style={styles.checkIcon}
               />
-              <Text style={styles.checkText}>위치 정보 수집 및 이용 동의</Text>
+              <Text style={styles.checkText}>
+                위치 정보 수집 및 이용 동의(필수)
+              </Text>
+              <Image
+                source={require('../../img/RescueText/RightIcon.png')}
+                style={styles.rightIcon}
+              />
             </TouchableOpacity>
           </ScrollView>
 
           <TouchableOpacity
-            style={styles.submitButton}
+            style={[
+              styles.submitButton,
+              {
+                backgroundColor:
+                  personalInfoChecked && locationInfoChecked
+                    ? '#2527BF'
+                    : '#B5B5B5',
+              },
+            ]}
             onPress={onClose}
             disabled={!(personalInfoChecked && locationInfoChecked)}>
             <Text style={styles.submitButtonText}>동의 완료</Text>
