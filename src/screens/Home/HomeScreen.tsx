@@ -34,20 +34,6 @@ const HomeScreen = () => {
           source={require('../../img/Home/MEDIKO.png')}
           style={HomeStyles.logo}
         />
-        <View style={HomeStyles.iconContainer}>
-          <TouchableOpacity>
-            <Image
-              source={require('../../img/Home/notificationIcon.png')}
-              style={HomeStyles.notificationIcon}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image
-              source={require('../../img/Home/profileIcon.png')}
-              style={HomeStyles.notificationIcon}
-            />
-          </TouchableOpacity>
-        </View>
       </View>
 
       {/* Profile Section */}
@@ -141,8 +127,8 @@ const HomeScreen = () => {
               onPress: () => navigation.navigate('RescueText'),
             },
             {
-              icon: require('../../img/Home/communityIcon.png'),
-              label: '커뮤니티',
+              icon: require('../../img/Home/profileIcon.png'),
+              label: '개인 정보',
               onPress: () => navigation.navigate('SymptomOnsetTime'),
             },
           ].map((item, index) => (
