@@ -19,14 +19,8 @@ const HomeStyles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  notificationIcon: {
-    width: 30,
-    height: 30,
-    marginLeft: 10,
+  homeprofilesection: {
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
