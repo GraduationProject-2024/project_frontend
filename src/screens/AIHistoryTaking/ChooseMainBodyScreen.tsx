@@ -59,7 +59,18 @@ const ChooseMainBodyScreen: React.FC = () => {
       Alert.alert('선택 필요', '최소 1개 이상의 부위를 선택하세요.');
       return;
     }
-    navigation.navigate('RecommendHospitalList', {selectedParts});
+
+    // 선택한 부위의 세부 정보 가져오기
+    const selectedDetails = mainBodyParts
+      .filter(part => selectedParts.includes(part.title))
+      .map(part => ({
+        title: part.title,
+        details: part.description.split(', '), // 상세 내용을 배열로 변환
+      }));
+
+    console.log('선택한 세부 부위:', selectedDetails); // ✅ 디버깅용
+
+    navigation.navigate('ChooseDetailBody', {selectedDetails});
   };
 
   return (
@@ -89,9 +100,8 @@ const ChooseMainBodyScreen: React.FC = () => {
             {backgroundColor: selectedParts.length > 0 ? '#2527BF' : '#d1d1d1'},
           ]}
           onPress={handleConfirm}
-          disabled={selectedParts.length === 0} //
-        >
-          <Text style={styles.confirmButtonText}>확인</Text>
+          disabled={selectedParts.length === 0}>
+          <Text style={styles.confirmButtonText}>선택 완료</Text>
         </TouchableOpacity>
       </View>
     </View>
