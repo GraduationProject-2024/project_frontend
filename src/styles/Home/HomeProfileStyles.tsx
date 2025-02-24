@@ -3,7 +3,6 @@ import {StyleSheet} from 'react-native';
 const HomeProfileStyles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
-    marginVertical: 20,
   },
   profileCard: {
     width: '90%',

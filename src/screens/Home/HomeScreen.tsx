@@ -37,7 +37,9 @@ const HomeScreen = () => {
       </View>
 
       {/* Profile Section */}
-      <HomeProfileScreen />
+      <View style={HomeStyles.homeprofilesection}>
+        <HomeProfileScreen />
+      </View>
 
       {/* AI Pre-Diagnosis Section */}
       <View style={HomeStyles.diagnosisSection}>
@@ -47,14 +49,18 @@ const HomeScreen = () => {
         </Text>
         <View style={HomeStyles.buttonGrid}>
           {[
-            '전신',
-            '머리/목',
+            '근골격',
+            '피부',
+            '머리/정신',
             '얼굴',
-            '가슴/등',
+            '목',
+            '가슴',
+            '폐/위',
+            '등/허리',
             '복부',
-            '생식/비뇨기',
-            '팔/손',
-            '다리/발',
+            '팔',
+            '다리',
+            '엉덩이/비뇨기',
             '기타',
           ].map((label, index) => (
             <TouchableOpacity
