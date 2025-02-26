@@ -23,6 +23,7 @@ import RecordAndTranslateScreen from '../screens/RecordAndTranslate/RecordAndTra
 import RescueTextScreen from '../screens/RescueText/RescueTextScreen';
 import ChooseMainBodyScreen from '../screens/AIHistoryTaking/ChooseMainBodyScreen';
 import ChooseDetailBodyScreen from '../screens/AIHistoryTaking/ChooseDetailBodyScreen';
+import ChooseDetailSymptomScreen from '../screens/AIHistoryTaking/ChooseDetailSymptomScreen';
 import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
@@ -131,6 +132,13 @@ const AppNavigator = () => {
           component={ChooseDetailBodyScreen}
           options={{
             title: '세부 신체 부위 선택',
+          }}
+        />
+        <Stack.Screen
+          name="ChooseDetailSymptom"
+          component={ChooseDetailSymptomScreen}
+          options={{
+            title: '상세 증상 선택',
           }}
         />
         <Stack.Screen

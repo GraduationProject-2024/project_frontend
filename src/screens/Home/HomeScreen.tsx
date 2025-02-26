@@ -20,7 +20,9 @@ const HomeScreen = () => {
 
   const handleStartPress = () => {
     if (selectedButtons.length > 0) {
-      console.log('Selected sections:', selectedButtons);
+      navigation.navigate('ChooseMainBody', {
+        selectedBodyParts: selectedButtons,
+      });
     }
   };
 

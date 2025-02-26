@@ -41,9 +41,7 @@ const ChooseMainBodyScreen: React.FC = () => {
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
 
   const toggleSelection = (part: string) => {
-    const isSelected = selectedParts.includes(part);
-
-    if (isSelected) {
+    if (selectedParts.includes(part)) {
       setSelectedParts(selectedParts.filter(item => item !== part));
     } else {
       if (selectedParts.length >= 2) {
@@ -60,16 +58,14 @@ const ChooseMainBodyScreen: React.FC = () => {
       return;
     }
 
-    // 선택한 부위의 세부 정보 가져오기
     const selectedDetails = mainBodyParts
       .filter(part => selectedParts.includes(part.title))
       .map(part => ({
         title: part.title,
-        details: part.description.split(', '), // 상세 내용을 배열로 변환
+        details: part.description.split(', '),
       }));
 
-    console.log('선택한 세부 부위:', selectedDetails); // ✅ 디버깅용
-
+    console.log('✅ 선택한 부위:', selectedDetails);
     navigation.navigate('ChooseDetailBody', {selectedDetails});
   };
 
