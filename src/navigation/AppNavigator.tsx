@@ -21,6 +21,9 @@ import RecommendEmergencyMapScreen from '../screens/RecommendEmergency/Recommend
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
 import RecordAndTranslateScreen from '../screens/RecordAndTranslate/RecordAndTranslateScreen';
 import RescueTextScreen from '../screens/RescueText/RescueTextScreen';
+import ChooseMainBodyScreen from '../screens/AIHistoryTaking/ChooseMainBodyScreen';
+import ChooseDetailBodyScreen from '../screens/AIHistoryTaking/ChooseDetailBodyScreen';
+import ChooseDetailSymptomScreen from '../screens/AIHistoryTaking/ChooseDetailSymptomScreen';
 import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeScreen';
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
@@ -115,6 +118,27 @@ const AppNavigator = () => {
           component={HomeScreen}
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ChooseMainBody"
+          component={ChooseMainBodyScreen}
+          options={{
+            title: '주요 신체 부위 선택',
+          }}
+        />
+        <Stack.Screen
+          name="ChooseDetailBody"
+          component={ChooseDetailBodyScreen}
+          options={{
+            title: '세부 신체 부위 선택',
+          }}
+        />
+        <Stack.Screen
+          name="ChooseDetailSymptom"
+          component={ChooseDetailSymptomScreen}
+          options={{
+            title: '상세 증상 선택',
           }}
         />
         <Stack.Screen

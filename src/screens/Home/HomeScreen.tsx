@@ -20,7 +20,9 @@ const HomeScreen = () => {
 
   const handleStartPress = () => {
     if (selectedButtons.length > 0) {
-      console.log('Selected sections:', selectedButtons);
+      navigation.navigate('ChooseMainBody', {
+        selectedBodyParts: selectedButtons,
+      });
     }
   };
 
@@ -100,7 +102,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/aidiagnosisIcon.png'),
               label: 'AI 사전 문진',
-              onPress: () => navigation.navigate('SymptomOnsetTime'),
+              onPress: () => navigation.navigate('ChooseMainBody'),
             },
             {
               icon: require('../../img/Home/recommendhospitalIcon.png'),
