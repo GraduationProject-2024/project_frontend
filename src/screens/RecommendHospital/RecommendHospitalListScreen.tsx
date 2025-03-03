@@ -62,13 +62,6 @@ const RecommendHospitalListScreen = ({navigation}: {navigation: any}) => {
           </View>
         ))}
       </ScrollView>
-
-      {/* Map Button */}
-      <TouchableOpacity
-        style={styles.mapButton}
-        onPress={() => navigation.navigate('RecommendHospitalMap')}>
-        <Text style={styles.mapButtonText}>지도로 보기</Text>
-      </TouchableOpacity>
     </View>
   );
 };
