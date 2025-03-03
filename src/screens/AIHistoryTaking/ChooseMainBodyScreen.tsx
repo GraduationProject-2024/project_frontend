@@ -13,7 +13,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/ChooseMainBodyStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
-const API_URL = 'http://52.78.79.53:8081/api/v1/main-body/all';
+const FETCH_API_URL = 'http://52.78.79.53:8081/api/v1/main-body/all';
+const SAVE_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
 
 const ChooseMainBodyScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -22,8 +23,10 @@ const ChooseMainBodyScreen: React.FC = () => {
     {body: string; description: string}[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 주요 신체 부위 리스트 가져오기
   useEffect(() => {
     const fetchMainBodyParts = async () => {
       try {
@@ -33,7 +36,7 @@ const ChooseMainBodyScreen: React.FC = () => {
           return;
         }
 
-        const response = await fetch(API_URL, {
+        const response = await fetch(FETCH_API_URL, {
           method: 'GET',
           headers: {
             Accept: 'application/json;charset=UTF-8',
@@ -57,6 +60,7 @@ const ChooseMainBodyScreen: React.FC = () => {
     fetchMainBodyParts();
   }, []);
 
+  // 선택한 부위 토글
   const toggleSelection = (body: string) => {
     if (selectedParts.includes(body)) {
       setSelectedParts(selectedParts.filter(item => item !== body));
@@ -69,21 +73,53 @@ const ChooseMainBodyScreen: React.FC = () => {
     }
   };
 
-  const handleConfirm = () => {
+  // 선택한 부위 저장 API 호출
+  const handleConfirm = async () => {
     if (selectedParts.length === 0) {
       Alert.alert('선택 필요', '최소 1개 이상의 부위를 선택하세요.');
       return;
     }
 
-    const selectedDetails = mainBodyParts
-      .filter(part => selectedParts.includes(part.body))
-      .map(part => ({
-        title: part.body,
-        details: part.description,
-      }));
+    setIsSaving(true);
 
-    console.log('✅ 선택한 부위:', selectedDetails);
-    navigation.navigate('ChooseDetailBody', {selectedDetails});
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const requestBody = {
+        body: selectedParts,
+      };
+
+      console.log('📤 서버에 전송할 데이터:', requestBody);
+
+      const response = await fetch(SAVE_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const result = await response.json();
+      console.log('✅ 서버 응답:', result);
+
+      if (!response.ok) {
+        throw new Error(result.message || `서버 오류: ${response.status}`);
+      }
+
+      Alert.alert('Success', '선택한 부위가 저장되었습니다.');
+      navigation.navigate('ChooseDetailBody', {selectedDetails: selectedParts});
+    } catch (error) {
+      console.error('❌ 저장 오류:', error);
+      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -126,11 +162,18 @@ const ChooseMainBodyScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.confirmButton,
-            {backgroundColor: selectedParts.length > 0 ? '#2527BF' : '#d1d1d1'},
+            {
+              backgroundColor:
+                selectedParts.length > 0 && !isSaving ? '#2527BF' : '#d1d1d1',
+            },
           ]}
           onPress={handleConfirm}
-          disabled={selectedParts.length === 0}>
-          <Text style={styles.confirmButtonText}>선택 완료</Text>
+          disabled={selectedParts.length === 0 || isSaving}>
+          {isSaving ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.confirmButtonText}>선택 완료</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
