@@ -7,6 +7,7 @@ import {
   Image,
   Text,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginStyles from '../../styles/Login/LoginStyles';
 
 import MedikoImage from '../../img/Login/MEDIKO.png';
@@ -15,19 +16,56 @@ import GoogleLoginLogo from '../../img/Login/GoogleLoginLogo.png';
 import KakaoLoginLogo from '../../img/Login/KakaoLoginLogo.png';
 import NaverLoginLogo from '../../img/Login/NaverLoginLogo.png';
 
+const API_URL = 'http://52.78.79.53:8081/api/v1/member/sign-in';
+
 const LoginScreen = ({navigation}: {navigation: any}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    console.log('Entered Username:', username);
-    console.log('Entered Password:', password);
+  const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      Alert.alert('Error', '아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
 
-    if (username.trim() === 'noonsong' && password.trim() === '1234') {
-      Alert.alert('Success', 'You are logged in!');
-      navigation.navigate('Home');
-    } else {
-      Alert.alert('Error', 'Invalid username or password');
+    try {
+      console.log('🔹 로그인 요청 시작...', API_URL);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Accept: 'application/json;charset=UTF-8',
+        },
+        body: JSON.stringify({
+          loginId: username,
+          password: password,
+        }),
+      });
+
+      console.log('🔹 응답 상태 코드:', response.status);
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const errorText = await response.text();
+        throw new Error(`서버 응답이 JSON이 아닙니다: ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('🔹 서버 응답:', result);
+
+      if (response.ok) {
+        await AsyncStorage.setItem('accessToken', result.accessToken);
+        await AsyncStorage.setItem('refreshToken', result.refreshToken);
+
+        Alert.alert('Success', '로그인 성공!');
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Error', result.message || '로그인 실패');
+      }
+    } catch (error) {
+      console.error('❌ Login Error:', error);
+      Alert.alert('Error', `네트워크 오류: ${error.message}`);
     }
   };
 
@@ -48,13 +86,13 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         style={LoginStyles.input}
         placeholder="아이디 입력"
         value={username}
-        onChangeText={text => setUsername(text)} // 공백 포함 확인
+        onChangeText={text => setUsername(text)}
       />
       <TextInput
         style={LoginStyles.input}
         placeholder="비밀번호 입력"
         value={password}
-        onChangeText={text => setPassword(text)} // 공백 포함 확인
+        onChangeText={text => setPassword(text)}
         secureTextEntry
       />
 
