@@ -1,20 +1,89 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, ScrollView, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/ChooseDetailBodyStyles';
+
+const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
 
 const ChooseDetailBodyScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // ✅ 선택한 주요 신체 부위 데이터
+  // ✅ 선택한 주요 신체 부위 데이터 (ChooseMainBodyScreen에서 전달됨)
   const selectedDetails = route.params?.selectedDetails || [];
 
+  // ✅ 세부 신체 부위 저장 (API 결과)
+  const [subBodyParts, setSubBodyParts] = useState<
+    {body: string; description: string; mainBodyPartId: number}[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedConditions, setSelectedConditions] = useState({});
+
+  // ✅ 선택된 주요 신체 부위에 해당하는 세부 신체 부위 조회
   useEffect(() => {
-    console.log('📌 선택된 주요 신체 부위:', selectedDetails);
+    const fetchSubBodyParts = async () => {
+      setLoading(true);
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+          Alert.alert('Error', '로그인이 필요합니다.');
+          return;
+        }
+
+        const bodyParams = selectedDetails
+          .map(part => `body=${part.title}`)
+          .join('&');
+        const requestUrl = `${SUB_BODY_API_URL}?${bodyParams}`;
+
+        console.log('📤 세부 신체 부위 조회 요청:', requestUrl);
+
+        const response = await fetch(requestUrl, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json;charset=UTF-8',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`서버 오류: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('✅ 서버 응답 (세부 신체 부위):', data);
+
+        setSubBodyParts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubBodyParts();
   }, [selectedDetails]);
 
-  const [selectedConditions, setSelectedConditions] = useState({});
+  // ✅ 주요 신체 부위별로 세부 신체 부위 그룹화
+  const groupedSubBodyParts = subBodyParts.reduce((acc, part) => {
+    if (!acc[part.mainBodyPartId]) {
+      acc[part.mainBodyPartId] = {
+        title: part.body,
+        description: part.description,
+        details: [],
+      };
+    }
+    acc[part.mainBodyPartId].details.push(part.description);
+    return acc;
+  }, {});
 
   const toggleCondition = (bodyPart, condition) => {
     setSelectedConditions(prev => {
@@ -27,17 +96,9 @@ const ChooseDetailBodyScreen = () => {
 
       console.log(`🔹 ${bodyPart} 선택됨:`, updatedConditions);
 
-      setTimeout(() => {
-        console.log('📌 전체 선택된 세부 신체 부위:', newState);
-      }, 100);
-
       return newState;
     });
   };
-
-  useEffect(() => {
-    console.log('📌 현재 선택된 세부 신체 부위:', selectedConditions);
-  }, [selectedConditions]);
 
   const handleNext = () => {
     console.log('✅ 선택된 세부 신체 부위 데이터:', selectedConditions);
@@ -69,55 +130,49 @@ const ChooseDetailBodyScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* ✅ 세부 신체 부위 선택 */}
-        {selectedDetails.length > 0 ? (
-          selectedDetails.map((part, index) => (
-            <View key={index} style={styles.bodyPartContainer}>
-              <Text style={styles.partTitle}>{part.title || ''}</Text>
-              <View style={styles.conditionsWrapper}>
-                {Array.isArray(part.details) ? (
-                  part.details.map(detail => (
-                    <TouchableOpacity
-                      key={String(detail)}
-                      style={[
-                        styles.conditionButton,
-                        selectedConditions[part.title]?.includes(detail) &&
-                          styles.conditionButtonSelected,
-                      ]}
-                      onPress={() => toggleCondition(part.title, detail)}>
-                      <Text
-                        style={[
-                          styles.conditionText,
-                          selectedConditions[part.title]?.includes(detail) &&
-                            styles.conditionTextSelected,
-                        ]}>
-                        {String(detail)}
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={styles.noSelectionText}>
-                    세부 항목이 없습니다.
-                  </Text>
-                )}
-              </View>
-            </View>
-          ))
+        {loading ? (
+          <ActivityIndicator size="large" color="#2527BF" />
+        ) : error ? (
+          <Text style={styles.errorText}>❌ 오류 발생: {error}</Text>
         ) : (
-          <Text style={styles.noSelectionText}>선택된 부위가 없습니다.</Text>
+          <>
+            {Object.values(groupedSubBodyParts).map((group, index) => {
+              // ✅ ChooseMainBodyScreen에서 저장한 주요 신체 부위를 직접 사용
+              const selectedMainBodyPart =
+                selectedDetails[index]?.title || '주요 신체 부위 미확인';
+
+              return (
+                <View key={index} style={styles.groupContainer}>
+                  <Text style={styles.groupTitle}>{selectedMainBodyPart}</Text>
+                  <View style={styles.conditionsWrapper}>
+                    {group.details.map((detail, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={[
+                          styles.conditionButton,
+                          selectedConditions[group.title]?.includes(detail) &&
+                            styles.conditionButtonSelected,
+                        ]}
+                        onPress={() => toggleCondition(group.title, detail)}>
+                        <Text
+                          style={[
+                            styles.conditionText,
+                            selectedConditions[group.title]?.includes(detail) &&
+                              styles.conditionTextSelected,
+                          ]}>
+                          {detail}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              );
+            })}
+          </>
         )}
       </ScrollView>
-
-      {/* ✅ 다음 버튼 */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.confirmButton,
-            {
-              backgroundColor: '#2527BF',
-            },
-          ]}
-          onPress={handleNext}>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleNext}>
           <Text style={styles.confirmButtonText}>선택 완료</Text>
         </TouchableOpacity>
       </View>
