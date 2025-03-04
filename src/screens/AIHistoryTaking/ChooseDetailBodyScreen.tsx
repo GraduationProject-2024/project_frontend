@@ -7,10 +7,11 @@ const ChooseDetailBodyScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
+  // ✅ 선택한 주요 신체 부위 데이터
   const selectedDetails = route.params?.selectedDetails || [];
 
   useEffect(() => {
-    console.log('📌 선택된 주요 신체 부위 및 상세 증상:', selectedDetails);
+    console.log('📌 선택된 주요 신체 부위:', selectedDetails);
   }, [selectedDetails]);
 
   const [selectedConditions, setSelectedConditions] = useState({});
@@ -54,7 +55,6 @@ const ChooseDetailBodyScreen = () => {
 
     const selectedDetailsWithDescription = selectedDetails.map(part => ({
       title: part.title || '',
-      description: part.description || '',
       details: selectedConditions[part.title] || [],
     }));
 
@@ -69,15 +69,13 @@ const ChooseDetailBodyScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* ✅ 세부 신체 부위 선택 */}
         {selectedDetails.length > 0 ? (
           selectedDetails.map((part, index) => (
             <View key={index} style={styles.bodyPartContainer}>
               <Text style={styles.partTitle}>{part.title || ''}</Text>
-              {part.description ? (
-                <Text style={styles.descriptionText}>{part.description}</Text>
-              ) : null}
               <View style={styles.conditionsWrapper}>
-                {Array.isArray(part.details) ? (
+                {Arrayㄱ.isArray(part.details) ? (
                   part.details.map(detail => (
                     <TouchableOpacity
                       key={String(detail)}
@@ -109,6 +107,8 @@ const ChooseDetailBodyScreen = () => {
           <Text style={styles.noSelectionText}>선택된 부위가 없습니다.</Text>
         )}
       </ScrollView>
+
+      {/* ✅ 다음 버튼 */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[

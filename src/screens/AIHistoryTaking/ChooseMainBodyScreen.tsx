@@ -26,7 +26,7 @@ const ChooseMainBodyScreen: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 주요 신체 부위 리스트 가져오기
+  // ✅ 주요 신체 부위 리스트 가져오기
   useEffect(() => {
     const fetchMainBodyParts = async () => {
       try {
@@ -60,7 +60,7 @@ const ChooseMainBodyScreen: React.FC = () => {
     fetchMainBodyParts();
   }, []);
 
-  // 선택한 부위 토글
+  // ✅ 선택한 부위 토글 (최대 2개)
   const toggleSelection = (body: string) => {
     if (selectedParts.includes(body)) {
       setSelectedParts(selectedParts.filter(item => item !== body));
@@ -73,10 +73,10 @@ const ChooseMainBodyScreen: React.FC = () => {
     }
   };
 
-  // 선택한 부위 저장 API 호출
+  // ✅ 선택한 부위 저장 API 호출 및 다음 화면으로 이동
   const handleConfirm = async () => {
     if (selectedParts.length === 0) {
-      Alert.alert('선택 필요', '최소 1개 이상의 부위를 선택하세요.');
+      Alert.alert('선택 필요', '최소 1개 이상의 신체 부위를 선택하세요.');
       return;
     }
 
@@ -113,7 +113,20 @@ const ChooseMainBodyScreen: React.FC = () => {
       }
 
       Alert.alert('Success', '선택한 부위가 저장되었습니다.');
-      navigation.navigate('ChooseDetailBody', {selectedDetails: selectedParts});
+
+      // ✅ 선택한 부위를 객체 배열로 변환하여 전달
+      const selectedDetails = selectedParts.map(bodyPart => {
+        const part = mainBodyParts.find(p => p.body === bodyPart);
+        return {
+          title: part?.body || '',
+          description: part?.description || '',
+          details: [], // 상세 증상은 이후 추가될 예정
+        };
+      });
+
+      console.log('📌 다음 화면으로 전달할 데이터:', selectedDetails);
+
+      navigation.navigate('ChooseDetailBody', {selectedDetails});
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
