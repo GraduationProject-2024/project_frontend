@@ -75,7 +75,7 @@ const ChooseDetailBodyScreen = () => {
             <View key={index} style={styles.bodyPartContainer}>
               <Text style={styles.partTitle}>{part.title || ''}</Text>
               <View style={styles.conditionsWrapper}>
-                {Arrayㄱ.isArray(part.details) ? (
+                {Array.isArray(part.details) ? (
                   part.details.map(detail => (
                     <TouchableOpacity
                       key={String(detail)}
