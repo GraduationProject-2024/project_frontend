@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/ChooseDetailBodyStyles';
 
 const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
+const SAVE_SELECTED_SBP_URL = 'http://52.78.79.53:8081/api/v1/selected-sbp'; // ✅ 저장 API URL
 
 const ChooseDetailBodyScreen = () => {
   const navigation = useNavigation();
@@ -25,6 +26,7 @@ const ChooseDetailBodyScreen = () => {
     {body: string; description: string; mainBodyPartId: number}[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedConditions, setSelectedConditions] = useState({});
 
@@ -100,31 +102,60 @@ const ChooseDetailBodyScreen = () => {
     });
   };
 
-  const handleNext = () => {
-    console.log('✅ 선택된 세부 신체 부위 데이터:', selectedConditions);
+  // ✅ 선택한 세부 신체 부위 저장 API 연동
+  const saveSelectedSubBodyParts = async () => {
+    setIsSaving(true);
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
 
-    const selectedBodyParts = Object.keys(selectedConditions).filter(
-      key => selectedConditions[key].length > 0,
-    );
+      for (const mainBodyPart of selectedDetails) {
+        const selectedSubBodyParts =
+          selectedConditions[mainBodyPart.title] || [];
+        if (selectedSubBodyParts.length === 0) {
+          continue;
+        } // 선택한 세부 부위가 없으면 건너뜀
 
-    console.log('✅ 최종 전달할 신체 부위:', selectedBodyParts);
+        const requestBody = {
+          body: selectedSubBodyParts,
+          selectedMBPId: mainBodyPart.selectedMBPId, // 주요 신체 부위 ID
+          selectedSBPId: 0, // 필요하면 수정
+        };
 
-    if (selectedBodyParts.length === 0) {
-      Alert.alert('선택 필요', '최소 1개 이상의 신체 부위를 선택하세요.');
-      return;
+        const requestUrl = `${SAVE_SELECTED_SBP_URL}/${mainBodyPart.selectedMBPId}`;
+        console.log('📤 저장 API 요청:', requestUrl, requestBody);
+
+        const response = await fetch(requestUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            Accept: 'application/json;charset=UTF-8',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        const result = await response.json();
+        console.log('✅ 저장 응답:', result);
+
+        if (!response.ok) {
+          throw new Error(result.message || `서버 오류: ${response.status}`);
+        }
+      }
+
+      Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
+      navigation.navigate('ChooseDetailSymptom', {
+        selectedDetails,
+      });
+    } catch (error) {
+      console.error('❌ 저장 오류:', error);
+      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+    } finally {
+      setIsSaving(false);
     }
-
-    const selectedDetailsWithDescription = selectedDetails.map(part => ({
-      title: part.title || '',
-      details: selectedConditions[part.title] || [],
-    }));
-
-    console.log('📌 최종 전달할 상세 데이터:', selectedDetailsWithDescription);
-
-    navigation.navigate('ChooseDetailSymptom', {
-      selectedBodyParts,
-      selectedDetails: selectedDetailsWithDescription,
-    });
   };
 
   return (
@@ -137,7 +168,6 @@ const ChooseDetailBodyScreen = () => {
         ) : (
           <>
             {Object.values(groupedSubBodyParts).map((group, index) => {
-              // ✅ ChooseMainBodyScreen에서 저장한 주요 신체 부위를 직접 사용
               const selectedMainBodyPart =
                 selectedDetails[index]?.title || '주요 신체 부위 미확인';
 
@@ -172,8 +202,18 @@ const ChooseDetailBodyScreen = () => {
         )}
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.confirmButton} onPress={handleNext}>
-          <Text style={styles.confirmButtonText}>선택 완료</Text>
+        <TouchableOpacity
+          style={[
+            styles.confirmButton,
+            {backgroundColor: isSaving ? '#d1d1d1' : '#2527BF'},
+          ]}
+          onPress={saveSelectedSubBodyParts}
+          disabled={isSaving}>
+          {isSaving ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.confirmButtonText}>선택 완료</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
