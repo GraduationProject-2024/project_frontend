@@ -8,7 +8,13 @@ const TranslateLanguageScreen = ({navigation}) => {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const languages = ['한국어', 'English', '中国人', 'Tiếng Việt'];
+  const languages = [
+    '한국어',
+    'English',
+    'Tiếng Việt',
+    '中国人(简体)',
+    '中国人(繁体)',
+  ];
 
   const renderItem = ({item}) => (
     <TouchableOpacity

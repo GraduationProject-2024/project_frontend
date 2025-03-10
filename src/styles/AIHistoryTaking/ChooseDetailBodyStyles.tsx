@@ -10,25 +10,38 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   bodyPartContainer: {
-    marginBottom: 40,
+    marginBottom: 30,
   },
   partTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2527BF',
+    marginBottom: 12,
+  },
+  groupContainer: {
     marginBottom: 20,
+  },
+  groupTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2527BF',
+    marginBottom: 10,
   },
   conditionsWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    justifyContent: 'flex-start',
+    gap: 12, // 버튼 간 간격 증가
   },
   conditionButton: {
+    minWidth: 80, // 버튼 최소 너비 증가
+    paddingVertical: 10, // 버튼 크기 증가
+    paddingHorizontal: 18,
+    borderRadius: 24, // 둥근 버튼 형태 유지
     borderWidth: 1,
     borderColor: '#B5B5B5',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFFFFF',
   },
   conditionButtonSelected: {
@@ -36,7 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2527BF',
   },
   conditionText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#000000',
   },
   conditionTextSelected: {
