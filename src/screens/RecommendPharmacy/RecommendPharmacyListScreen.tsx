@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Alert,
@@ -11,7 +10,7 @@ import {
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // AsyncStorage 추가
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import RecommendPharmacyListStyles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
 
 const RecommendPharmacyListScreen = () => {
@@ -24,7 +23,7 @@ const RecommendPharmacyListScreen = () => {
     requestLocationPermission();
   }, []);
 
-  // 📌 1️⃣ 위치 권한 요청 함수 (Android + iOS)
+  // 📌 1️⃣ 위치 권한 요청
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -38,8 +37,8 @@ const RecommendPharmacyListScreen = () => {
           return;
         }
       } catch (error) {
-        console.error('위치 권한 요청 오류:', error);
-        Alert.alert('위치 권한 요청에 실패했습니다.');
+        console.error('❌ 위치 권한 요청 오류:', error);
+        Alert.alert('위치 권한 요청 실패');
         setLoading(false);
         return;
       }
@@ -59,37 +58,29 @@ const RecommendPharmacyListScreen = () => {
   const getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
       position => {
-        console.log('✅ 위치 가져오기 성공:', position);
         const {latitude, longitude} = position.coords;
+        console.log('✅ 위치 가져오기 성공:', {latitude, longitude});
+
+        if (!latitude || !longitude) {
+          console.error('❌ 위도/경도 값이 없음');
+          Alert.alert('위치 정보를 가져올 수 없습니다.');
+          return;
+        }
 
         setLocation({latitude, longitude});
         fetchPharmacies(latitude, longitude);
       },
       error => {
-        console.error('❌ 위치 정보를 가져오는 데 실패했습니다:', error);
+        console.error('❌ 위치 정보를 가져오는 데 실패:', error);
+        Alert.alert('위치 정보를 가져올 수 없습니다.');
 
-        let errorMessage = '위치 정보를 가져올 수 없습니다.';
-        switch (error.code) {
-          case 1: // PERMISSION_DENIED
-            errorMessage = '위치 권한이 거부되었습니다.';
-            break;
-          case 2: // POSITION_UNAVAILABLE
-            errorMessage = '위치 정보를 사용할 수 없습니다.';
-            break;
-          case 3: // TIMEOUT
-            errorMessage = '위치 정보 요청이 시간 초과되었습니다.';
-            break;
-          default:
-            errorMessage = '알 수 없는 오류가 발생했습니다.';
-        }
-
-        Alert.alert(errorMessage);
-        setLoading(false);
+        // 기본 좌표(서울 시청)로 요청
+        fetchPharmacies(37.5665, 126.978);
       },
       {
-        enableHighAccuracy: true, // 더 정확한 위치 사용
-        timeout: 15000, // 15초 내에 응답 없으면 실패 처리
-        maximumAge: 0, // 캐시된 위치 데이터를 사용하지 않음
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
       },
     );
   };
@@ -110,14 +101,20 @@ const RecommendPharmacyListScreen = () => {
     }
   };
 
-  // 📌 4️⃣ 약국 추천 API 호출 (토큰 포함)
+  // 📌 4️⃣ API 요청
   const fetchPharmacies = async (lat, lon) => {
-    console.log('📡 API 요청 전송:', lat, lon);
+    console.log('📡 요청 데이터:', {lat, lon});
+
+    if (!lat || !lon) {
+      console.error('❌ 위도/경도 값이 없습니다.');
+      Alert.alert('위치 정보를 가져올 수 없습니다.');
+      return;
+    }
 
     const token = await getAccessToken();
     if (!token) {
       return;
-    } // 토큰이 없으면 API 요청 중단
+    }
 
     try {
       const response = await fetch('http://52.78.79.53:8081/api/v1/pharmacy', {
@@ -129,12 +126,14 @@ const RecommendPharmacyListScreen = () => {
         body: JSON.stringify({lat, lon}),
       });
 
+      console.log('📩 응답 상태 코드:', response.status);
+
       if (!response.ok) {
         throw new Error(`서버 응답 오류: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('📩 API 응답:', data);
+      console.log('📩 API 응답 데이터:', data);
 
       if (!data || data.length === 0) {
         Alert.alert('📢 근처 약국 정보를 찾을 수 없습니다.');
@@ -151,7 +150,6 @@ const RecommendPharmacyListScreen = () => {
 
   return (
     <View style={RecommendPharmacyListStyles.container}>
-      {/* 📌 5️⃣ 로딩 상태 */}
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
@@ -162,13 +160,46 @@ const RecommendPharmacyListScreen = () => {
                 key={index}
                 style={RecommendPharmacyListStyles.pharmacyContainer}>
                 <Text style={RecommendPharmacyListStyles.pharmacyName}>
-                  {pharmacy.name}
-                </Text>
-                <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                  {pharmacy.time} | {pharmacy.distance}
+                  {pharmacy.dutyname}
                 </Text>
                 <Text style={RecommendPharmacyListStyles.pharmacyAddress}>
                   {pharmacy.address}
+                </Text>
+                <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
+                  전화번호: {pharmacy.dutytel1 || '정보 없음'}
+                </Text>
+                <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
+                  거리: {pharmacy.transit_travel_distance_km?.toFixed(2)} km
+                </Text>
+                <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
+                  예상 이동 시간: {pharmacy.transit_travel_time_m} 분
+                </Text>
+                <Text style={RecommendPharmacyListStyles.pharmacyHours}>
+                  운영 시간:
+                  {pharmacy.dutytime1s && pharmacy.dutytime1c
+                    ? ` 월 ${pharmacy.dutytime1s} - ${pharmacy.dutytime1c}`
+                    : ''}
+                  {pharmacy.dutytime2s && pharmacy.dutytime2c
+                    ? ` 화 ${pharmacy.dutytime2s} - ${pharmacy.dutytime2c}`
+                    : ''}
+                  {pharmacy.dutytime3s && pharmacy.dutytime3c
+                    ? ` 수 ${pharmacy.dutytime3s} - ${pharmacy.dutytime3c}`
+                    : ''}
+                  {pharmacy.dutytime4s && pharmacy.dutytime4c
+                    ? ` 목 ${pharmacy.dutytime4s} - ${pharmacy.dutytime4c}`
+                    : ''}
+                  {pharmacy.dutytime5s && pharmacy.dutytime5c
+                    ? ` 금 ${pharmacy.dutytime5s} - ${pharmacy.dutytime5c}`
+                    : ''}
+                  {pharmacy.dutytime6s && pharmacy.dutytime6c
+                    ? ` 토 ${pharmacy.dutytime6s} - ${pharmacy.dutytime6c}`
+                    : ''}
+                  {pharmacy.dutytime7s && pharmacy.dutytime7c
+                    ? ` 일 ${pharmacy.dutytime7s} - ${pharmacy.dutytime7c}`
+                    : ''}
+                  {pharmacy.dutytime8s && pharmacy.dutytime8c
+                    ? ` 공휴일 ${pharmacy.dutytime8s} - ${pharmacy.dutytime8c}`
+                    : ''}
                 </Text>
               </View>
             ))
