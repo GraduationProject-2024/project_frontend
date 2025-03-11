@@ -12,7 +12,7 @@ import SignupStyles from '../../styles/Signup/SignupStyles';
 import pwOpenIcon from '../../img/Signup/pwOpen.png';
 import pwCloseIcon from '../../img/Signup/pwClose.png';
 
-const SignupScreen = ({navigation}: {navigation: any}) => {
+const SignupScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -27,7 +27,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
       return;
     }
 
-    // 회원가입 API 요청 데이터
     const signupData = {
       loginId: email,
       password: password,
@@ -49,12 +48,16 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
       );
 
       const text = await response.text();
-
       const result = text ? JSON.parse(text) : {};
 
       if (response.ok) {
+        const memberId = result.memberId; // 서버에서 반환된 memberId 저장
+        if (!memberId) {
+          throw new Error('회원가입 성공했지만 memberId를 받지 못했습니다.');
+        }
+
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('MedicalInformation');
+        navigation.navigate('ChooseLanguage', {memberId}); // memberId 전달
       } else {
         Alert.alert('Error', result.msg || 'Signup failed');
       }
@@ -66,7 +69,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={SignupStyles.container}>
-      {/* 이메일 입력 */}
       <Text style={SignupStyles.label}>이메일</Text>
       <TextInput
         style={SignupStyles.input}
@@ -76,7 +78,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
         keyboardType="email-address"
       />
 
-      {/* 이름 입력 */}
       <Text style={SignupStyles.label}>이름</Text>
       <TextInput
         style={SignupStyles.input}
@@ -85,7 +86,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
         onChangeText={setName}
       />
 
-      {/* 닉네임 입력 */}
       <Text style={SignupStyles.label}>닉네임</Text>
       <TextInput
         style={SignupStyles.input}
@@ -94,7 +94,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
         onChangeText={setNickname}
       />
 
-      {/* 비밀번호 입력 */}
       <Text style={SignupStyles.label}>비밀번호</Text>
       <View style={SignupStyles.passwordContainer}>
         <TextInput
@@ -112,7 +111,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
         </TouchableOpacity>
       </View>
 
-      {/* 비밀번호 확인 입력 */}
       <Text style={SignupStyles.label}>비밀번호 확인</Text>
       <View style={SignupStyles.passwordContainer}>
         <TextInput
@@ -131,7 +129,6 @@ const SignupScreen = ({navigation}: {navigation: any}) => {
         </TouchableOpacity>
       </View>
 
-      {/* 회원 가입 버튼 */}
       <TouchableOpacity
         style={[
           SignupStyles.signupButton,
