@@ -13,7 +13,9 @@ import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
 const ChooseLanguageScreen = ({navigation}) => {
   const route = useRoute();
-  const {memberId} = route.params || {};
+  const memberId = route.params?.memberId
+    ? parseInt(route.params.memberId, 10)
+    : null; // long으로 변환
 
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,7 @@ const ChooseLanguageScreen = ({navigation}) => {
   ];
 
   const handleLanguageSelection = async () => {
-    if (!selectedLanguage || !memberId) {
+    if (!selectedLanguage || memberId === null || isNaN(memberId)) {
       Alert.alert('Error', '회원 정보를 불러올 수 없습니다.');
       return;
     }
@@ -52,7 +54,7 @@ const ChooseLanguageScreen = ({navigation}) => {
       }
 
       Alert.alert('성공', '언어 설정이 저장되었습니다.');
-      navigation.navigate('MedicalInformation');
+      navigation.navigate('MedicalInformation', {memberId});
     } catch (error) {
       console.error('API 요청 오류:', error);
       Alert.alert(
