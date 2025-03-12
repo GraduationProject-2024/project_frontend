@@ -3,51 +3,42 @@ import {StyleSheet} from 'react-native';
 const RecommendPharmacyListStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    padding: 12,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  pharmacyContainer: {
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 10,
+  card: {
+    marginBottom: 12,
+    borderRadius: 10,
+    elevation: 3,
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   pharmacyName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#000000',
+  },
+  pharmacyAddress: {
+    fontSize: 15,
+    marginBottom: 4,
     color: '#000000',
   },
   pharmacyInfo: {
     fontSize: 15,
-    color: '#666666',
-    marginTop: 4,
-    marginBottom: 4,
+    marginBottom: 2,
+    color: '#000000',
   },
-  pharmacyAddress: {
+  pharmacyHours: {
     fontSize: 15,
-    color: '#666666',
-    marginBottom: 4,
+    marginTop: 8,
+    color: '#000000',
   },
-  mapButton: {
-    position: 'absolute',
-    bottom: 30,
-    left: 16,
-    right: 16,
-    height: 50,
-    backgroundColor: '#2527BF',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mapButtonText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+  hoursText: {
+    fontSize: 15,
+    color: '#000000',
+    paddingLeft: 8,
   },
 });
 
