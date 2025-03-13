@@ -1,37 +1,104 @@
-import React from 'react';
-import {View, Text, ScrollView, TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import styles from '../../styles/RecommendHospital/RecommendDepartmentStyles';
 
-const departments = [
-  {title: '가정의학과', description: '건강증진, 예방, 만성질환 등'},
-  {title: '내과', description: '감기, 소화기, 호흡기 등'},
-  {title: '마취통증의학과', description: '근육통증, 만성통증 등'},
-  {title: '비뇨의학과', description: '소변시 통증, 남성 질환 등'},
-  {title: '산부인과', description: '피임상담, 여성질환 등'},
-  {title: '성형외과', description: '피부관리, 화상, 상처 등'},
-  {title: '소아청소년과', description: '소아호흡기, 소아소화기, 알레르기 등'},
-  {title: '신경과', description: '두통, 어지럼증, 뇌졸중 등'},
-  {title: '신경외과', description: '요통, 디스크, 신경질환 등'},
-  {title: '안과', description: '눈 피로, 결막염, 다래끼 등'},
-  {title: '영상의학과', description: '방사선 촬영, MRI, CT 등'},
-  {title: '외과', description: '갑상선, 유방, 하지정맥류 등'},
-  {title: '응급의학과', description: '심한 탈수, 골절 처치 등'},
-  {title: '이비인후과', description: '비염, 이염, 편도염 등'},
-  {title: '재활의학과', description: '신체 회복, 물리 치료, 만성통증 등'},
-  {title: '정신건강의학과', description: '수면장애, 스트레스, 중독 등'},
-  {title: '정형외과', description: '관절염, 골반, 척추 통증 등'},
-  {title: '치의과', description: '치아치료, 외과질환, 턱관절 등'},
-  {title: '피부과', description: '두드러기, 가려움증, 여드름 등'},
-  {title: '한방과', description: '한의원 진료, 다이어트, 침술 등'},
-];
+const API_URL = 'http://52.78.79.53:8081/api/v1/department';
 
 const RecommendDepartmentScreen = () => {
   const navigation = useNavigation();
+  const [departments, setDepartments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchAccessToken = async () => {
+    try {
+      const response = await axios.post(LOGIN_URL, {
+        username: 'noonsong',
+        password: 'noonsong',
+      });
+
+      const accessToken = response.data?.access_token;
+      if (accessToken) {
+        await AsyncStorage.setItem('accessToken', accessToken);
+        return accessToken;
+      } else {
+        throw new Error('액세스 토큰을 가져오지 못했습니다.');
+      }
+    } catch (err) {
+      console.error('로그인 실패:', err);
+      setError(`로그인에 실패했습니다: ${err.message}`);
+      return null;
+    }
+  };
+
+  const fetchDepartments = async () => {
+    setLoading(true);
+    try {
+      let accessToken = await AsyncStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        accessToken = await fetchAccessToken();
+        if (!accessToken) {
+          throw new Error('토큰이 없어 데이터를 불러올 수 없습니다.');
+        }
+      }
+
+      const response = await axios.get(API_URL, {
+        timeout: 5000,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      setDepartments(response.data);
+    } catch (err) {
+      console.error('API 요청 실패:', err.response?.status, err.response?.data);
+      setError(
+        `데이터를 불러오는 데 실패했습니다: ${err.response?.status} - ${
+          err.response?.data?.message || err.message
+        }`,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
 
   const handlePress = () => {
     navigation.navigate('RecommendHospitalList');
   };
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#0000ff"
+        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
