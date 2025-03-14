@@ -83,7 +83,7 @@ const RecommendDepartmentScreen = () => {
           onPress={() => {
             console.log('📌 선택된 진료과:', department);
             navigation.navigate('RecommendHospitalList', {
-              selectedDepartment: department.title, // ✅ title이 아닌 id가 필요한지 확인
+              selectedDepartment: department.title, // ✅ `title`을 넘기도록 수정
             });
           }}>
           <Text style={styles.title}>{department.title}</Text>
