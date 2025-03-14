@@ -5,8 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
-  Button,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
@@ -21,35 +19,6 @@ const RecommendDepartmentScreen = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedDepartment, setSelectedDepartment] = useState(null); // 추가됨
-  const [modalVisible, setModalVisible] = useState(false); // 모달 상태 추가
-
-  // 특정 진료과 정보를 가져오는 API 함수
-  const fetchDepartmentDetail = async title => {
-    try {
-      const accessToken = await AsyncStorage.getItem('accessToken');
-      if (!accessToken) {
-        throw new Error('액세스 토큰이 없습니다.');
-      }
-
-      const response = await axios.get(`${API_URL}/${title}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      setSelectedDepartment(response.data);
-      setModalVisible(true); // 모달 열기
-    } catch (err) {
-      console.error(
-        '특정 진료과 정보 요청 실패:',
-        err.response?.status,
-        err.response?.data,
-      );
-      setError(`정보를 불러오지 못했습니다: ${err.message}`);
-    }
-  };
 
   // 전체 진료과 리스트 가져오기
   const fetchDepartments = async () => {
@@ -69,6 +38,7 @@ const RecommendDepartmentScreen = () => {
         },
       });
 
+      console.log('✅ 진료과 데이터 수신:', response.data);
       setDepartments(response.data);
     } catch (err) {
       console.error('API 요청 실패:', err.response?.status, err.response?.data);
@@ -110,33 +80,16 @@ const RecommendDepartmentScreen = () => {
         <TouchableOpacity
           key={index}
           style={styles.departmentContainer}
-          onPress={() => fetchDepartmentDetail(department.title)} // 클릭 시 상세 정보 요청
-        >
+          onPress={() => {
+            console.log('📌 선택된 진료과:', department);
+            navigation.navigate('RecommendHospitalList', {
+              selectedDepartment: department.title, // ✅ title이 아닌 id가 필요한지 확인
+            });
+          }}>
           <Text style={styles.title}>{department.title}</Text>
           <Text style={styles.description}>{department.description}</Text>
         </TouchableOpacity>
       ))}
-
-      {/* 특정 진료과 상세 정보를 보여주는 모달 */}
-      <Modal visible={modalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {selectedDepartment ? (
-              <>
-                <Text style={styles.modalTitle}>
-                  {selectedDepartment.title}
-                </Text>
-                <Text style={styles.modalDescription}>
-                  {selectedDepartment.description}
-                </Text>
-                <Button title="닫기" onPress={() => setModalVisible(false)} />
-              </>
-            ) : (
-              <Text>정보를 불러오는 중...</Text>
-            )}
-          </View>
-        </View>
-      </Modal>
     </ScrollView>
   );
 };
