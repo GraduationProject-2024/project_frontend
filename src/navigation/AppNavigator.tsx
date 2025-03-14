@@ -14,6 +14,7 @@ import HomeScreen from '../screens/Home/HomeScreen';
 import RecommendDepartmentScreen from '../screens/RecommendHospital/RecommendDepartmentScreen';
 import RecommendHospitalListScreen from '../screens/RecommendHospital/RecommendHospitalListScreen';
 import RecommendPharmacyListScreen from '../screens/RecommendPharmacy/RecommendPharmacyListScreen';
+import CurrentConditionScreen from '../screens/RecommendEmergency/CurrentConditionScreen';
 import RecommendEmergencyListScreen from '../screens/RecommendEmergency/RecommendEmergencyListScreen';
 import TranslateLanguageScreen from '../screens/TranslateLanguage/TranslateLanguageScreen';
 import RecordAndTranslateScreen from '../screens/RecordAndTranslate/RecordAndTranslateScreen';
@@ -185,6 +186,13 @@ const AppNavigator = () => {
           component={RecommendPharmacyListScreen}
           options={{
             title: '약국 추천',
+          }}
+        />
+        <Stack.Screen
+          name="CurrentCondition"
+          component={CurrentConditionScreen}
+          options={{
+            title: '현재 상태',
           }}
         />
         <Stack.Screen
