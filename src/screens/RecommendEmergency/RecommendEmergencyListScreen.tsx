@@ -56,13 +56,6 @@ const RecommendEmergencyListScreen = ({navigation}: {navigation: any}) => {
           </View>
         ))}
       </ScrollView>
-
-      {/* Map Button */}
-      <TouchableOpacity
-        style={styles.mapButton}
-        onPress={() => navigation.navigate('RecommendEmergencyMap')}>
-        <Text style={styles.mapButtonText}>지도로 보기</Text>
-      </TouchableOpacity>
     </View>
   );
 };
