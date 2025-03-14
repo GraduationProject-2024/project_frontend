@@ -15,35 +15,36 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('📌 선택된 진료과:', selectedDepartment); // ✅ 디버깅 로그 추가
+    console.log('📌 선택된 진료과:', selectedDepartment);
 
     Geolocation.getCurrentPosition(
       async position => {
         const {latitude, longitude} = position.coords;
 
         try {
-          // ✅ 액세스 토큰 가져오기
+          // ✅ 액세스 토큰 가져오기 및 확인
           const accessToken = await AsyncStorage.getItem('accessToken');
+          console.log('✅ 액세스 토큰:', accessToken);
 
           if (!accessToken) {
-            throw new Error('액세스 토큰이 없습니다.');
+            throw new Error('❌ 액세스 토큰이 없습니다.');
           }
 
           // ✅ API 요청 데이터 구성
           const requestData = {
             lat: parseFloat(latitude),
             lon: parseFloat(longitude),
-            is_report: true,
-            report_id: 0,
-            department: selectedDepartment, // ✅ title이 아닌 id가 필요한지 확인
-            suspected_disease: ['unknown'], // 빈 배열 대신 기본값 설정
+            is_report: false,
+            report_id: '',
+            department: selectedDepartment, // ✅ 선택한 진료과 title을 그대로 사용
+            suspected_disease: [''],
             secondary_hospital: true,
             tertiary_hospital: true,
           };
 
           console.log('📌 API 요청 파라미터:', requestData);
 
-          // ✅ API 요청
+          // ✅ API 요청 (디버깅 추가)
           const response = await axios.post(API_URL, requestData, {
             headers: {
               'Content-Type': 'application/json',
@@ -54,11 +55,18 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
           console.log('✅ 병원 데이터 수신:', response.data);
           setHospitals(response.data);
         } catch (err) {
-          console.error(
-            '❌ 병원 추천 API 요청 실패:',
-            err.response?.status,
-            err.response?.data,
-          );
+          console.error('❌ 병원 추천 API 요청 실패:', err.message);
+
+          if (err.response) {
+            console.log('📌 서버 응답 상태 코드:', err.response.status);
+            console.log(
+              '📌 서버 응답 데이터:',
+              JSON.stringify(err.response.data, null, 2),
+            );
+          } else {
+            console.log('📌 응답 없음 (서버 응답이 undefined)');
+          }
+
           setError(`데이터를 불러오는 데 실패했습니다: ${err.message}`);
         } finally {
           setLoading(false);
@@ -90,6 +98,13 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
           <View key={index} style={styles.hospitalContainer}>
             <Text style={styles.hospitalName}>{hospital.name}</Text>
             <Text style={styles.hospitalInfo}>{hospital.address}</Text>
+            <Text style={styles.hospitalInfo}>
+              🚆 이동 거리:{' '}
+              {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
+            </Text>
+            <Text style={styles.hospitalInfo}>
+              ⏳ 예상 소요 시간: {hospital.transit_travel_time_m || '-'} 분
+            </Text>
           </View>
         ))}
       </ScrollView>
