@@ -6,9 +6,12 @@ import {
   ActivityIndicator,
   PermissionsAndroid,
   Platform,
+  Alert,
+  Linking,
+  TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Geolocation from 'react-native-geolocation-service'; // ✅ Geolocation 추가
+import Geolocation from 'react-native-geolocation-service';
 import {useNavigation} from '@react-navigation/native';
 import styles from '../../styles/RecommendEmergency/RecommendEmergencyListStyles';
 
@@ -19,7 +22,6 @@ const RecommendEmergencyListScreen = () => {
   const [longitude, setLongitude] = useState<number | null>(null);
   const navigation = useNavigation();
 
-  // 🔹 위치 권한 요청 (Android)
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -42,7 +44,6 @@ const RecommendEmergencyListScreen = () => {
     return true;
   };
 
-  // 🔹 현재 위치 가져오기
   const getLocation = async () => {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
@@ -61,7 +62,6 @@ const RecommendEmergencyListScreen = () => {
     );
   };
 
-  // 🔹 비동기로 토큰 및 특수 상태 가져오기
   const getStoredData = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -76,12 +76,11 @@ const RecommendEmergencyListScreen = () => {
     }
   };
 
-  // 🔹 응급실 추천 API 요청
   const fetchEmergencyList = async () => {
     setLoading(true);
     try {
       const {token, conditions} = await getStoredData();
-      const isCondition = conditions.length > 0; // ✅ 특수 상태 값 여부 설정
+      const isCondition = conditions.length > 0;
 
       if (latitude === null || longitude === null) {
         console.warn('위치 정보를 가져오지 못했습니다.');
@@ -92,7 +91,7 @@ const RecommendEmergencyListScreen = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? {Authorization: `Bearer ${token}`} : {}), // ✅ 토큰 추가
+          ...(token ? {Authorization: `Bearer ${token}`} : {}),
         },
         body: JSON.stringify({
           isCondition: isCondition,
@@ -111,6 +110,7 @@ const RecommendEmergencyListScreen = () => {
 
       setEmergencyList(
         data.map((item: any) => ({
+          id: item.id,
           name: item.dutyName,
           number: item.dutyTel3 || '번호 없음',
           time: `${item.transit_travel_time_m}분`,
@@ -125,7 +125,53 @@ const RecommendEmergencyListScreen = () => {
     }
   };
 
-  // 🔹 위치 가져온 후 응급실 리스트 요청
+  const fetchEmergencyMap = async (erId: number) => {
+    try {
+      const {token} = await getStoredData();
+
+      const response = await fetch(
+        `http://52.78.79.53:8081/api/v1/er-map/${erId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? {Authorization: `Bearer ${token}`} : {}),
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('응급실 지도 정보:', data);
+
+      Alert.alert(
+        '지도 선택',
+        '어떤 지도에서 응급실 위치를 확인하시겠습니까?',
+        [
+          {
+            text: '네이버 지도',
+            onPress: () => Linking.openURL(data.map_urls.naver_map),
+          },
+          {
+            text: '카카오 지도',
+            onPress: () => Linking.openURL(data.map_urls.kakao_map),
+          },
+          {
+            text: '구글 지도',
+            onPress: () => Linking.openURL(data.map_urls.google_map),
+          },
+          {text: '취소', style: 'cancel'},
+        ],
+        {cancelable: true},
+      );
+    } catch (error) {
+      console.error('Error fetching emergency map:', error);
+    }
+  };
+
   useEffect(() => {
     getLocation();
   }, []);
@@ -143,14 +189,18 @@ const RecommendEmergencyListScreen = () => {
       ) : (
         <ScrollView style={styles.EmergencyList}>
           {emergencyList.map((Emergency, index) => (
-            <View key={index} style={styles.EmergencyContainer}>
-              <Text style={styles.EmergencyName}>{Emergency.name}</Text>
-              <Text style={styles.EmergencyNumber}>{Emergency.number}</Text>
-              <Text style={styles.EmergencyInfo}>
-                {Emergency.time} | {Emergency.distance}
-              </Text>
-              <Text style={styles.EmergencyAddress}>{Emergency.address}</Text>
-            </View>
+            <TouchableOpacity
+              key={index}
+              onPress={() => fetchEmergencyMap(Emergency.id)}>
+              <View style={styles.EmergencyContainer}>
+                <Text style={styles.EmergencyName}>{Emergency.name}</Text>
+                <Text style={styles.EmergencyNumber}>{Emergency.number}</Text>
+                <Text style={styles.EmergencyInfo}>
+                  {Emergency.time} | {Emergency.distance}
+                </Text>
+                <Text style={styles.EmergencyAddress}>{Emergency.address}</Text>
+              </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
       )}
