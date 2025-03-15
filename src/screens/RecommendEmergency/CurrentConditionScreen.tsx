@@ -8,9 +8,9 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ AsyncStorage 추가
 import {useNavigation} from '@react-navigation/native';
-import styles from '../../styles/MedicalInformation/MedicineInformationStyles';
+import styles from '../../styles/RecommendEmergency/CurrentConditionStyles';
 
-const MedicineInformationScreen = () => {
+const CurrentConditionScreen = () => {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [medicalConditions, setMedicalConditions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -114,11 +114,11 @@ const MedicineInformationScreen = () => {
         ]}
         onPress={handleNext}>
         <Text style={styles.actionButtonText}>
-          {selectedConditions.length > 0 ? '다음' : '건너뛰기'}
+          {selectedConditions.length > 0 ? '선택 완료' : '건너뛰기'}
         </Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export default MedicineInformationScreen;
+export default CurrentConditionScreen;
