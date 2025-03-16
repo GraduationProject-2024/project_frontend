@@ -137,7 +137,7 @@ const HomeScreen = () => {
             {
               icon: require('../../img/Home/profileIcon.png'),
               label: '개인 정보',
-              onPress: () => navigation.navigate('SymptomOnsetTime'),
+              onPress: () => navigation.navigate('MyInformation'),
             },
           ].map((item, index) => (
             <TouchableOpacity

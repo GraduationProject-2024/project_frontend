@@ -26,6 +26,7 @@ import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeS
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
 import AdditionalInformationScreen from '../screens/AIHistoryTaking/AdditionalInformationScreen';
+import MyInformationScreen from '../screens/MyInformation/MyInformationScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
 
@@ -221,6 +222,13 @@ const AppNavigator = () => {
           component={RescueTextScreen}
           options={{
             title: '119 문자 신고',
+          }}
+        />
+        <Stack.Screen
+          name="MyInformation"
+          component={MyInformationScreen}
+          options={{
+            title: '개인 정보',
           }}
         />
       </Stack.Navigator>
