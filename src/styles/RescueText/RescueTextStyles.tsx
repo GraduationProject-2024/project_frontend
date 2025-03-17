@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
     marginTop: 10,
-    marginBottom: 10,
   },
   toggleButton: {
     borderWidth: 1,
@@ -121,6 +120,50 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FFFFFF',
     fontWeight: 'bold',
+  },
+  imageUploadContainer: {
+    marginBottom: 20,
+  },
+  imageUploadButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  imageIcon: {
+    width: 60,
+    height: 60,
+    tintColor: '#B5B5B5',
+  },
+  uploadedImageContainer: {
+    position: 'relative',
+    marginRight: 10,
+    marginTop: 5,
+  },
+  uploadedImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#2527BF',
+    borderRadius: 50,
+    padding: 6,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 15,
+    top: -2,
   },
 });
 

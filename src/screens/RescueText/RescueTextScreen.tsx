@@ -11,6 +11,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
 import styles from '../../styles/RescueText/RescueTextStyles';
 import ConsentModal from '../../components/RescueText/ConsentModal';
 
@@ -30,9 +31,32 @@ const RescueTextScreen = () => {
   const [title, setTitle] = useState('');
   const [selectedEmergencyType, setSelectedEmergencyType] = useState(null);
   const [isConsentModalVisible, setConsentModalVisible] = useState(true);
+  const [images, setImages] = useState([]); // 이미지 목록 상태 추가
 
   const handleConsentComplete = () => {
     setConsentModalVisible(false);
+  };
+
+  // 📌 이미지 선택 함수 (최대 3개 제한)
+  const pickImage = async () => {
+    if (images.length >= 3) {
+      alert('이미지는 최대 3개까지 첨부할 수 있습니다.');
+      return;
+    }
+    launchImageLibrary({mediaType: 'photo'}, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorMessage) {
+        console.log('Image picker error: ', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        setImages([...images, response.assets[0].uri]); // 새 이미지 추가
+      }
+    });
+  };
+
+  // 📌 이미지 삭제 함수
+  const removeImage = index => {
+    setImages(images.filter((_, i) => i !== index));
   };
 
   return (
@@ -77,6 +101,7 @@ const RescueTextScreen = () => {
                   onChangeText={setDetailedAddress}
                 />
               </View>
+
               {/* 제목 입력 섹션 */}
               <View style={styles.sectionContainer}>
                 <Text style={styles.labelText}>제목 입력</Text>
@@ -136,6 +161,38 @@ const RescueTextScreen = () => {
                     </TouchableOpacity>
                   ))}
                 </View>
+              </View>
+
+              {/* 이미지 업로드 섹션 */}
+              <View style={styles.imageUploadContainer}>
+                <Text style={styles.labelText}>신고 관련 이미지 추가</Text>
+                <Text style={styles.titleText}>
+                  *이미지는 3개 이하로 첨부 가능합니다
+                </Text>
+                <ScrollView horizontal>
+                  {images.length < 3 && (
+                    <TouchableOpacity
+                      style={styles.imageUploadButton}
+                      onPress={pickImage}>
+                      <Image
+                        source={require('../../img/AdditionalInformation/AddImage.png')}
+                        style={styles.imageIcon}
+                      />
+                    </TouchableOpacity>
+                  )}
+
+                  {/* 업로드된 이미지 렌더링 */}
+                  {images.map((uri, index) => (
+                    <View key={index} style={styles.uploadedImageContainer}>
+                      <Image source={{uri}} style={styles.uploadedImage} />
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => removeImage(index)}>
+                        <Text style={styles.deleteButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
               </View>
             </ScrollView>
           </TouchableWithoutFeedback>
