@@ -131,7 +131,7 @@ const HomeScreen = () => {
             },
             {
               icon: require('../../img/Home/rescuemessageIcon.png'),
-              label: '119 문자 신고',
+              label: '119 신고',
               onPress: () => navigation.navigate('RescueText'),
             },
             {
