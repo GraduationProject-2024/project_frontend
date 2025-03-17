@@ -221,7 +221,7 @@ const AppNavigator = () => {
           name="RescueText"
           component={RescueTextScreen}
           options={{
-            title: '119 문자 신고',
+            title: '119 신고',
           }}
         />
         <Stack.Screen
