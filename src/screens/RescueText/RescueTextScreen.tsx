@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,8 +12,11 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/RescueText/RescueTextStyles';
 import ConsentModal from '../../components/RescueText/ConsentModal';
+
+const API_URL = 'http://52.78.79.53:8081/api/v1/member/form';
 
 const emergencyTypes = [
   '화재',
@@ -31,13 +34,12 @@ const RescueTextScreen = () => {
   const [title, setTitle] = useState('');
   const [selectedEmergencyType, setSelectedEmergencyType] = useState(null);
   const [isConsentModalVisible, setConsentModalVisible] = useState(true);
-  const [images, setImages] = useState([]); // 이미지 목록 상태 추가
+  const [images, setImages] = useState([]);
 
   const handleConsentComplete = () => {
     setConsentModalVisible(false);
   };
 
-  // 📌 이미지 선택 함수 (최대 3개 제한)
   const pickImage = async () => {
     if (images.length >= 3) {
       alert('이미지는 최대 3개까지 첨부할 수 있습니다.');
@@ -49,15 +51,50 @@ const RescueTextScreen = () => {
       } else if (response.errorMessage) {
         console.log('Image picker error: ', response.errorMessage);
       } else if (response.assets && response.assets.length > 0) {
-        setImages([...images, response.assets[0].uri]); // 새 이미지 추가
+        setImages([...images, response.assets[0].uri]);
       }
     });
   };
 
-  // 📌 이미지 삭제 함수
   const removeImage = index => {
     setImages(images.filter((_, i) => i !== index));
   };
+
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        console.log('🚨 액세스 토큰이 없습니다.');
+        return;
+      }
+
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log('✅ API 응답 데이터:', data);
+      console.log('👤 사용자 이름:', data.name);
+      console.log('📞 전화번호:', data.number);
+      console.log('📍 주소:', data.address);
+      console.log('🔑 비밀번호(암호화됨):', data.password);
+    } catch (error) {
+      console.error('❌ 사용자 정보 조회 오류:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <>
@@ -73,7 +110,6 @@ const RescueTextScreen = () => {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ScrollView
               contentContainerStyle={{flexGrow: 1, paddingBottom: 50}}>
-              {/* 안내 문구 */}
               <Text style={styles.titleText}>
                 <Text style={{color: 'red', fontWeight: 'bold'}}>
                   119 웹 신고
@@ -83,7 +119,6 @@ const RescueTextScreen = () => {
                 위해서는 입력하는 것을 권장드립니다.
               </Text>
 
-              {/* 주소 입력 섹션 */}
               <View style={styles.addressContainer}>
                 <Text style={styles.labelText}>주소 입력</Text>
                 <TextInput
@@ -102,7 +137,6 @@ const RescueTextScreen = () => {
                 />
               </View>
 
-              {/* 제목 입력 섹션 */}
               <View style={styles.sectionContainer}>
                 <Text style={styles.labelText}>제목 입력</Text>
                 <TextInput
@@ -114,7 +148,6 @@ const RescueTextScreen = () => {
                 />
               </View>
 
-              {/* 신고 내용 입력 */}
               <View style={styles.additionalInfoContainer}>
                 <Text style={styles.labelText}>신고 내용 입력</Text>
                 <View style={styles.inputWithIconAndCounterContainer}>
@@ -137,7 +170,6 @@ const RescueTextScreen = () => {
                 </View>
               </View>
 
-              {/* 응급 사항 유형 선택 */}
               <View style={styles.sectionContainer}>
                 <Text style={styles.labelText}>응급 사항 유형</Text>
                 <View style={styles.toggleContainer}>
@@ -163,7 +195,6 @@ const RescueTextScreen = () => {
                 </View>
               </View>
 
-              {/* 이미지 업로드 섹션 */}
               <View style={styles.imageUploadContainer}>
                 <Text style={styles.labelText}>신고 관련 이미지 추가</Text>
                 <Text style={styles.titleText}>
@@ -181,7 +212,6 @@ const RescueTextScreen = () => {
                     </TouchableOpacity>
                   )}
 
-                  {/* 업로드된 이미지 렌더링 */}
                   {images.map((uri, index) => (
                     <View key={index} style={styles.uploadedImageContainer}>
                       <Image source={{uri}} style={styles.uploadedImage} />
