@@ -15,7 +15,7 @@ const ChooseLanguageScreen = ({navigation}) => {
   const route = useRoute();
   const memberId = route.params?.memberId
     ? parseInt(route.params.memberId, 10)
-    : null; // long으로 변환
+    : null;
 
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loading, setLoading] = useState(false);

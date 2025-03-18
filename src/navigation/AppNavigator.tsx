@@ -7,6 +7,7 @@ import LoginScreen from '../screens/Login/LoginScreen';
 import SignupScreen from '../screens/Signup/SignupScreen';
 import ChooseLanguageScreen from '../screens/ChooseLanguage/ChooseLanguageScreen';
 import MedicalInformationScreen from '../screens/MedicalInformation/MedicalInformationScreen';
+import IntegratedMedicalScreen from '../screens/MedicalInformation/IntegratedMedicalScreen';
 import PastMedicalHistoryScreen from '../screens/MedicalInformation/PastMedicalHistoryScreen';
 import FamilyMedicalHistoryScreen from '../screens/MedicalInformation/FamilyMedicalHistoryScreen';
 import MedicineInformationScreen from '../screens/MedicalInformation/MedicineInformationScreen';
@@ -87,6 +88,13 @@ const AppNavigator = () => {
         <Stack.Screen
           name="MedicalInformation"
           component={MedicalInformationScreen}
+          options={{
+            title: '기본 정보',
+          }}
+        />
+        <Stack.Screen
+          name="IntegratedMedical"
+          component={IntegratedMedicalScreen}
           options={{
             title: '건강 정보',
           }}

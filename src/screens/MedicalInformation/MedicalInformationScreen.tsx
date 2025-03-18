@@ -82,7 +82,7 @@ const MedicalInformationScreen = ({navigation}) => {
       }
 
       Alert.alert('성공', '기본 정보가 저장되었습니다.');
-      navigation.navigate('PastMedicalHistory', {memberId});
+      navigation.navigate('IntegratedMedical', {memberId});
     } catch (error) {
       console.error('API 요청 오류:', error);
       Alert.alert(
