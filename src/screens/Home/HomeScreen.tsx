@@ -1,12 +1,91 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeStyles from '../../styles/Home/HomeStyles';
 import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
+const API_BASE_URL = 'http://52.78.79.53:8081/api/v1';
+
 const HomeScreen = () => {
   const [selectedButtons, setSelectedButtons] = useState([]);
+  const [bodyParts, setBodyParts] = useState([]);
+  const [accessToken, setAccessToken] = useState(null);
   const navigation = useNavigation();
+
+  // ✅ 로그인 후 액세스 토큰을 받아와 AsyncStorage에 저장
+  const getAccessToken = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'noonsong',
+          password: 'noonsong',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('로그인 실패');
+      }
+
+      const data = await response.json();
+      await AsyncStorage.setItem('accessToken', data.accessToken);
+      setAccessToken(data.accessToken);
+    } catch (error) {
+      console.error('로그인 중 오류 발생:', error);
+    }
+  };
+
+  // ✅ API에서 신체 부위 목록 가져오기
+  const fetchBodyParts = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        console.error('액세스 토큰이 없습니다.');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/main-body/all`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('네트워크 응답이 올바르지 않습니다.');
+      }
+
+      const data = await response.json();
+      setBodyParts(data.map(item => item.description));
+    } catch (error) {
+      console.error('신체 항목 데이터를 가져오는 중 오류 발생:', error);
+    }
+  };
+
+  // ✅ 앱이 시작될 때 저장된 토큰 불러와 API 호출
+  useEffect(() => {
+    const initializeApp = async () => {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (token) {
+        setAccessToken(token);
+      } else {
+        await getAccessToken();
+      }
+    };
+    initializeApp();
+  }, []);
+
+  // ✅ 액세스 토큰이 설정되면 신체 부위 목록 요청
+  useEffect(() => {
+    if (accessToken) {
+      fetchBodyParts();
+    }
+  }, [accessToken]);
 
   const handleButtonPress = label => {
     if (selectedButtons.includes(label)) {
@@ -20,7 +99,7 @@ const HomeScreen = () => {
 
   const handleStartPress = () => {
     if (selectedButtons.length > 0) {
-      navigation.navigate('ChooseMainBody', {
+      navigation.navigate('ChooseDetailBody', {
         selectedBodyParts: selectedButtons,
       });
     }
@@ -50,38 +129,30 @@ const HomeScreen = () => {
           치료가 필요하신 부분을 선택해주세요
         </Text>
         <View style={HomeStyles.buttonGrid}>
-          {[
-            '근골격',
-            '피부',
-            '머리/정신',
-            '얼굴',
-            '목',
-            '가슴',
-            '폐/위',
-            '등/허리',
-            '복부',
-            '팔',
-            '다리',
-            '엉덩이/비뇨기',
-            '기타',
-          ].map((label, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                HomeStyles.diagnosisButton,
-                selectedButtons.includes(label) && HomeStyles.selectedButton,
-              ]}
-              onPress={() => handleButtonPress(label)}>
-              <Text
+          {bodyParts.length > 0 ? (
+            bodyParts.map((label, index) => (
+              <TouchableOpacity
+                key={index}
                 style={[
-                  HomeStyles.diagnosisButtonText,
-                  selectedButtons.includes(label) &&
-                    HomeStyles.selectedButtonText,
-                ]}>
-                {label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                  HomeStyles.diagnosisButton,
+                  selectedButtons.includes(label) && HomeStyles.selectedButton,
+                ]}
+                onPress={() => handleButtonPress(label)}>
+                <Text
+                  style={[
+                    HomeStyles.diagnosisButtonText,
+                    selectedButtons.includes(label) &&
+                      HomeStyles.selectedButtonText,
+                  ]}>
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={HomeStyles.loadingText}>
+              신체 데이터를 불러오는 중...
+            </Text>
+          )}
         </View>
         <TouchableOpacity
           style={[
