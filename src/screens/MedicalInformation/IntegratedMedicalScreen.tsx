@@ -20,19 +20,17 @@ const IntegratedMedicalScreen = ({navigation}) => {
   const [allergies, setAllergies] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (
-      !phoneNumber.trim() ||
-      !pastMedicalHistory.trim() ||
-      !familyHistory.trim() ||
-      !currentMedications.trim() ||
-      !allergies.trim()
-    ) {
-      Alert.alert('오류', '입력 정보를 확인해주세요.');
-      return;
-    }
+  const isAnyFieldFilled =
+    phoneNumber.trim() ||
+    pastMedicalHistory.trim() ||
+    familyHistory.trim() ||
+    currentMedications.trim() ||
+    allergies.trim();
 
-    Alert.alert('성공', '정보가 저장되었습니다.');
+  const handleSubmit = () => {
+    Alert.alert('성공', '정보가 저장되었습니다.', [
+      {text: '확인', onPress: () => navigation.navigate('Home')},
+    ]);
   };
 
   return (
@@ -90,27 +88,12 @@ const IntegratedMedicalScreen = ({navigation}) => {
           style={[
             styles.button,
             {
-              backgroundColor:
-                phoneNumber &&
-                pastMedicalHistory &&
-                familyHistory &&
-                currentMedications &&
-                allergies
-                  ? '#2527BF'
-                  : '#CCCCCC',
+              backgroundColor: isAnyFieldFilled ? '#2527BF' : '#CCCCCC',
             },
           ]}
-          disabled={
-            !phoneNumber ||
-            !pastMedicalHistory ||
-            !familyHistory ||
-            !currentMedications ||
-            !allergies ||
-            loading
-          }
           onPress={handleSubmit}>
           <Text style={styles.buttonText}>
-            {loading ? '저장 중...' : '건강 정보 등록'}
+            {isAnyFieldFilled ? '등록 완료' : '건너뛰기'}
           </Text>
         </TouchableOpacity>
       </View>
