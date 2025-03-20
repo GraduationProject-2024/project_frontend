@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,27 +10,150 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/RescueText/RescueTextStyles';
-import ConsentModal from '../../components/RescueText/ConsentModal'; // 약관 모달 추가
+import ConsentModal from '../../components/RescueText/ConsentModal';
+
+const USER_API_URL = 'http://52.78.79.53:8081/api/v1/member/form';
+const REPORT_API_URL = 'http://52.78.79.53:5001/fill_form';
+
+const emergencyTypes = [
+  '화재',
+  '구조 요청',
+  '응급 상황',
+  '교통 사고',
+  '재난',
+  '기타',
+];
 
 const RescueTextScreen = () => {
+  const [userData, setUserData] = useState({});
   const [address, setAddress] = useState('');
   const [detailedAddress, setDetailedAddress] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
-  const [isConsentModalVisible, setConsentModalVisible] = useState(true); // 약관 모달 상태 추가
+  const [title, setTitle] = useState('');
+  const [selectedEmergencyType, setSelectedEmergencyType] = useState(null);
+  const [isConsentModalVisible, setConsentModalVisible] = useState(true);
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchUserData();
+    };
+    fetchData();
+  }, []);
 
   const handleConsentComplete = () => {
-    // 약관 동의 완료 시 모달 닫기
     setConsentModalVisible(false);
+  };
+
+  const pickImage = async () => {
+    if (images.length >= 3) {
+      alert('이미지는 최대 3개까지 첨부할 수 있습니다.');
+      return;
+    }
+
+    const response = await launchImageLibrary({mediaType: 'photo'});
+
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.errorMessage) {
+      console.log('Image picker error: ', response.errorMessage);
+    } else if (response.assets && response.assets.length > 0) {
+      setImages(prevImages => [...prevImages, response.assets[0].uri]);
+    }
+  };
+
+  const removeImage = index => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        console.log('🚨 액세스 토큰이 없습니다.');
+        return;
+      }
+
+      const response = await fetch(USER_API_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUserData(data);
+      console.log('✅ 사용자 정보:', data);
+    } catch (error) {
+      console.error('❌ 사용자 정보 조회 오류:', error);
+    }
+  };
+
+  const handleSubmitReport = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        alert('🚨 액세스 토큰이 없습니다. 로그인이 필요합니다.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('name', userData.name);
+      formData.append('number', userData.number);
+      formData.append('119_gen_pw', userData.password);
+      formData.append('incident_location', address);
+      formData.append('address', detailedAddress);
+      formData.append('emergency_type', selectedEmergencyType);
+      formData.append('title', title);
+      formData.append('content', additionalInfo);
+
+      images.forEach((uri, index) => {
+        formData.append(`file_${index + 1}`, {
+          uri,
+          name: `image_${index + 1}.jpg`,
+          type: 'image/jpeg',
+        });
+      });
+
+      const response = await fetch(REPORT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        alert('🚨 신고가 성공적으로 접수되었습니다.');
+      } else {
+        alert('❌ 신고 실패: ' + data.message);
+      }
+
+      console.log('📨 신고 응답:', data);
+    } catch (error) {
+      console.error('❌ 신고 요청 중 오류 발생:', error);
+      alert('🚨 신고 요청 중 오류가 발생했습니다.');
+    }
   };
 
   return (
     <>
-      {/* 약관 모달 */}
       <ConsentModal
         visible={isConsentModalVisible}
-        onClose={handleConsentComplete} // 동의 완료 콜백
+        onClose={handleConsentComplete}
       />
 
       {!isConsentModalVisible && (
@@ -38,36 +161,44 @@ const RescueTextScreen = () => {
           style={styles.container}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <ScrollView contentContainerStyle={{flexGrow: 1}}>
-              {/* 주소 입력 섹션 */}
+            <ScrollView
+              contentContainerStyle={{flexGrow: 1, paddingBottom: 50}}>
+              <Text style={styles.titleText}>
+                <Text style={{color: 'red', fontWeight: 'bold'}}>
+                  119 웹 신고
+                </Text>
+                를 할 수 있습니다. {'\n'}
+                신고 접수를 위해 정보를 입력해주세요.
+              </Text>
+
               <View style={styles.addressContainer}>
                 <Text style={styles.labelText}>주소 입력</Text>
-                <Text style={styles.helperText}>
-                  현 위치의 주소를 GPS로 연동해 자동으로 입력합니다
-                </Text>
                 <TextInput
                   style={styles.addressInput}
-                  placeholder="GPS 연동 자동 입력"
-                  placeholderTextColor="#B1B1B1"
+                  placeholder="도로명 주소 입력"
                   value={address}
                   onChangeText={setAddress}
                 />
                 <TextInput
                   style={styles.detailedAddressInput}
                   placeholder="상세 주소 입력"
-                  placeholderTextColor="#B1B1B1"
                   value={detailedAddress}
                   onChangeText={setDetailedAddress}
                 />
               </View>
-              {/* 신고 내용 입력 */}
+
+              <View style={styles.sectionContainer}>
+                <Text style={styles.labelText}>제목 입력</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="제목을 입력해주세요"
+                  value={title}
+                  onChangeText={setTitle}
+                />
+              </View>
+
               <View style={styles.additionalInfoContainer}>
                 <Text style={styles.labelText}>신고 내용 입력</Text>
-                <Text style={styles.helperText}>
-                  신고하는 사고/사건/상황 혹은 당사자 여부 등을 작성해주세요{' '}
-                  {'\n'}
-                  직접 내용을 작성하는 것이 어렵다면 음성으로 입력해주세요
-                </Text>
                 <View style={styles.inputWithIconAndCounterContainer}>
                   <TextInput
                     style={styles.textInputWithIconAndCounter}
@@ -87,11 +218,68 @@ const RescueTextScreen = () => {
                   </Text>
                 </View>
               </View>
+
+              <View style={styles.sectionContainer}>
+                <Text style={styles.labelText}>응급 사항 유형</Text>
+                <View style={styles.toggleContainer}>
+                  {emergencyTypes.map(type => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.toggleButton,
+                        selectedEmergencyType === type &&
+                          styles.selectedToggleButton,
+                      ]}
+                      onPress={() => setSelectedEmergencyType(type)}>
+                      <Text
+                        style={
+                          selectedEmergencyType === type
+                            ? styles.selectedToggleText
+                            : styles.toggleText
+                        }>
+                        {type}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.imageUploadContainer}>
+                <Text style={styles.labelText}>신고 관련 이미지 추가</Text>
+                <Text style={styles.titleText}>
+                  *이미지는 3개 이하로 첨부 가능합니다
+                </Text>
+                <ScrollView horizontal>
+                  {images.length < 3 && (
+                    <TouchableOpacity
+                      style={styles.imageUploadButton}
+                      onPress={pickImage}>
+                      <Image
+                        source={require('../../img/AdditionalInformation/AddImage.png')}
+                        style={styles.imageIcon}
+                      />
+                    </TouchableOpacity>
+                  )}
+
+                  {images.map((uri, index) => (
+                    <View key={index} style={styles.uploadedImageContainer}>
+                      <Image source={{uri}} style={styles.uploadedImage} />
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => removeImage(index)}>
+                        <Text style={styles.deleteButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
             </ScrollView>
           </TouchableWithoutFeedback>
 
-          <TouchableOpacity style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>119 문자 전송하기</Text>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmitReport}>
+            <Text style={styles.submitButtonText}>119 신고하기</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
       )}

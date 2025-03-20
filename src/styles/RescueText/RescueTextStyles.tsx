@@ -6,19 +6,56 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFFFFF',
   },
+  titleText: {
+    fontSize: 16,
+    color: '#2527BF',
+    marginBottom: 20,
+  },
+  sectionContainer: {
+    marginBottom: 20,
+  },
   labelText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 10,
   },
-  helperText: {
-    fontSize: 14,
-    color: '#2527BF',
-    marginBottom: 20,
+  textInput: {
+    height: 50,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 10,
+    padding: 10,
+    fontSize: 16,
+    color: '#000000',
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 10,
+  },
+  toggleButton: {
+    borderWidth: 1,
+    borderColor: '#B5B5B5',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  selectedToggleButton: {
+    borderColor: '#2527BF',
+    backgroundColor: '#2527BF',
+  },
+  toggleText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  selectedToggleText: {
+    fontSize: 16,
+    color: '#FFFFFF',
   },
   addressContainer: {
-    marginBottom: 30,
+    marginBottom: 10,
   },
   addressInput: {
     height: 50,
@@ -38,38 +75,34 @@ const styles = StyleSheet.create({
     color: '#000000',
     marginBottom: 10,
   },
-  deleteButton: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#2527BF',
-    borderRadius: 50,
-    padding: 6,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deleteButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 15,
-    top: -2,
-  },
   additionalInfoContainer: {
     marginBottom: 20,
   },
-  textInput: {
-    height: 150,
-    backgroundColor: '#F6F6F6',
-    borderRadius: 10,
+  textInputWithIconAndCounter: {
+    height: 200,
     padding: 10,
     fontSize: 16,
     color: '#000000',
     textAlignVertical: 'top',
   },
-  characterCount: {
-    textAlign: 'right',
+  inputWithIconAndCounterContainer: {
+    position: 'relative',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 10,
+    paddingBottom: 30,
+  },
+  microphoneIconInside: {
+    position: 'absolute',
+    left: 10,
+    top: 180,
+    width: 40,
+    height: 40,
+  },
+  characterCountInside: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    fontSize: 16,
     color: '#B5B5B5',
   },
   submitButton: {
@@ -88,33 +121,49 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
-  inputWithIconAndCounterContainer: {
+  imageUploadContainer: {
+    marginBottom: 20,
+  },
+  imageUploadButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  imageIcon: {
+    width: 60,
+    height: 60,
+    tintColor: '#B5B5B5',
+  },
+  uploadedImageContainer: {
     position: 'relative',
-    backgroundColor: '#F6F6F6',
+    marginRight: 10,
+    marginTop: 5,
+  },
+  uploadedImage: {
+    width: 60,
+    height: 60,
     borderRadius: 10,
   },
-  textInputWithIconAndCounter: {
-    height: 200,
-    padding: 10,
-    paddingLeft: 15,
-    paddingBottom: 30,
-    fontSize: 16,
-    color: '#000000',
-    textAlignVertical: 'top',
-  },
-  microphoneIconInside: {
+  deleteButton: {
     position: 'absolute',
-    left: 10,
-    top: 140,
-    width: 40,
-    height: 40,
+    top: -5,
+    right: -5,
+    backgroundColor: '#2527BF',
+    borderRadius: 50,
+    padding: 6,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  characterCountInside: {
-    position: 'absolute',
-    right: 10,
-    bottom: 10,
-    fontSize: 16,
-    color: '#B5B5B5',
+  deleteButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 15,
+    top: -2,
   },
 });
 

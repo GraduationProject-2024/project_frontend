@@ -49,7 +49,7 @@ const SignupStyles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 100,
+    marginTop: 70,
   },
   signupButtonText: {
     color: '#ffffff',

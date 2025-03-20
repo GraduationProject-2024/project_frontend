@@ -6,6 +6,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 16,
   },
+  titleText: {
+    fontSize: 16,
+    color: '#2527BF',
+    marginBottom: 20,
+  },
   bodyPartContainer: {
     marginBottom: 16,
     borderBottomWidth: 1,

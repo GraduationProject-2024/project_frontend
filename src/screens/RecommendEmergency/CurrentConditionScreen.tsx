@@ -75,9 +75,9 @@ const CurrentConditionScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        예상하는 현재의 응급 상태를 선택해주세요.
+        예상하는 현재의 응급 상태를 선택해주세요.{'\n'}
+        해당하는 상태가 없다면 건너뛰십시오.
       </Text>
-      <Text style={styles.title}>해당하는 상태가 없다면 건너뛰십시오.</Text>
 
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
