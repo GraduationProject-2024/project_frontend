@@ -6,20 +6,36 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ AsyncStorage 추가
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next'; // ✅ 번역 추가
 import styles from '../../styles/RecommendEmergency/CurrentConditionStyles';
 
 const CurrentConditionScreen = () => {
+  const {t, i18n} = useTranslation(); // ✅ 번역 훅 추가
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [medicalConditions, setMedicalConditions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
+  const [_, setForceUpdate] = useState(0); // 🔥 강제 리렌더링 추가
+
+  // ✅ 언어 변경 감지 및 강제 리렌더링
+  useEffect(() => {
+    const languageChangedHandler = () => {
+      setForceUpdate(prev => prev + 1); // 🔥 강제 리렌더링
+    };
+
+    i18n.on('languageChanged', languageChangedHandler);
+
+    return () => {
+      i18n.off('languageChanged', languageChangedHandler);
+    };
+  }, []);
 
   // 🔹 비동기로 액세스 토큰을 가져오는 함수
   const getToken = async () => {
     try {
-      const token = await AsyncStorage.getItem('accessToken'); // ✅ 저장된 토큰 가져오기
+      const token = await AsyncStorage.getItem('accessToken');
       return token || null;
     } catch (error) {
       console.error('Error fetching token:', error);
@@ -31,13 +47,13 @@ const CurrentConditionScreen = () => {
   const fetchMedicalConditions = async () => {
     setLoading(true);
     try {
-      const token = await getToken(); // ✅ 비동기로 토큰 가져오기
+      const token = await getToken();
 
       const response = await fetch('http://52.78.79.53:8081/api/v1/condition', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? {Authorization: `Bearer ${token}`} : {}), // ✅ 토큰이 있으면 헤더에 추가
+          ...(token ? {Authorization: `Bearer ${token}`} : {}),
         },
       });
 
@@ -68,15 +84,16 @@ const CurrentConditionScreen = () => {
   };
 
   const handleNext = () => {
-    console.log('선택된 복용하는 약:', selectedConditions);
+    console.log(t('선택된 복용하는 약:'), selectedConditions);
     navigation.navigate('RecommendEmergencyList');
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        예상하는 현재의 응급 상태를 선택해주세요.{'\n'}
-        해당하는 상태가 없다면 건너뛰십시오.
+        {t('예상하는 현재의 응급 상태를 선택해주세요.')}
+        {'\n'}
+        {t('해당하는 상태가 없다면 건너뛰십시오.')}
       </Text>
 
       {loading ? (
@@ -98,7 +115,7 @@ const CurrentConditionScreen = () => {
                   selectedConditions.includes(condition) &&
                     styles.conditionTextSelected,
                 ]}>
-                {condition}
+                {t(condition)} {/* ✅ 번역 적용 */}
               </Text>
             </TouchableOpacity>
           ))}
@@ -114,7 +131,7 @@ const CurrentConditionScreen = () => {
         ]}
         onPress={handleNext}>
         <Text style={styles.actionButtonText}>
-          {selectedConditions.length > 0 ? '선택 완료' : '건너뛰기'}
+          {selectedConditions.length > 0 ? t('선택 완료') : t('건너뛰기')}
         </Text>
       </TouchableOpacity>
     </View>

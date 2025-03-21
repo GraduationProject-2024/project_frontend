@@ -39,11 +39,12 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     height: 50,
-    backgroundColor: '#d1d1d1',
-    borderRadius: 10,
-    justifyContent: 'center',
+    backgroundColor: '#2527BF',
+    borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 24,
+    justifyContent: 'center',
+    marginTop: 16,
+    marginBottom: 10,
   },
   actionButtonActive: {
     backgroundColor: '#2527BF',
@@ -52,8 +53,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#B5B5B5',
   },
   actionButtonText: {
-    fontSize: 16,
     color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
