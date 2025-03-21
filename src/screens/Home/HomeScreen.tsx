@@ -2,16 +2,32 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next'; // ✅ 번역 적용
 import HomeStyles from '../../styles/Home/HomeStyles';
 import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
 const API_BASE_URL = 'http://52.78.79.53:8081/api/v1';
 
 const HomeScreen = () => {
+  const {t, i18n} = useTranslation(); // ✅ 번역 훅 추가
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [bodyParts, setBodyParts] = useState([]);
   const [accessToken, setAccessToken] = useState(null);
   const navigation = useNavigation();
+  const [_, setForceUpdate] = useState(0); // 🔥 강제 리렌더링 추가
+
+  // ✅ 언어 변경 감지 및 강제 리렌더링
+  useEffect(() => {
+    const languageChangedHandler = () => {
+      setForceUpdate(prev => prev + 1); // 🔥 강제 리렌더링
+    };
+
+    i18n.on('languageChanged', languageChangedHandler);
+
+    return () => {
+      i18n.off('languageChanged', languageChangedHandler);
+    };
+  }, []);
 
   // ✅ 로그인 후 액세스 토큰을 받아와 AsyncStorage에 저장
   const getAccessToken = async () => {
@@ -124,9 +140,11 @@ const HomeScreen = () => {
 
       {/* AI Pre-Diagnosis Section */}
       <View style={HomeStyles.diagnosisSection}>
-        <Text style={HomeStyles.sectionTitle}>AI 사전 문진 바로 시작하기</Text>
+        <Text style={HomeStyles.sectionTitle}>
+          {t('AI 사전 문진 바로 시작하기')}
+        </Text>
         <Text style={HomeStyles.sectionSubtitle}>
-          치료가 필요하신 부분을 선택해주세요
+          {t('치료가 필요하신 부분을 선택해주세요')}
         </Text>
         <View style={HomeStyles.buttonGrid}>
           {bodyParts.length > 0 ? (
@@ -144,13 +162,13 @@ const HomeScreen = () => {
                     selectedButtons.includes(label) &&
                       HomeStyles.selectedButtonText,
                   ]}>
-                  {label}
+                  {t(label)} {/* ✅ 번역 적용 */}
                 </Text>
               </TouchableOpacity>
             ))
           ) : (
             <Text style={HomeStyles.loadingText}>
-              신체 데이터를 불러오는 중...
+              {t('신체 데이터를 불러오는 중...')}
             </Text>
           )}
         </View>
@@ -161,53 +179,53 @@ const HomeScreen = () => {
           ]}
           onPress={handleStartPress}
           disabled={!isStartButtonActive}>
-          <Text style={HomeStyles.startButtonText}>시작하기</Text>
+          <Text style={HomeStyles.startButtonText}>{t('시작하기')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Menu Section */}
       <View style={HomeStyles.menuSection}>
-        <Text style={HomeStyles.sectionTitle}>메뉴 바로 가기</Text>
+        <Text style={HomeStyles.sectionTitle}>{t('메뉴 바로 가기')}</Text>
         <View style={HomeStyles.menuGrid}>
           {[
             {
               icon: require('../../img/Home/aidiagnosisIcon.png'),
-              label: 'AI 사전 문진',
+              label: t('AI 사전 문진'),
               onPress: () => navigation.navigate('ChooseMainBody'),
             },
             {
               icon: require('../../img/Home/recommendhospitalIcon.png'),
-              label: '병원 추천',
+              label: t('병원 추천'),
               onPress: () => navigation.navigate('RecommendDepartment'),
             },
             {
               icon: require('../../img/Home/recommendpharmacyIcon.png'),
-              label: '약국 추천',
+              label: t('약국 추천'),
               onPress: () => navigation.navigate('RecommendPharmacyList'),
             },
             {
               icon: require('../../img/Home/recommendemergencyIcon.png'),
-              label: '응급실 추천',
+              label: t('응급실 추천'),
               onPress: () => navigation.navigate('CurrentCondition'),
             },
             {
               icon: require('../../img/Home/translatelanguageIcon.png'),
-              label: '언어 변환',
+              label: t('언어 변환'),
               onPress: () => navigation.navigate('TranslateLanguage'),
             },
             {
               icon: require('../../img/Home/recordtranslateIcon.png'),
-              label: '녹음 및 번역',
+              label: t('녹음 및 번역'),
               onPress: () => navigation.navigate('RecordAndTranslate'),
             },
             {
               icon: require('../../img/Home/rescuemessageIcon.png'),
-              label: '119 신고',
+              label: t('119 신고'),
               onPress: () => navigation.navigate('RescueText'),
             },
             {
               icon: require('../../img/Home/profileIcon.png'),
-              label: '개인 정보',
+              label: t('개인 정보'),
               onPress: () => navigation.navigate('MyInformation'),
             },
           ].map((item, index) => (

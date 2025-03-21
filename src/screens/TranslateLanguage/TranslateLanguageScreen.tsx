@@ -8,28 +8,15 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import TranslateLanguageStyles from '../../styles/TranslateLanguage/TranslateLanguageStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
-import i18n from '../../locales/i18n';
-import {useTranslation} from 'react-i18next';
+import RNRestart from 'react-native-restart';
+import {changeAppLanguage} from '../../locales/i18n'; // ✅ 변경된 언어 변경 함수 가져오기
 
 const TranslateLanguageScreen = ({navigation}) => {
   const {t, i18n} = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
-  const [_, setForceUpdate] = useState(0);
-
-  useEffect(() => {
-    const languageChangedHandler = () => {
-      setSelectedLanguage(i18n.language);
-      setForceUpdate(prev => prev + 1); // 강제 리렌더링
-    };
-
-    i18n.on('languageChanged', languageChangedHandler);
-
-    return () => {
-      i18n.off('languageChanged', languageChangedHandler);
-    };
-  }, []);
 
   const languages = [
     {label: '한국어', value: 'ko'},
@@ -40,19 +27,31 @@ const TranslateLanguageScreen = ({navigation}) => {
   ];
 
   const handleLanguageChange = async language => {
-    await i18n.changeLanguage(language.value);
-    await AsyncStorage.setItem('appLanguage', language.value); // 언어 저장
-    console.log(`🌍 언어 변경: ${language.value}`);
-    setForceUpdate(prev => prev + 1); // 🔥 강제 리렌더링 추가
-  };
+    console.log(`🌍 언어 변경 요청: ${language.value}`);
 
-  const handleConfirmLanguageChange = () => {
+    // ✅ 현재 언어와 동일한 경우 변경하지 않음
+    if (i18n.language === language.value) {
+      console.log('ℹ️ 동일한 언어 선택됨, 변경하지 않음.');
+      return;
+    }
+
+    await changeAppLanguage(language.value); // ✅ `i18n.ts`에 정의된 변경 함수 사용
+
     Alert.alert(
       t('언어 변경'),
-      t('언어가 변경되었습니다. 홈 화면으로 이동하시겠습니까?'),
+      t('언어가 변경되었습니다. 앱이 재시작됩니다.'),
       [
-        {text: t('취소'), style: 'cancel'},
-        {text: t('확인'), onPress: () => navigation.navigate('Home')},
+        {
+          text: t('취소'),
+          style: 'cancel',
+        },
+        {
+          text: t('확인'),
+          onPress: () => {
+            console.log('🔥 앱을 재시작합니다.');
+            RNRestart.restart();
+          },
+        },
       ],
     );
   };
@@ -63,7 +62,11 @@ const TranslateLanguageScreen = ({navigation}) => {
         data={languages}
         renderItem={({item}) => (
           <TouchableOpacity
-            style={TranslateLanguageStyles.languageItem}
+            style={[
+              TranslateLanguageStyles.languageItem,
+              selectedLanguage === item.value &&
+                TranslateLanguageStyles.selectedLanguageItem,
+            ]}
             onPress={() => handleLanguageChange(item)}>
             <Text style={TranslateLanguageStyles.languageText}>
               {item.label}
@@ -84,10 +87,12 @@ const TranslateLanguageScreen = ({navigation}) => {
         <TouchableOpacity
           style={[
             TranslateLanguageStyles.button,
-            {backgroundColor: selectedLanguage ? '#2527BF' : '#B5B5B5'},
+            selectedLanguage
+              ? TranslateLanguageStyles.activeButton
+              : TranslateLanguageStyles.disabledButton,
           ]}
           disabled={!selectedLanguage}
-          onPress={handleConfirmLanguageChange}>
+          onPress={() => handleLanguageChange({value: selectedLanguage})}>
           <Text style={TranslateLanguageStyles.buttonText}>
             {t('언어 변환')}
           </Text>
