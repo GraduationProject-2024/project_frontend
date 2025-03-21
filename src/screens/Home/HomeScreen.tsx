@@ -2,24 +2,24 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTranslation} from 'react-i18next'; // ✅ 번역 적용
+import {useTranslation} from 'react-i18next';
 import HomeStyles from '../../styles/Home/HomeStyles';
 import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
 const API_BASE_URL = 'http://52.78.79.53:8081/api/v1';
 
 const HomeScreen = () => {
-  const {t, i18n} = useTranslation(); // ✅ 번역 훅 추가
+  const {t, i18n} = useTranslation();
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [bodyParts, setBodyParts] = useState([]);
   const [accessToken, setAccessToken] = useState(null);
   const navigation = useNavigation();
-  const [_, setForceUpdate] = useState(0); // 🔥 강제 리렌더링 추가
+  const [_, setForceUpdate] = useState(0);
 
   // ✅ 언어 변경 감지 및 강제 리렌더링
   useEffect(() => {
     const languageChangedHandler = () => {
-      setForceUpdate(prev => prev + 1); // 🔥 강제 리렌더링
+      setForceUpdate(prev => prev + 1);
     };
 
     i18n.on('languageChanged', languageChangedHandler);
@@ -162,7 +162,7 @@ const HomeScreen = () => {
                     selectedButtons.includes(label) &&
                       HomeStyles.selectedButtonText,
                   ]}>
-                  {t(label)} {/* ✅ 번역 적용 */}
+                  {t(label)}
                 </Text>
               </TouchableOpacity>
             ))
@@ -190,42 +190,42 @@ const HomeScreen = () => {
           {[
             {
               icon: require('../../img/Home/aidiagnosisIcon.png'),
-              label: t('AI 사전 문진'),
+              label: 'AI 사전 문진',
               onPress: () => navigation.navigate('ChooseMainBody'),
             },
             {
               icon: require('../../img/Home/recommendhospitalIcon.png'),
-              label: t('병원 추천'),
+              label: '병원 추천',
               onPress: () => navigation.navigate('RecommendDepartment'),
             },
             {
               icon: require('../../img/Home/recommendpharmacyIcon.png'),
-              label: t('약국 추천'),
+              label: '약국 추천',
               onPress: () => navigation.navigate('RecommendPharmacyList'),
             },
             {
               icon: require('../../img/Home/recommendemergencyIcon.png'),
-              label: t('응급실 추천'),
+              label: '응급실 추천',
               onPress: () => navigation.navigate('CurrentCondition'),
             },
             {
               icon: require('../../img/Home/translatelanguageIcon.png'),
-              label: t('언어 변환'),
+              label: '언어 변환',
               onPress: () => navigation.navigate('TranslateLanguage'),
             },
             {
               icon: require('../../img/Home/recordtranslateIcon.png'),
-              label: t('녹음 및 번역'),
+              label: '녹음 및 번역',
               onPress: () => navigation.navigate('RecordAndTranslate'),
             },
             {
               icon: require('../../img/Home/rescuemessageIcon.png'),
-              label: t('119 신고'),
+              label: '119 신고',
               onPress: () => navigation.navigate('RescueText'),
             },
             {
               icon: require('../../img/Home/profileIcon.png'),
-              label: t('개인 정보'),
+              label: '개인 정보',
               onPress: () => navigation.navigate('MyInformation'),
             },
           ].map((item, index) => (
@@ -234,7 +234,7 @@ const HomeScreen = () => {
               style={HomeStyles.menuItem}
               onPress={item.onPress}>
               <Image source={item.icon} style={HomeStyles.menuIcon} />
-              <Text style={HomeStyles.menuText}>{item.label}</Text>
+              <Text style={HomeStyles.menuText}>{t(item.label)}</Text>
             </TouchableOpacity>
           ))}
         </View>

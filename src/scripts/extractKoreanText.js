@@ -10,18 +10,32 @@ const __dirname = path.dirname(__filename);
 const SCREENS_DIR = path.join(__dirname, '../screens');
 const OUTPUT_FILE = path.join(__dirname, '../locales/ko.json');
 
-// 🚀 한글 문장을 정확히 추출하는 정규식
-const KOREAN_REGEX = /([\uAC00-\uD7A3]+(?:\s?[가-힣0-9,.!?()"'\-<>:{}[\]]+)*)/g;
+// ✅ 한글 및 특수문자 탐지 정규식 (이모지 포함)
+const KOREAN_REGEX =
+  /([\uAC00-\uD7A3]+(?:\s?[가-힣0-9,.!?()"'\-<>:{}[\]\s💡✨🔥👍😊🤔]*)*)/g;
 
-// 📌 강화된 정규식 패턴 (더 많은 한글 탐지)
+// ✅ HTML 엔터티 변환 함수
+function decodeHTMLEntities(text) {
+  const entities = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+  };
+
+  return text.replace(/&[a-zA-Z0-9#]+;/g, match => entities[match] || match);
+}
+
+// ✅ 강화된 정규식 패턴
 const JSX_TEXT_REGEX = /<Text[^>]*>(.*?)<\/Text>/gs; // <Text>한글</Text>
 const JSX_EXPRESSION_REGEX = /<Text[^>]*>{["'`](.*?)["'`]}<\/Text>/gs; // <Text>{"한글"}</Text>
 const ATTRIBUTE_REGEX =
-  /(placeholder|title|label|buttonText|alt|hint|header|aria-label)=["'`](.*?)["'`]/g; // 속성에서 한글 추출
+  /(placeholder|title|label|buttonText|alt|hint|header|aria-label)=["'`](.*?)["'`]/g; // 속성 값
 const FUNCTION_REGEX = /\b(?:alert|t|someFunc)\(["'`](.*?)["'`]\)/g; // alert("한글")
 const GENERAL_FUNC_REGEX = /\b\w+\(["'`](.*?)["'`]\)/g; // someFunc("한글")
 
-// 모든 파일을 읽어서 한글을 추출하는 함수
+// ✅ 모든 파일을 읽어서 한글을 추출하는 함수
 const extractKoreanText = dir => {
   let koreanTexts = new Set();
 
@@ -42,7 +56,7 @@ const extractKoreanText = dir => {
         const matches = content.match(KOREAN_REGEX);
         if (matches) {
           matches.forEach(match => {
-            koreanTexts.add(match.trim());
+            koreanTexts.add(decodeHTMLEntities(match.trim())); // 🔥 HTML 엔터티 변환 적용
           });
         }
 
@@ -52,7 +66,7 @@ const extractKoreanText = dir => {
           jsxTextMatches.forEach(match => {
             const textContent = match.replace(/<\/?Text[^>]*>/g, '').trim();
             if (textContent.match(KOREAN_REGEX)) {
-              koreanTexts.add(textContent);
+              koreanTexts.add(decodeHTMLEntities(textContent));
             }
           });
         }
@@ -65,7 +79,7 @@ const extractKoreanText = dir => {
               .replace(/<Text[^>]*>{["'`]?|["'`]?}<\/Text>/g, '')
               .trim();
             if (extractedText.match(KOREAN_REGEX)) {
-              koreanTexts.add(extractedText);
+              koreanTexts.add(decodeHTMLEntities(extractedText));
             }
           });
         }
@@ -75,7 +89,7 @@ const extractKoreanText = dir => {
         attributeMatches.forEach(match => {
           const extractedText = match[2].trim();
           if (extractedText.match(KOREAN_REGEX)) {
-            koreanTexts.add(extractedText);
+            koreanTexts.add(decodeHTMLEntities(extractedText));
           }
         });
 
@@ -84,7 +98,7 @@ const extractKoreanText = dir => {
         functionMatches.forEach(match => {
           const extractedText = match[1].trim();
           if (extractedText.match(KOREAN_REGEX)) {
-            koreanTexts.add(extractedText);
+            koreanTexts.add(decodeHTMLEntities(extractedText));
           }
         });
 
@@ -93,7 +107,7 @@ const extractKoreanText = dir => {
         generalFuncMatches.forEach(match => {
           const extractedText = match[1].trim();
           if (extractedText.match(KOREAN_REGEX)) {
-            koreanTexts.add(extractedText);
+            koreanTexts.add(decodeHTMLEntities(extractedText));
           }
         });
       }
@@ -104,7 +118,7 @@ const extractKoreanText = dir => {
   return Array.from(koreanTexts);
 };
 
-// 한글을 JSON 파일로 저장하는 함수
+// ✅ 한글을 JSON 파일로 저장하는 함수
 const saveKoreanTextToJSON = () => {
   const koreanTexts = extractKoreanText(SCREENS_DIR);
   console.log(`✅ 총 ${koreanTexts.length}개의 한글 문자열이 추출됨!`); // ✅ 총 개수 출력
@@ -118,5 +132,5 @@ const saveKoreanTextToJSON = () => {
   console.log(`✅ 한글 문자열이 ${OUTPUT_FILE} 파일에 저장되었습니다!`);
 };
 
-// 실행
+// ✅ 실행
 saveKoreanTextToJSON();
