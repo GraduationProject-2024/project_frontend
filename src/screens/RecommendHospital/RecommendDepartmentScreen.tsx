@@ -9,25 +9,26 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
 import styles from '../../styles/RecommendHospital/RecommendDepartmentStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/department';
 
 const RecommendDepartmentScreen = () => {
   const navigation = useNavigation();
+  const {t} = useTranslation(); // ✅ 번역 훅 추가
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 전체 진료과 리스트 가져오기
+  // ✅ API에서 진료과 리스트 가져오기
   const fetchDepartments = async () => {
     setLoading(true);
     try {
       let accessToken = await AsyncStorage.getItem('accessToken');
 
       if (!accessToken) {
-        throw new Error('토큰이 없어 데이터를 불러올 수 없습니다.');
+        throw new Error(t('토큰이 없어 데이터를 불러올 수 없습니다.'));
       }
 
       const response = await axios.get(API_URL, {
@@ -43,7 +44,7 @@ const RecommendDepartmentScreen = () => {
     } catch (err) {
       console.error('API 요청 실패:', err.response?.status, err.response?.data);
       setError(
-        `데이터를 불러오는 데 실패했습니다: ${err.response?.status} - ${
+        `${t('데이터를 불러오는 데 실패했습니다')}: ${err.response?.status} - ${
           err.response?.data?.message || err.message
         }`,
       );
@@ -86,8 +87,8 @@ const RecommendDepartmentScreen = () => {
               selectedDepartment: department.title, // ✅ `title`을 넘기도록 수정
             });
           }}>
-          <Text style={styles.title}>{department.title}</Text>
-          <Text style={styles.description}>{department.description}</Text>
+          <Text style={styles.title}>{t(department.title)}</Text>
+          <Text style={styles.description}>{t(department.description)}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
