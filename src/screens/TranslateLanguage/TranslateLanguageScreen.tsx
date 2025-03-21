@@ -3,44 +3,47 @@ import {View, Text, FlatList, TouchableOpacity, Image} from 'react-native';
 import TranslateLanguageStyles from '../../styles/TranslateLanguage/TranslateLanguageStyles';
 import TranslateLanguageAlertScreen from '../../components/TranslateLanguage/TranslateLanguageAlertScreen';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
+import i18n from '../../locales/i18n'; // ✅ i18n import 확인
+import {useTranslation} from 'react-i18next';
 
 const TranslateLanguageScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const languages = [
-    '한국어',
-    'English',
-    'Tiếng Việt',
-    '中国人(简体)',
-    '中国人(繁体)',
+    {label: '한국어', value: 'ko'},
+    {label: 'English', value: 'en'},
+    {label: 'Tiếng Việt', value: 'vi'},
+    {label: '中国人(简体)', value: 'zh-cn'},
+    {label: '中国人(繁体)', value: 'zh-tw'},
   ];
 
-  const renderItem = ({item}) => (
-    <TouchableOpacity
-      style={TranslateLanguageStyles.languageItem}
-      onPress={() => setSelectedLanguage(item)}>
-      <Text style={TranslateLanguageStyles.languageText}>{item}</Text>
-      {selectedLanguage === item && (
-        <Image
-          source={CheckIcon}
-          style={TranslateLanguageStyles.languageIcon}
-        />
-      )}
-    </TouchableOpacity>
-  );
-
-  const handleConfirm = () => {
-    setModalVisible(false);
-    navigation.navigate('Home');
+  const handleLanguageChange = language => {
+    setSelectedLanguage(language);
+    i18n.changeLanguage(language.value);
   };
 
   return (
     <View style={TranslateLanguageStyles.container}>
       <FlatList
         data={languages}
-        renderItem={renderItem}
-        keyExtractor={item => item}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            style={TranslateLanguageStyles.languageItem}
+            onPress={() => handleLanguageChange(item)}>
+            <Text style={TranslateLanguageStyles.languageText}>
+              {item.label}
+            </Text>
+            {selectedLanguage?.value === item.value && (
+              <Image
+                source={CheckIcon}
+                style={TranslateLanguageStyles.languageIcon}
+              />
+            )}
+          </TouchableOpacity>
+        )}
+        keyExtractor={item => item.value}
         style={TranslateLanguageStyles.languageList}
       />
 
@@ -48,24 +51,16 @@ const TranslateLanguageScreen = ({navigation}) => {
         <TouchableOpacity
           style={[
             TranslateLanguageStyles.button,
-            {
-              backgroundColor: selectedLanguage ? '#2527BF' : '#B5B5B5',
-            },
+            {backgroundColor: selectedLanguage ? '#2527BF' : '#B5B5B5'},
           ]}
-          disabled={!selectedLanguage}
-          onPress={() => setModalVisible(true)}>
-          <Text style={TranslateLanguageStyles.buttonText}>언어 변환</Text>
+          disabled={!selectedLanguage}>
+          <Text style={TranslateLanguageStyles.buttonText}>
+            {t('언어 변환')}
+          </Text>
         </TouchableOpacity>
       </View>
-
-      <TranslateLanguageAlertScreen
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onConfirm={handleConfirm}
-        selectedLanguage={selectedLanguage}
-      />
     </View>
   );
 };
 
-export default TranslateLanguageScreen;
+export default TranslateLanguageScreen; // ✅ 반드시 default export!

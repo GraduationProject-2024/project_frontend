@@ -10,7 +10,7 @@
     "test": "jest",
     "scripts": {
       "extract:korean": "node src/scripts/extractKoreanText.js",
-          "translate": "node -r dotenv/config src/scripts/translateJSON.js"
+      "translate": "node -r dotenv/config src/scripts/translateJSON.js"
     }
   },
   "dependencies": {
@@ -24,8 +24,10 @@
     "dotenv": "^16.4.7",
     "expo-linear-gradient": "^14.0.1",
     "expo-modules-core": "^2.1.2",
+    "i18next": "^24.2.3",
     "node-fetch": "^3.3.2",
     "react": "18.3.1",
+    "react-i18next": "^15.4.1",
     "react-native": "0.76.2",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^2.21.2",
