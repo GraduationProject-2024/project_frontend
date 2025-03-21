@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import en from './en.json';
 import ko from './ko.json';
 import vi from './vi.json';
@@ -14,15 +15,23 @@ const resources = {
   'zh-tw': {translation: zhTW},
 };
 
-// ✅ 초기화 코드 수정
-const initI18n = async () => {
+export const initializeI18n = async () => {
   try {
+    console.log('🔄 i18n 초기화 시작');
+
+    const savedLanguage = await AsyncStorage.getItem('appLanguage');
+    console.log('📦 저장된 언어:', savedLanguage);
+
+    const defaultLanguage = savedLanguage || 'ko';
+    console.log('🌍 적용할 언어:', defaultLanguage);
+
     await i18n.use(initReactI18next).init({
       resources,
-      lng: 'ko', // 기본 언어 설정
+      lng: defaultLanguage,
       fallbackLng: 'en',
       compatibilityJSON: 'v3',
       interpolation: {escapeValue: false},
+      react: {useSuspense: false},
     });
 
     console.log(`✅ i18n 초기화 완료! 현재 언어: ${i18n.language}`);
@@ -30,8 +39,5 @@ const initI18n = async () => {
     console.error('❌ i18n 초기화 오류:', error);
   }
 };
-
-// ✅ 비동기 실행
-initI18n();
 
 export default i18n;
