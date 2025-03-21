@@ -513,5 +513,11 @@
   "언어 변환": "Chuyển đổi ngôn ngữ",
   "🌍 언어 변경 요청: ${language.value}": "🌍 Yêu cầu thay đổi ngôn ngữ: ${language.value}",
   "ℹ️ 동일한 언어 선택됨, 변경하지 않음.": "ℹ️ Ngôn ngữ được chọn không thay đổi.",
-  "🔥 앱을 재시작합니다.": "🔥 Khởi động lại ứng dụng."
+  "🔥 앱을 재시작합니다.": "🔥 Khởi động lại ứng dụng.",
+  "약관 동의": "Đồng ý điều khoản",
+  "약관에 동의하셔야 119 문자 신고가 가능합니다": "Bạn phải đồng ý với các điều khoản để báo cáo khẩn cấp qua tin nhắn 119.",
+  "약관 전체 동의": "Đồng ý tất cả các điều khoản",
+  "개인 정보 수집 및 이용 동의 (필수)": "Đồng ý thu thập và sử dụng thông tin cá nhân (Bắt buộc)",
+  "위치 정보 수집 및 이용 동의(필수)": "Đồng ý thu thập và sử dụng thông tin vị trí (Bắt buộc)",
+  "동의 완료": "Hoàn tất đồng ý"
 }

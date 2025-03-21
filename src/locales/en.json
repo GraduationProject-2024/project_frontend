@@ -510,5 +510,12 @@
   "언어 변환": "Language Conversion",
   "🌍 언어 변경 요청: ${language.value}": "🌍 Request language change: ${language.value}",
   "ℹ️ 동일한 언어 선택됨, 변경하지 않음.": "ℹ️ Same language selected, no change.",
-  "🔥 앱을 재시작합니다.": "🔥 Restart the app."
+  "🔥 앱을 재시작합니다.": "🔥 Restart the app.",
+  "약관 동의": "Terms Agreement",
+  "약관에 동의하셔야 119 문자 신고가 가능합니다": "You must agree to the terms to report an emergency via text to 119.",
+  "약관 전체 동의": "Agree to all terms",
+  "개인 정보 수집 및 이용 동의 (필수)": "Consent to the collection and use of personal information (Required)",
+  "위치 정보 수집 및 이용 동의(필수)": "Consent to the collection and use of location information (Required)",
+  "동의 완료": "Agreement Complete",
+
 }
