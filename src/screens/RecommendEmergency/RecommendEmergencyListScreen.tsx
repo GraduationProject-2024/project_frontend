@@ -13,9 +13,11 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from 'react-native-geolocation-service';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next'; // ✅ 번역 훅 추가
 import styles from '../../styles/RecommendEmergency/RecommendEmergencyListStyles';
 
 const RecommendEmergencyListScreen = () => {
+  const {t} = useTranslation(); // ✅ 번역 훅 사용
   const [emergencyList, setEmergencyList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -28,11 +30,11 @@ const RecommendEmergencyListScreen = () => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: '위치 권한 필요',
-            message: '이 앱은 응급실 추천을 위해 위치 정보를 사용합니다.',
-            buttonNeutral: '나중에',
-            buttonNegative: '거부',
-            buttonPositive: '허용',
+            title: t('위치 권한 필요'),
+            message: t('이 앱은 응급실 추천을 위해 위치 정보를 사용합니다.'),
+            buttonNeutral: t('나중에'),
+            buttonNegative: t('거부'),
+            buttonPositive: t('허용'),
           },
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED;
@@ -56,7 +58,7 @@ const RecommendEmergencyListScreen = () => {
         setLongitude(position.coords.longitude);
       },
       error => {
-        console.error('위치 정보를 가져올 수 없습니다:', error);
+        console.error(t('위치 정보를 가져올 수 없습니다:'), error);
       },
       {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
     );
@@ -71,7 +73,7 @@ const RecommendEmergencyListScreen = () => {
         conditions: conditions ? JSON.parse(conditions) : [],
       };
     } catch (error) {
-      console.error('Error fetching stored data:', error);
+      console.error(t('저장된 데이터를 가져오는 중 오류 발생:'), error);
       return {token: null, conditions: []};
     }
   };
@@ -83,7 +85,7 @@ const RecommendEmergencyListScreen = () => {
       const isCondition = conditions.length > 0;
 
       if (latitude === null || longitude === null) {
-        console.warn('위치 정보를 가져오지 못했습니다.');
+        console.warn(t('위치 정보를 가져오지 못했습니다.'));
         return;
       }
 
@@ -106,20 +108,20 @@ const RecommendEmergencyListScreen = () => {
       }
 
       const data = await response.json();
-      console.log('응급실 추천 리스트:', data);
+      console.log(t('응급실 추천 리스트:'), data);
 
       setEmergencyList(
         data.map((item: any) => ({
           id: item.id,
           name: item.dutyName,
-          number: item.dutyTel3 || '번호 없음',
-          time: `${item.transit_travel_time_m}분`,
-          distance: `${item.transit_travel_distance_km}km`,
+          number: item.dutyTel3 || t('번호 없음'),
+          time: `${item.transit_travel_time_m}${t('분')}`,
+          distance: `${item.transit_travel_distance_km}${t('km')}`,
           address: item.dutyAddr,
         })),
       );
     } catch (error) {
-      console.error('Error fetching emergency list:', error);
+      console.error(t('응급실 목록을 가져오는 중 오류 발생:'), error);
     } finally {
       setLoading(false);
     }
@@ -145,30 +147,30 @@ const RecommendEmergencyListScreen = () => {
       }
 
       const data = await response.json();
-      console.log('응급실 지도 정보:', data);
+      console.log(t('응급실 지도 정보:'), data);
 
       Alert.alert(
-        '지도 선택',
-        '어떤 지도에서 응급실 위치를 확인하시겠습니까?',
+        t('지도 선택'),
+        t('어떤 지도에서 응급실 위치를 확인하시겠습니까?'),
         [
           {
-            text: '네이버 지도',
+            text: t('네이버 지도'),
             onPress: () => Linking.openURL(data.map_urls.naver_map),
           },
           {
-            text: '카카오 지도',
+            text: t('카카오 지도'),
             onPress: () => Linking.openURL(data.map_urls.kakao_map),
           },
           {
-            text: '구글 지도',
+            text: t('구글 지도'),
             onPress: () => Linking.openURL(data.map_urls.google_map),
           },
-          {text: '취소', style: 'cancel'},
+          {text: t('취소'), style: 'cancel'},
         ],
         {cancelable: true},
       );
     } catch (error) {
-      console.error('Error fetching emergency map:', error);
+      console.error(t('응급실 지도 정보를 가져오는 중 오류 발생:'), error);
     }
   };
 
