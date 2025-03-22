@@ -69,7 +69,7 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
 
 const SymptomOnsetTimeScreen = () => {
   const [selectedNumber, setSelectedNumber] = useState(5);
-  const [selectedUnit, setSelectedUnit] = useState('초');
+  const [selectedUnit, setSelectedUnit] = useState('분');
   const [isNextButtonActive, setIsNextButtonActive] = useState(false);
   const navigation = useNavigation();
 
