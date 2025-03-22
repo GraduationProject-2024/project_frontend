@@ -90,7 +90,7 @@ const SymptomOnsetTimeScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const selectedSignIds = route.params?.selectedSignIds; // ✅ 전달받은 증상 ID
+  const selectedSignIds = route.params?.selectedSignIds;
   const [selectedNumber, setSelectedNumber] = useState(5);
   const [selectedUnit, setSelectedUnit] = useState('분');
   const [isNextButtonActive, setIsNextButtonActive] = useState(false);
@@ -162,7 +162,7 @@ const SymptomOnsetTimeScreen = () => {
       );
 
       Alert.alert('Success', '증상 시작 시간이 저장되었습니다.');
-      navigation.navigate('PainIntensity'); // ✅ 다음 단계로 이동
+      navigation.navigate('PainIntensity');
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
