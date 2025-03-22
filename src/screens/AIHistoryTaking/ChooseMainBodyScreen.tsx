@@ -15,12 +15,16 @@ import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
 const FETCH_API_URL = 'http://52.78.79.53:8081/api/v1/main-body/all';
 const SAVE_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
+const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
 
 const ChooseMainBodyScreen: React.FC = () => {
   const navigation = useNavigation();
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const [mainBodyParts, setMainBodyParts] = useState<
-    {body: string; description: string}[]
+    {body: string; description: string; mainBodyPartId: number}[]
+  >([]);
+  const [subBodyParts, setSubBodyParts] = useState<
+    {body: string; description: string; mainBodyPartId: number}[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -60,27 +64,39 @@ const ChooseMainBodyScreen: React.FC = () => {
     fetchMainBodyParts();
   }, []);
 
-  const toggleSelection = (body: string) => {
-    const matchedPart = mainBodyParts.find(p => p.body === body);
-    if (!matchedPart) {
-      return;
-    }
-
-    if (selectedParts.includes(matchedPart.description)) {
-      setSelectedParts(
-        selectedParts.filter(item => item !== matchedPart.description),
-      );
-    } else {
-      if (selectedParts.length >= 2) {
-        Alert.alert('선택 제한', '최대 2개까지만 선택할 수 있습니다.');
+  const fetchSubBodyParts = async (bodies: string[]) => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
         return;
       }
-      setSelectedParts([...selectedParts, matchedPart.description]);
+
+      const query = bodies
+        .map(body => `body=${encodeURIComponent(body)}`)
+        .join('&');
+      const requestUrl = `${SUB_BODY_API_URL}?${query}`;
+      console.log('📤 세부 신체 부위 조회 요청:', requestUrl);
+
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ 서버 응답 (세부 신체 부위):', data);
+      setSubBodyParts(data);
+    } catch (err) {
+      console.error('❌ 세부 신체 부위 조회 오류:', err);
+      setError(err.message);
     }
-    console.log('📌 현재 선택한 신체 부위:', [
-      ...selectedParts,
-      matchedPart.description,
-    ]);
   };
 
   const handleConfirm = async () => {
@@ -124,6 +140,8 @@ const ChooseMainBodyScreen: React.FC = () => {
       if (!result.selectedMBPId) {
         throw new Error('서버 응답에 selectedMBPId가 없습니다.');
       }
+
+      await fetchSubBodyParts(selectedParts);
 
       Alert.alert('Success', '선택한 부위가 저장되었습니다.');
       navigation.navigate('ChooseDetailBody', {

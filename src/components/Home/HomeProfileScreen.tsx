@@ -14,6 +14,7 @@ const HomeProfileScreen = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnim = useRef(new Animated.Value(0)).current;
 
+  const [nickname, setNickname] = useState('');
   const [gender, setGender] = useState('');
   const [age, setAge] = useState(0);
   const [pastHistory, setPastHistory] = useState('');
@@ -21,7 +22,33 @@ const HomeProfileScreen = () => {
   const [nowMedicine, setNowMedicine] = useState('');
   const [allergy, setAllergy] = useState('');
 
-  // API 호출 함수
+  // 닉네임 조회 API 호출
+  const fetchNickname = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(
+        'http://52.78.79.53:8081/api/v1/member/nickname',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setNickname(data.nickname);
+    } catch (error) {
+      console.error('Error fetching nickname:', error);
+    }
+  };
+
+  // 기본 정보 조회 API 호출
   const fetchBasicInfo = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -75,6 +102,7 @@ const HomeProfileScreen = () => {
 
   // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
+    fetchNickname();
     fetchBasicInfo();
     fetchHealthInfo();
   }, []);
@@ -124,7 +152,7 @@ const HomeProfileScreen = () => {
             style={styles.profileImage}
           />
           <View>
-            <Text style={styles.profileText}>눈송이 님</Text>
+            <Text style={styles.profileText}>{nickname} 님</Text>
             <Text style={styles.profileSubText}>
               {gender}, 만 {age}세
             </Text>

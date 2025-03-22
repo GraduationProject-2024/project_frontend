@@ -9,15 +9,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
-  bodyPartContainer: {
-    marginBottom: 30,
-  },
-  partTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2527BF',
-    marginBottom: 12,
-  },
   groupContainer: {
     marginBottom: 20,
   },
@@ -27,33 +18,36 @@ const styles = StyleSheet.create({
     color: '#2527BF',
     marginBottom: 10,
   },
-  conditionsWrapper: {
+  toggleContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    gap: 12, // 버튼 간 간격 증가
+    gap: 10,
+    marginTop: 5,
   },
-  conditionButton: {
-    minWidth: 80, // 버튼 최소 너비 증가
-    paddingVertical: 10, // 버튼 크기 증가
-    paddingHorizontal: 18,
-    borderRadius: 24, // 둥근 버튼 형태 유지
+  toggleButton: {
     borderWidth: 1,
     borderColor: '#B5B5B5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
   },
-  conditionButtonSelected: {
+  selectedToggleButton: {
     borderColor: '#2527BF',
     backgroundColor: '#2527BF',
   },
-  conditionText: {
-    fontSize: 14,
-    color: '#000000',
+  toggleText: {
+    fontSize: 16,
+    color: '#000',
   },
-  conditionTextSelected: {
+  selectedToggleText: {
+    fontSize: 16,
     color: '#FFFFFF',
+  },
+  noDataText: {
+    fontSize: 14,
+    color: '#999',
+    marginLeft: 10,
   },
   buttonContainer: {
     width: '100%',
@@ -63,7 +57,6 @@ const styles = StyleSheet.create({
   confirmButton: {
     width: '100%',
     height: 50,
-    backgroundColor: '#2527BF',
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
