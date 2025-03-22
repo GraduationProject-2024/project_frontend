@@ -180,8 +180,9 @@ const AdditionalInformationScreen = () => {
           styles.skipButton,
           {backgroundColor: isButtonActive ? '#2527BF' : '#B5B5B5'},
         ]}
-        onPress={isButtonActive ? saveAdditionalInfo : null}
-        disabled={!isButtonActive}>
+        onPress={() =>
+          navigation.navigate('AIHistoryTakingReport', {symptomId})
+        }>
         <Text style={styles.skipButtonText}>
           {isButtonActive ? 'AI 사전문진 확인하기' : '건너뛰기'}
         </Text>

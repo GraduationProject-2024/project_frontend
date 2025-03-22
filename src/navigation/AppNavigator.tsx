@@ -27,6 +27,7 @@ import SymptomOnsetTimeScreen from '../screens/AIHistoryTaking/SymptomOnsetTimeS
 import PainIntensityScreen from '../screens/AIHistoryTaking/PainIntensityScreen';
 import PainDurationScreen from '../screens/AIHistoryTaking/PainDurationScreen';
 import AdditionalInformationScreen from '../screens/AIHistoryTaking/AdditionalInformationScreen';
+import AIHistoryTakingReportScreen from '../screens/AIHistoryTaking/AIHistoryTakingReportScreen';
 import MyInformationScreen from '../screens/MyInformation/MyInformationScreen';
 
 import BackIcon from '../img/Header/BackIcon.png';
@@ -174,6 +175,13 @@ const AppNavigator = () => {
           component={AdditionalInformationScreen}
           options={{
             title: '추가 사항',
+          }}
+        />
+        <Stack.Screen
+          name="AIHistoryTakingReport"
+          component={AIHistoryTakingReportScreen}
+          options={{
+            title: 'AI 사전 문진 결과',
           }}
         />
         <Stack.Screen
