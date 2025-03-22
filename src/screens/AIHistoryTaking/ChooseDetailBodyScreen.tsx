@@ -24,11 +24,14 @@ const ChooseDetailBodyScreen = () => {
     {body: string; description: string; mainBodyPartId: number}[]
   >([]);
   const [selectedSubParts, setSelectedSubParts] = useState<string[]>([]);
+  const [selectedSBPId, setSelectedSBPId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log('📌 선택된 주요 신체 부위 ID:', selectedMBPId);
+
     const fetchSelectedMainBody = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
@@ -53,6 +56,11 @@ const ChooseDetailBodyScreen = () => {
             Accept: 'application/json;charset=UTF-8',
             Authorization: `Bearer ${token}`,
           },
+        });
+
+        console.log('🛠 요청 헤더:', {
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
         });
 
         if (!response.ok) {
@@ -133,8 +141,8 @@ const ChooseDetailBodyScreen = () => {
       }
 
       const requestUrl = `${SELECTED_SBP_API_URL}/${selectedMBPId}`;
-      const requestBody = {description: selectedSubParts}; // 🔥 여기서 선택한 세부 신체 부위
-      console.log('📤 서버에 전송할 데이터:', requestBody); // 🔍 디버깅 로그
+      const requestBody = {description: selectedSubParts};
+      console.log('📤 서버에 전송할 데이터:', JSON.stringify(requestBody));
 
       const response = await fetch(requestUrl, {
         method: 'POST',
@@ -146,6 +154,14 @@ const ChooseDetailBodyScreen = () => {
         body: JSON.stringify(requestBody),
       });
 
+      console.log('🛠 요청 URL:', requestUrl);
+      console.log('🛠 요청 메서드: POST');
+      console.log('🛠 요청 헤더:', {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Accept: 'application/json;charset=UTF-8',
+        Authorization: `Bearer ${token}`,
+      });
+
       const result = await response.json();
       console.log('✅ 서버 응답:', result);
 
@@ -153,11 +169,16 @@ const ChooseDetailBodyScreen = () => {
         throw new Error(result.message || `서버 오류: ${response.status}`);
       }
 
+      if (!result.selectedSBPId) {
+        throw new Error('서버 응답에 selectedSBPId가 없습니다.');
+      }
+
+      setSelectedSBPId(result.selectedSBPId);
       Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
 
-      // ✅ 🔥 다음 화면으로 `selectedSubParts`를 전달하도록 수정
       navigation.navigate('ChooseDetailSymptom', {
         selectedDetails: selectedSubParts,
+        selectedSBPId: result.selectedSBPId,
       });
     } catch (error) {
       console.error('❌ 저장 오류:', error);

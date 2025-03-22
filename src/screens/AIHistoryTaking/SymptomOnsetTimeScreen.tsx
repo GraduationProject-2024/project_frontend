@@ -68,13 +68,13 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
 };
 
 const SymptomOnsetTimeScreen = () => {
-  const [selectedNumber, setSelectedNumber] = useState(1);
+  const [selectedNumber, setSelectedNumber] = useState(5);
   const [selectedUnit, setSelectedUnit] = useState('초');
   const [isNextButtonActive, setIsNextButtonActive] = useState(false);
   const navigation = useNavigation();
 
-  const numbers = Array.from({length: 59}, (_, i) => (i + 1).toString());
-  const units = ['초', '분', '시간', '일', '주', '달', '년'];
+  const numbers = Array.from({length: 11}, (_, i) => ((i + 1) * 5).toString());
+  const units = ['분', '시간', '일', '주', '달', '년'];
 
   const handleScrollChange = () => {
     setIsNextButtonActive(true);
@@ -86,9 +86,9 @@ const SymptomOnsetTimeScreen = () => {
       <View style={styles.centeredPickerWrapper}>
         <WheelPicker
           options={numbers}
-          selectedIndex={selectedNumber - 1}
+          selectedIndex={numbers.indexOf(selectedNumber.toString())}
           onChange={index => {
-            setSelectedNumber(index + 1);
+            setSelectedNumber(parseInt(numbers[index], 10));
             handleScrollChange();
           }}
         />
