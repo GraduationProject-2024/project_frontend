@@ -18,17 +18,14 @@ const ChooseDetailSymptomScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // ✅ 이전 화면에서 전달받은 데이터
   const selectedDetails = route.params?.selectedDetails || [];
-  const selectedSBPId = route.params?.selectedSBPId; // 단일 ID로 처리
+  const selectedSBPId = route.params?.selectedSBPId;
 
-  const [detailedSigns, setDetailedSigns] = useState<{
-    [key: string]: {sign: string; description: string}[];
-  }>({});
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [detailedSigns, setDetailedSigns] = useState({});
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     console.log('📌 선택된 세부 신체 부위:', selectedDetails);
@@ -49,7 +46,7 @@ const ChooseDetailSymptomScreen = () => {
     }
   }, [selectedDetails]);
 
-  const fetchDetailedSigns = async (details: string[]) => {
+  const fetchDetailedSigns = async details => {
     if (details.length === 0) {
       console.warn('🚨 선택된 세부 신체 부위가 없습니다. 요청을 건너뜁니다.');
       return;
@@ -62,8 +59,7 @@ const ChooseDetailSymptomScreen = () => {
         return;
       }
 
-      const allSigns: {[key: string]: {sign: string; description: string}[]} =
-        {};
+      const allSigns = {};
 
       for (const detail of details) {
         const requestUrl = `${DETAILED_SIGN_API_URL}?body=${encodeURIComponent(
@@ -98,7 +94,7 @@ const ChooseDetailSymptomScreen = () => {
     }
   };
 
-  const toggleSymptom = (symptom: {sign: string; description: string}) => {
+  const toggleSymptom = symptom => {
     setSelectedSymptoms(prev =>
       prev.includes(symptom.description)
         ? prev.filter(item => item !== symptom.description)
@@ -119,6 +115,7 @@ const ChooseDetailSymptomScreen = () => {
     }
 
     setIsSaving(true);
+    const selectedSignIds = [];
 
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -127,69 +124,50 @@ const ChooseDetailSymptomScreen = () => {
         return;
       }
 
-      // ✅ `selectedSymptoms`에서 `description` 값만 전송 (한글 값)
-      const selectedDescriptions = selectedSymptoms;
-
-      if (selectedDescriptions.length === 0) {
-        Alert.alert('Error', '선택한 증상 중 서버에서 허용하는 값이 없습니다.');
-        console.error(
-          '🚨 유효한 증상이 없음. 필터링된 데이터:',
-          selectedDescriptions,
-        );
-        return;
-      }
-
-      // ✅ 여러 개의 증상에 대해 개별 요청 보내기
-      for (const symptom of selectedDescriptions) {
+      for (const symptom of selectedSymptoms) {
         const requestBody = {description: [symptom]};
         const requestUrl = `${SAVE_SIGN_API_URL}/${selectedSBPId}`;
 
         console.log('📤 선택한 증상 저장 요청:', requestUrl);
         console.log('📤 요청 데이터:', JSON.stringify(requestBody, null, 2));
 
-        try {
-          const response = await fetch(requestUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json;charset=UTF-8',
-              Accept: 'application/json;charset=UTF-8',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestBody),
-          });
+        const response = await fetch(requestUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            Accept: 'application/json;charset=UTF-8',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+        });
 
-          const statusCode = response.status;
-          console.log(
-            `🔍 HTTP 응답 상태 코드 (SBP ID ${selectedSBPId}): ${statusCode}`,
-          );
-
-          if (!response.ok) {
-            const errorResponse = await response.json();
-            console.error(
-              `❌ 서버 오류 (SBP ID ${selectedSBPId}):`,
-              errorResponse,
-            );
-            throw new Error(
-              `서버 오류: ${statusCode} - ${JSON.stringify(errorResponse)}`,
-            );
-          }
-
-          const result = await response.json();
-          console.log(
-            `✅ 서버 응답 (선택한 증상 저장 - SBP ID ${selectedSBPId}):`,
-            result,
-          );
-        } catch (networkError) {
+        if (!response.ok) {
+          const errorResponse = await response.json();
           console.error(
-            `❌ 네트워크 오류 (SBP ID ${selectedSBPId}):`,
-            networkError,
+            `❌ 서버 오류 (SBP ID ${selectedSBPId}):`,
+            errorResponse,
           );
-          Alert.alert('Error', `네트워크 오류 발생: ${networkError.message}`);
+          throw new Error(`서버 오류: ${JSON.stringify(errorResponse)}`);
+        }
+
+        const result = await response.json();
+        console.log(
+          `✅ 서버 응답 (선택한 증상 저장 - SBP ID ${selectedSBPId}):`,
+          result,
+        );
+
+        if (result.signId) {
+          selectedSignIds.push(result.signId);
         }
       }
 
+      console.log('✅ 모든 저장된 signId 리스트:', selectedSignIds);
       Alert.alert('Success', '선택한 증상이 저장되었습니다.');
-      navigation.navigate('SymptomOnsetTime');
+
+      // ✅ SymptomOnsetTimeScreen으로 `selectedSignIds` 전달
+      navigation.navigate('SymptomOnsetTime', {
+        selectedSignIds: selectedSignIds.join(','), // 콤마로 연결하여 전달
+      });
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
