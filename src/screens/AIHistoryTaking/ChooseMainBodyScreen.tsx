@@ -139,7 +139,7 @@ const ChooseMainBodyScreen: React.FC = () => {
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.titleText}>
-          먼저 통증을 느끼는 신체 부위를 선택해주세요{'/n'}
+          먼저 통증을 느끼는 신체 부위를 선택해주세요{'\n'}
           신체 부위는 최대 두 군데를 선택할 수 있습니다
         </Text>
         {mainBodyParts.map((part, index) => (

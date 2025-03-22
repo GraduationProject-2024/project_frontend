@@ -13,6 +13,7 @@ import styles from '../../styles/AIHistoryTaking/ChooseDetailBodyStyles';
 
 const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
 const SELECTED_MBP_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
+const SELECTED_SBP_API_URL = 'http://52.78.79.53:8081/api/v1/selected-sbp';
 
 const ChooseDetailBodyScreen = () => {
   const navigation = useNavigation();
@@ -125,6 +126,33 @@ const ChooseDetailBodyScreen = () => {
   const saveSelectedSubBodyParts = async () => {
     setIsSaving(true);
     try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const requestUrl = `${SELECTED_SBP_API_URL}/${selectedMBPId}`;
+      const requestBody = {description: selectedSubParts};
+      console.log('📤 서버에 전송할 데이터:', requestBody);
+
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const result = await response.json();
+      console.log('✅ 서버 응답:', result);
+
+      if (!response.ok) {
+        throw new Error(result.message || `서버 오류: ${response.status}`);
+      }
+
       Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
       navigation.navigate('ChooseDetailSymptom');
     } catch (error) {
