@@ -73,34 +73,6 @@ const RescueTextScreen = () => {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const fetchUserData = async () => {
-    try {
-      const token = await AsyncStorage.getItem('accessToken');
-      if (!token) {
-        console.log('🚨 액세스 토큰이 없습니다.');
-        return;
-      }
-
-      const response = await fetch(USER_API_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setUserData(data);
-      console.log('✅ 사용자 정보:', data);
-    } catch (error) {
-      console.error('❌ 사용자 정보 조회 오류:', error);
-    }
-  };
-
   const handleSubmitReport = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -110,14 +82,17 @@ const RescueTextScreen = () => {
       }
 
       const formData = new FormData();
-      formData.append('name', userData.name);
-      formData.append('number', userData.number);
-      formData.append('119_gen_pw', userData.password);
-      formData.append('incident_location', address);
-      formData.append('address', detailedAddress);
-      formData.append('emergency_type', selectedEmergencyType);
-      formData.append('title', title);
-      formData.append('content', additionalInfo);
+      formData.append('name', userData.name || null);
+      formData.append('number', userData.number || null);
+      formData.append('119_gen_pw', userData.password || null);
+      formData.append('incident_location', address.trim() ? address : null);
+      formData.append(
+        'address',
+        detailedAddress.trim() ? detailedAddress : null,
+      );
+      formData.append('emergency_type', selectedEmergencyType || null);
+      formData.append('title', title.trim() ? title : null);
+      formData.append('content', additionalInfo.trim() ? additionalInfo : null);
 
       images.forEach((uri, index) => {
         formData.append(`file_${index + 1}`, {

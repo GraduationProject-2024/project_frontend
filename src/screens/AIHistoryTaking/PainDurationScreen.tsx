@@ -91,7 +91,7 @@ const PainDurationScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const symptomId = route.params?.symptomId; // ✅ 이전 화면에서 전달된 symptomId 사용
+  const symptomId = route.params?.symptomId;
   const [selectedNumber, setSelectedNumber] = useState(5);
   const [selectedUnit, setSelectedUnit] = useState('분');
   const [isNextButtonActive, setIsNextButtonActive] = useState(false);
@@ -103,8 +103,8 @@ const PainDurationScreen = () => {
     return null;
   }
 
-  const numbers = Array.from({length: 11}, (_, i) => (i + 1) * 5).map(String); // ✅ 5~55 단위 설정
-  const units = ['분', '시간', '일', '주', '달', '년']; // ✅ 시간 단위 설정
+  const numbers = Array.from({length: 11}, (_, i) => (i + 1) * 5).map(String);
+  const units = ['분', '시간', '일', '주', '달', '년'];
 
   const handleScrollChange = () => {
     setIsNextButtonActive(true);
@@ -160,7 +160,7 @@ const PainDurationScreen = () => {
       );
 
       Alert.alert('Success', '증상 지속 시간이 저장되었습니다.');
-      navigation.navigate('AdditionalInformation', {symptomId}); // ✅ symptomId 전달 추가
+      navigation.navigate('AdditionalInformation', {symptomId});
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
