@@ -13,9 +13,20 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/AdditionalInformationStyles';
 
 const AdditionalInformationScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const symptomId = route.params?.symptomId;
+
+  if (!symptomId) {
+    Alert.alert('Error', '증상 ID가 없습니다.');
+    return null;
+  }
+
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [images, setImages] = useState([]);
 
@@ -32,7 +43,7 @@ const AdditionalInformationScreen = () => {
         quality: 1,
         selectionLimit: 10 - images.length,
       },
-      response => {
+      async response => {
         if (response.didCancel) {
           Alert.alert('이미지 선택이 취소되었습니다.');
         } else if (response.errorCode) {
@@ -40,9 +51,52 @@ const AdditionalInformationScreen = () => {
         } else if (response.assets) {
           const newImages = response.assets.map(asset => asset.uri);
           setImages(prevImages => [...prevImages, ...newImages].slice(0, 10));
+          await uploadImages(newImages);
         }
       },
     );
+  };
+
+  const uploadImages = async imageUris => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const formData = new FormData();
+      imageUris.forEach((uri, index) => {
+        formData.append('file', {
+          uri,
+          name: `image_${index}.jpg`,
+          type: 'image/jpeg',
+        });
+      });
+
+      const response = await fetch(
+        `http://52.78.79.53:8081/api/v1/symptom/img/${symptomId}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('이미지 업로드 실패');
+      }
+
+      const result = await response.json();
+      console.log('✅ 이미지 업로드 완료:', result);
+      Alert.alert('Success', '이미지가 업로드되었습니다.');
+    } catch (error) {
+      console.error('❌ 이미지 업로드 오류:', error);
+      Alert.alert('Error', `이미지 업로드 중 오류 발생: ${error.message}`);
+    }
   };
 
   const removeImage = index => {
@@ -58,7 +112,9 @@ const AdditionalInformationScreen = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <Text style={styles.headerText}>
-            증상에 대해 추가적으로{'\n'}전달하고 싶은 사항을 알려주세요
+            증상에 대해 추가적으로
+            {'\n'}
+            전달하고 싶은 사항을 알려주세요
           </Text>
 
           {/* 이미지 업로드 섹션 */}

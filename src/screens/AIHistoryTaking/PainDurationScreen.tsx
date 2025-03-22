@@ -160,7 +160,7 @@ const PainDurationScreen = () => {
       );
 
       Alert.alert('Success', '증상 지속 시간이 저장되었습니다.');
-      navigation.navigate('AdditionalInformation'); // ✅ 다음 단계로 이동
+      navigation.navigate('AdditionalInformation', {symptomId}); // ✅ symptomId 전달 추가
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
