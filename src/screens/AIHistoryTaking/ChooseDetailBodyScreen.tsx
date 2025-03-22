@@ -133,8 +133,8 @@ const ChooseDetailBodyScreen = () => {
       }
 
       const requestUrl = `${SELECTED_SBP_API_URL}/${selectedMBPId}`;
-      const requestBody = {description: selectedSubParts};
-      console.log('📤 서버에 전송할 데이터:', requestBody);
+      const requestBody = {description: selectedSubParts}; // 🔥 여기서 선택한 세부 신체 부위
+      console.log('📤 서버에 전송할 데이터:', requestBody); // 🔍 디버깅 로그
 
       const response = await fetch(requestUrl, {
         method: 'POST',
@@ -154,7 +154,11 @@ const ChooseDetailBodyScreen = () => {
       }
 
       Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
-      navigation.navigate('ChooseDetailSymptom');
+
+      // ✅ 🔥 다음 화면으로 `selectedSubParts`를 전달하도록 수정
+      navigation.navigate('ChooseDetailSymptom', {
+        selectedDetails: selectedSubParts,
+      });
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
