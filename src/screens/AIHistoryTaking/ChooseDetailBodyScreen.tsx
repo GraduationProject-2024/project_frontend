@@ -21,6 +21,7 @@ const ChooseDetailBodyScreen = () => {
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // ✅ 선택한 주요 신체 부위 조회 API 연동
   useEffect(() => {
@@ -83,6 +84,20 @@ const ChooseDetailBodyScreen = () => {
     }
   }, [selectedMBPId]);
 
+  const saveSelectedSubBodyParts = async () => {
+    setIsSaving(true);
+    try {
+      // TODO: API 연동 로직 추가
+      Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
+      navigation.navigate('ChooseDetailSymptom');
+    } catch (error) {
+      console.error('❌ 저장 오류:', error);
+      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -91,20 +106,26 @@ const ChooseDetailBodyScreen = () => {
         ) : error ? (
           <Text style={styles.errorText}>❌ 오류 발생: {error}</Text>
         ) : (
-          <>
-            {selectedDetails.map((detail, index) => (
-              <View key={index} style={styles.groupContainer}>
-                <Text style={styles.groupTitle}>{detail}</Text>
-              </View>
-            ))}
-          </>
+          selectedDetails.map((detail, index) => (
+            <View key={index} style={styles.groupContainer}>
+              <Text style={styles.groupTitle}>{detail}</Text>
+            </View>
+          ))
         )}
       </ScrollView>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.confirmButton, {backgroundColor: '#2527BF'}]}
-          onPress={() => navigation.navigate('ChooseDetailSymptom')}>
-          <Text style={styles.confirmButtonText}>선택 완료</Text>
+          style={[
+            styles.confirmButton,
+            {backgroundColor: isSaving ? '#d1d1d1' : '#2527BF'},
+          ]}
+          onPress={saveSelectedSubBodyParts}
+          disabled={isSaving}>
+          {isSaving ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.confirmButtonText}>선택 완료</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
