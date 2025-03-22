@@ -1,8 +1,17 @@
 import React, {useState} from 'react';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import Slider from '@react-native-community/slider';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/PainIntensityStyles';
+
 import PainIntensityFaceEmoji_1 from '../../img/PainIntensity/PainIntensityFaceEmoji_1.png';
 import PainIntensityFaceEmoji_2 from '../../img/PainIntensity/PainIntensityFaceEmoji_2.png';
 import PainIntensityFaceEmoji_3 from '../../img/PainIntensity/PainIntensityFaceEmoji_3.png';
@@ -14,6 +23,9 @@ import PainIntensityFaceEmoji_8 from '../../img/PainIntensity/PainIntensityFaceE
 import PainIntensityFaceEmoji_9 from '../../img/PainIntensity/PainIntensityFaceEmoji_9.png';
 import PainIntensityFaceEmoji_10 from '../../img/PainIntensity/PainIntensityFaceEmoji_10.png';
 import SliderThumb from '../../img/PainIntensity/SliderThumb.png';
+
+const PAIN_INTENSITY_API_URL =
+  'http://52.78.79.53:8081/api/v1/symptom/intensity';
 
 const painImages = [
   PainIntensityFaceEmoji_1,
@@ -29,9 +41,19 @@ const painImages = [
 ];
 
 const PainIntensityScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const symptomId = route.params?.symptomId;
+
   const [painLevel, setPainLevel] = useState(1);
   const [isSliderMoved, setIsSliderMoved] = useState(false);
-  const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+
+  if (!symptomId) {
+    console.error('🚨 symptomId가 undefined입니다.');
+    Alert.alert('Error', '선택된 증상 ID가 없습니다.');
+    return null;
+  }
 
   const painDescriptions = [
     {
@@ -86,6 +108,63 @@ const PainIntensityScreen = () => {
     },
   ];
 
+  const savePainIntensity = async () => {
+    setLoading(true);
+
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const requestBody = {
+        intensity: painLevel,
+      };
+
+      const requestUrl = `${PAIN_INTENSITY_API_URL}/${symptomId}`;
+      console.log('📤 통증 강도 저장 요청:', requestUrl);
+      console.log('📤 요청 데이터:', JSON.stringify(requestBody, null, 2));
+
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const statusCode = response.status;
+      console.log(
+        `🔍 HTTP 응답 상태 코드 (Symptom ID ${symptomId}): ${statusCode}`,
+      );
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error(`❌ 서버 오류 (Symptom ID ${symptomId}):`, errorResponse);
+        throw new Error(
+          `서버 오류: ${statusCode} - ${JSON.stringify(errorResponse)}`,
+        );
+      }
+
+      const result = await response.json();
+      console.log(
+        `✅ 서버 응답 (통증 강도 저장 - Symptom ID ${symptomId}):`,
+        result,
+      );
+
+      Alert.alert('Success', '통증 강도가 저장되었습니다.');
+      navigation.navigate('PainDuration');
+    } catch (error) {
+      console.error('❌ 저장 오류:', error);
+      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>통증의 강도를 선택해주세요</Text>
@@ -100,6 +179,7 @@ const PainIntensityScreen = () => {
       <Text style={styles.painDescription}>
         {painDescriptions[painLevel - 1].description}
       </Text>
+
       <Slider
         style={[styles.slider, {transform: [{scaleY: 3}]}]}
         minimumValue={1}
@@ -114,14 +194,19 @@ const PainIntensityScreen = () => {
           setIsSliderMoved(true);
         }}
       />
+
       <TouchableOpacity
         style={[
           styles.nextButton,
           {backgroundColor: isSliderMoved ? '#2527BF' : '#B5B5B5'},
         ]}
-        disabled={!isSliderMoved}
-        onPress={() => navigation.navigate('PainDuration')}>
-        <Text style={styles.nextButtonText}>다음</Text>
+        disabled={!isSliderMoved || loading}
+        onPress={savePainIntensity}>
+        {loading ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <Text style={styles.nextButtonText}>다음</Text>
+        )}
       </TouchableOpacity>
     </View>
   );

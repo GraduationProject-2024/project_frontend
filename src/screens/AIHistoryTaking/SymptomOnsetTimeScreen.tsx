@@ -161,8 +161,17 @@ const SymptomOnsetTimeScreen = () => {
         result,
       );
 
+      const symptomId = result.symptomId;
+
+      if (!symptomId) {
+        console.error('🚨 symptomId가 서버 응답에 없습니다:', result);
+        Alert.alert('Error', '서버 응답에 symptomId가 없습니다.');
+        return;
+      }
+
       Alert.alert('Success', '증상 시작 시간이 저장되었습니다.');
-      navigation.navigate('PainIntensity');
+
+      navigation.navigate('PainIntensity', {symptomId});
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
