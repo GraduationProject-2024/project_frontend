@@ -100,6 +100,13 @@ const ChooseDetailBodyScreen = () => {
           </>
         )}
       </ScrollView>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.confirmButton, {backgroundColor: '#2527BF'}]}
+          onPress={() => navigation.navigate('ChooseDetailSymptom')}>
+          <Text style={styles.confirmButtonText}>선택 완료</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
