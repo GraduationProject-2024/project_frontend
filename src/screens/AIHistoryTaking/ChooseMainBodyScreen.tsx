@@ -121,9 +121,13 @@ const ChooseMainBodyScreen: React.FC = () => {
         throw new Error(result.message || `서버 오류: ${response.status}`);
       }
 
+      if (!result.selectedMBPId) {
+        throw new Error('서버 응답에 selectedMBPId가 없습니다.');
+      }
+
       Alert.alert('Success', '선택한 부위가 저장되었습니다.');
       navigation.navigate('ChooseDetailBody', {
-        selectedMBId: result.selectedMBId,
+        selectedMBPId: result.selectedMBPId,
       });
     } catch (error) {
       console.error('❌ 저장 오류:', error);
@@ -137,7 +141,7 @@ const ChooseMainBodyScreen: React.FC = () => {
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.titleText}>
-          먼저 통증을 느끼는 신체 부위를 선택해주세요{'\n'}
+          먼저 통증을 느끼는 신체 부위를 선택해주세요{'/n'}
           신체 부위는 최대 두 군데를 선택할 수 있습니다
         </Text>
         {mainBodyParts.map((part, index) => (
