@@ -4,14 +4,11 @@ import {
   Text,
   ScrollView,
   ActivityIndicator,
-  PermissionsAndroid,
-  Platform,
   Alert,
-  Linking,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Geolocation from 'react-native-geolocation-service';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next'; // ✅ 번역 훅 추가
 import styles from '../../styles/RecommendEmergency/RecommendEmergencyListStyles';
@@ -20,49 +17,11 @@ const RecommendEmergencyListScreen = () => {
   const {t} = useTranslation(); // ✅ 번역 훅 사용
   const [emergencyList, setEmergencyList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
   const navigation = useNavigation();
 
-  const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: t('위치 권한 필요'),
-            message: t('이 앱은 응급실 추천을 위해 위치 정보를 사용합니다.'),
-            buttonNeutral: t('나중에'),
-            buttonNegative: t('거부'),
-            buttonPositive: t('허용'),
-          },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } catch (err) {
-        console.warn(err);
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const getLocation = async () => {
-    const hasPermission = await requestLocationPermission();
-    if (!hasPermission) {
-      return;
-    }
-
-    Geolocation.getCurrentPosition(
-      position => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-      },
-      error => {
-        console.error(t('위치 정보를 가져올 수 없습니다:'), error);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
-  };
+  // ✅ 고정된 위도, 경도 설정 (서울특별시 용산구 한강대로 366 근처)
+  const latitude = 37.546584;
+  const longitude = 126.964649;
 
   const getStoredData = async () => {
     try {
@@ -84,11 +43,6 @@ const RecommendEmergencyListScreen = () => {
       const {token, conditions} = await getStoredData();
       const isCondition = conditions.length > 0;
 
-      if (latitude === null || longitude === null) {
-        console.warn(t('위치 정보를 가져오지 못했습니다.'));
-        return;
-      }
-
       const response = await fetch('http://52.78.79.53:8081/api/v1/er', {
         method: 'POST',
         headers: {
@@ -98,8 +52,8 @@ const RecommendEmergencyListScreen = () => {
         body: JSON.stringify({
           isCondition: isCondition,
           conditions: conditions,
-          lat: latitude,
-          lon: longitude,
+          lat: latitude, // ✅ 고정된 값 사용
+          lon: longitude, // ✅ 고정된 값 사용
         }),
       });
 
@@ -175,14 +129,8 @@ const RecommendEmergencyListScreen = () => {
   };
 
   useEffect(() => {
-    getLocation();
+    fetchEmergencyList();
   }, []);
-
-  useEffect(() => {
-    if (latitude !== null && longitude !== null) {
-      fetchEmergencyList();
-    }
-  }, [latitude, longitude]);
 
   return (
     <View style={styles.container}>

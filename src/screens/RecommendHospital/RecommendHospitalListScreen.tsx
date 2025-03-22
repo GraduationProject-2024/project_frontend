@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -24,57 +23,54 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [mapUrls, setMapUrls] = useState(null);
 
+  // ✅ 고정된 위도, 경도 설정 (서울특별시 용산구 한강대로 366 근처)
+  const latitude = 37.546584;
+  const longitude = 126.964649;
+
   useEffect(() => {
     console.log('📌 선택된 진료과:', selectedDepartment);
+    console.log('📍 고정된 위치: 위도', latitude, '경도', longitude);
 
-    Geolocation.getCurrentPosition(
-      async position => {
-        const {latitude, longitude} = position.coords;
+    const fetchHospitals = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        console.log('✅ 액세스 토큰:', accessToken);
 
-        try {
-          const accessToken = await AsyncStorage.getItem('accessToken');
-          console.log('✅ 액세스 토큰:', accessToken);
-
-          if (!accessToken) {
-            throw new Error('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.');
-          }
-
-          const requestData = {
-            lat: parseFloat(latitude),
-            lon: parseFloat(longitude),
-            is_report: false,
-            report_id: '',
-            department: selectedDepartment,
-            suspected_disease: [''],
-            secondary_hospital: true,
-            tertiary_hospital: true,
-          };
-
-          console.log('📌 API 요청 파라미터:', requestData);
-
-          const response = await axios.post(API_URL, requestData, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          console.log('✅ 병원 데이터 수신:', response.data);
-          setHospitals(response.data);
-        } catch (err) {
-          console.error('❌ 병원 추천 API 요청 실패:', err.message);
-          setError(`데이터를 불러오는 데 실패했습니다: ${err.message}`);
-        } finally {
-          setLoading(false);
+        if (!accessToken) {
+          throw new Error('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.');
         }
-      },
-      error => {
-        console.error('❌ 위치 정보를 가져오는 데 실패했습니다.', error);
-        setError('위치 정보를 가져오는 데 실패했습니다.');
+
+        const requestData = {
+          lat: latitude, // ✅ 고정된 위도 사용
+          lon: longitude, // ✅ 고정된 경도 사용
+          is_report: false,
+          report_id: '',
+          department: selectedDepartment,
+          suspected_disease: [''],
+          secondary_hospital: true,
+          tertiary_hospital: true,
+        };
+
+        console.log('📌 API 요청 파라미터:', requestData);
+
+        const response = await axios.post(API_URL, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        console.log('✅ 병원 데이터 수신:', response.data);
+        setHospitals(response.data);
+      } catch (err) {
+        console.error('❌ 병원 추천 API 요청 실패:', err.message);
+        setError(`데이터를 불러오는 데 실패했습니다: ${err.message}`);
+      } finally {
         setLoading(false);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
+      }
+    };
+
+    fetchHospitals();
   }, [selectedDepartment]);
 
   const onHospitalSelect = async hospitalId => {

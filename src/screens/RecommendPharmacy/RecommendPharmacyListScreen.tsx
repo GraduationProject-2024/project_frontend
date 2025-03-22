@@ -5,24 +5,28 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-  PermissionsAndroid,
-  Platform,
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RecommendPharmacyListStyles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
+
+const API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy';
+const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy-map';
 
 const RecommendPharmacyListScreen = () => {
   const navigation = useNavigation();
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ 고정된 위도, 경도 설정 (서울특별시 용산구 한강대로 366 근처)
+  const latitude = 37.546584;
+  const longitude = 126.964649;
+
   useEffect(() => {
-    requestLocationPermission();
+    fetchPharmacies(latitude, longitude);
   }, []);
 
   const getAccessToken = async () => {
@@ -46,13 +50,16 @@ const RecommendPharmacyListScreen = () => {
     }
 
     try {
-      const response = await fetch('http://52.78.79.53:8081/api/v1/pharmacy', {
+      const requestData = {lat, lon}; // ✅ 고정된 위도, 경도 사용
+      console.log('📌 약국 조회 요청 데이터:', requestData);
+
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({lat, lon}),
+        body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
@@ -60,59 +67,14 @@ const RecommendPharmacyListScreen = () => {
       }
 
       const data = await response.json();
+      console.log('✅ 약국 데이터 수신:', data);
       setPharmacies(data);
     } catch (error) {
+      console.error('❌ 약국 API 요청 실패:', error.message);
       Alert.alert('서버 요청 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      position => {
-        const {latitude, longitude} = position.coords;
-        console.log(`📍 현재 위치: ${latitude}, ${longitude}`);
-        fetchPharmacies(latitude, longitude);
-      },
-      error => {
-        console.error('❌ 위치 정보를 가져오는 데 실패:', error);
-        fetchPharmacies(37.54589035287757, 126.96360809538088);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
-      },
-    );
-  };
-
-  const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert('위치 권한이 필요합니다.');
-          setLoading(false);
-          return;
-        }
-      } catch (error) {
-        console.error('❌ 위치 권한 요청 오류:', error);
-        Alert.alert('위치 권한 요청 실패');
-        setLoading(false);
-        return;
-      }
-    } else {
-      const status = await Geolocation.requestAuthorization('whenInUse');
-      if (status !== 'granted') {
-        Alert.alert('위치 권한이 필요합니다.');
-        setLoading(false);
-        return;
-      }
-    }
-    getCurrentLocation();
   };
 
   const fetchPharmacyMapUrl = async pharmacyId => {
@@ -122,15 +84,12 @@ const RecommendPharmacyListScreen = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://52.78.79.53:8081/api/v1/pharmacy-map/${pharmacyId}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${MAP_API_URL}/${pharmacyId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       if (!response.ok) {
         throw new Error(`서버 응답 오류: ${response.status}`);
