@@ -43,7 +43,7 @@ const painImages = [
 const PainIntensityScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const symptomId = route.params?.symptomId;
+  const symptomId = route.params?.symptomId; // ✅ 이전 화면에서 symptomId 전달받음
 
   const [painLevel, setPainLevel] = useState(1);
   const [isSliderMoved, setIsSliderMoved] = useState(false);
@@ -156,7 +156,9 @@ const PainIntensityScreen = () => {
       );
 
       Alert.alert('Success', '통증 강도가 저장되었습니다.');
-      navigation.navigate('PainDuration');
+
+      // ✅ symptomId를 다음 화면(PainDurationScreen)으로 전달
+      navigation.navigate('PainDuration', {symptomId: result.symptomId});
     } catch (error) {
       console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);

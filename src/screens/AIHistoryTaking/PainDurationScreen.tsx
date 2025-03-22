@@ -1,7 +1,27 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, FlatList} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/PainDurationStyles';
+
+const SYMPTOM_DURATION_API_URL =
+  'http://52.78.79.53:8081/api/v1/symptom/duration';
+
+const TIME_UNIT_MAP = {
+  분: 'MINUTE',
+  시간: 'HOUR',
+  일: 'DAY',
+  주: 'WEEK',
+  달: 'MONTH',
+  년: 'YEAR',
+};
 
 const WheelPicker = ({options, selectedIndex, onChange}) => {
   const flatListRef = React.useRef(null);
@@ -68,27 +88,97 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
 };
 
 const PainDurationScreen = () => {
-  const [selectedNumber, setSelectedNumber] = useState(1);
-  const [selectedUnit, setSelectedUnit] = useState('초');
-  const [isNextButtonActive, setIsNextButtonActive] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
 
-  const numbers = Array.from({length: 59}, (_, i) => (i + 1).toString());
-  const units = ['초', '분', '시간'];
+  const symptomId = route.params?.symptomId; // ✅ 이전 화면에서 전달된 symptomId 사용
+  const [selectedNumber, setSelectedNumber] = useState(5);
+  const [selectedUnit, setSelectedUnit] = useState('분');
+  const [isNextButtonActive, setIsNextButtonActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  if (!symptomId) {
+    console.error('🚨 symptomId가 undefined입니다.');
+    Alert.alert('Error', '증상 ID가 없습니다.');
+    return null;
+  }
+
+  const numbers = Array.from({length: 11}, (_, i) => (i + 1) * 5).map(String); // ✅ 5~55 단위 설정
+  const units = ['분', '시간', '일', '주', '달', '년']; // ✅ 시간 단위 설정
 
   const handleScrollChange = () => {
     setIsNextButtonActive(true);
   };
 
+  const savePainDuration = async () => {
+    setLoading(true);
+
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const convertedUnit = TIME_UNIT_MAP[selectedUnit] || 'DEFAULT';
+      const requestBody = {
+        durationValue: selectedNumber,
+        durationUnit: convertedUnit,
+      };
+
+      const requestUrl = `${SYMPTOM_DURATION_API_URL}/${symptomId}`;
+      console.log('📤 증상 지속시간 저장 요청:', requestUrl);
+      console.log('📤 요청 데이터:', JSON.stringify(requestBody, null, 2));
+
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const statusCode = response.status;
+      console.log(
+        `🔍 HTTP 응답 상태 코드 (Symptom ID ${symptomId}): ${statusCode}`,
+      );
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error(`❌ 서버 오류 (Symptom ID ${symptomId}):`, errorResponse);
+        throw new Error(
+          `서버 오류: ${statusCode} - ${JSON.stringify(errorResponse)}`,
+        );
+      }
+
+      const result = await response.json();
+      console.log(
+        `✅ 서버 응답 (증상 지속시간 저장 - Symptom ID ${symptomId}):`,
+        result,
+      );
+
+      Alert.alert('Success', '증상 지속 시간이 저장되었습니다.');
+      navigation.navigate('AdditionalInformation'); // ✅ 다음 단계로 이동
+    } catch (error) {
+      console.error('❌ 저장 오류:', error);
+      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.question}>통증은 어느 정도 지속되나요?</Text>
+
       <View style={styles.centeredPickerWrapper}>
         <WheelPicker
           options={numbers}
-          selectedIndex={selectedNumber - 1}
+          selectedIndex={numbers.indexOf(selectedNumber.toString())}
           onChange={index => {
-            setSelectedNumber(index + 1);
+            setSelectedNumber(parseInt(numbers[index], 10));
             handleScrollChange();
           }}
         />
@@ -101,14 +191,19 @@ const PainDurationScreen = () => {
           }}
         />
       </View>
+
       <TouchableOpacity
         style={[
           styles.nextButton,
           {backgroundColor: isNextButtonActive ? '#2527BF' : '#B5B5B5'},
         ]}
-        disabled={!isNextButtonActive}
-        onPress={() => navigation.navigate('AdditionalInformation')}>
-        <Text style={styles.nextButtonText}>다음</Text>
+        disabled={!isNextButtonActive || loading}
+        onPress={savePainDuration}>
+        {loading ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <Text style={styles.nextButtonText}>다음</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
