@@ -4,15 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import en from './en.json';
 import ko from './ko.json';
 import vi from './vi.json';
-import zhCN from './zhCN.json'; // 기존 키 변경
-import zhTW from './zhTW.json'; // 기존 키 변경
+import zhCN from './zhCN.json';
+import zhTW from './zhTW.json';
 
 const resources = {
   en: {translation: en},
   ko: {translation: ko},
   vi: {translation: vi},
-  zhCN: {translation: zhCN}, // ✅ 하이픈 제거
-  zhTW: {translation: zhTW}, // ✅ 하이픈 제거
+  zhCN: {translation: zhCN},
+  zhTW: {translation: zhTW},
 };
 
 /**
@@ -22,15 +22,13 @@ export const initializeI18n = async () => {
   try {
     console.log('🔄 i18n 초기화 시작');
 
-    // ✅ AsyncStorage에서 저장된 언어 가져오기
     let savedLanguage = await AsyncStorage.getItem('appLanguage');
     console.log('📦 저장된 언어:', savedLanguage);
 
-    // ✅ 저장된 언어가 없으면 기본값('ko') 사용
+    // ✅ 저장된 언어가 없으면 기본값('en') 사용
     const defaultLanguage = savedLanguage || 'ko';
     console.log('🌍 적용할 언어:', defaultLanguage);
 
-    // ✅ JSON 데이터가 올바르게 로드되는지 확인
     console.log('📝 JSON 데이터 확인:', {
       zhCN,
       zhTW,
@@ -39,7 +37,7 @@ export const initializeI18n = async () => {
     await i18n.use(initReactI18next).init({
       resources,
       lng: defaultLanguage,
-      fallbackLng: 'ko', // ✅ 번역이 없을 경우 한국어 사용
+      fallbackLng: 'en',
       compatibilityJSON: 'v3',
       interpolation: {escapeValue: false},
       react: {useSuspense: false},
@@ -63,10 +61,8 @@ export const changeAppLanguage = async newLanguage => {
       return;
     }
 
-    // ✅ AsyncStorage에 변경된 언어 저장
     await AsyncStorage.setItem('appLanguage', newLanguage);
 
-    // ✅ i18n 언어 변경 적용
     await i18n.changeLanguage(newLanguage);
     console.log(`✅ 언어 변경 완료! 현재 언어: ${i18n.language}`);
   } catch (error) {

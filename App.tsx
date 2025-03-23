@@ -5,7 +5,7 @@ import {I18nextProvider} from 'react-i18next';
 import i18n, {initializeI18n} from './src/locales/i18n';
 import AppNavigator from './src/navigation/AppNavigator';
 import RNRestart from 'react-native-restart';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ 저장소 불러오기 추가
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 console.log('RNRestart:', RNRestart);
 
@@ -29,11 +29,10 @@ const App = () => {
     const handleLanguageChange = async () => {
       console.log(`🌍 현재 앱 언어 변경됨: ${i18n.language}`);
 
-      // ✅ 이전 언어와 비교하여 다를 때만 재시작
       const storedLang = await AsyncStorage.getItem('appLanguage');
       if (storedLang !== i18n.language) {
         console.log('🔥 앱을 재시작합니다.');
-        await AsyncStorage.setItem('appLanguage', i18n.language); // ✅ 변경된 언어 저장
+        await AsyncStorage.setItem('appLanguage', i18n.language);
         setTimeout(() => RNRestart.restart(), 500);
       } else {
         console.log(
