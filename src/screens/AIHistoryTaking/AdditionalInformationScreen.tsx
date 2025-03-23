@@ -22,9 +22,6 @@ const AdditionalInformationScreen = () => {
   const route = useRoute();
   const symptomId = route.params?.symptomId;
 
-  // symptomId 값 확인
-  console.log('📌 Received symptomId:', symptomId);
-
   if (!symptomId) {
     Alert.alert('Error', '증상 ID가 없습니다.');
     return null;
@@ -182,9 +179,10 @@ const AdditionalInformationScreen = () => {
           styles.skipButton,
           {backgroundColor: isButtonActive ? '#2527BF' : '#B5B5B5'},
         ]}
-        onPress={() =>
-          navigation.navigate('AIHistoryTakingReport', {symptomId})
-        }>
+        onPress={() => {
+          console.log('📌 Navigating with symptomId:', symptomId);
+          navigation.navigate('AIHistoryTakingReport', {symptomId});
+        }}>
         <Text style={styles.skipButtonText}>
           {isButtonActive ? 'AI 사전문진 확인하기' : '건너뛰기'}
         </Text>
