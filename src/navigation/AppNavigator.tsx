@@ -36,11 +36,7 @@ import CloseIcon from '../img/Header/CloseIcon.png';
 const Stack = createStackNavigator();
 
 const BackButton = () => (
-  <Image
-    source={BackIcon}
-    style={{width: 24, height: 24}}
-    resizeMode="contain"
-  />
+  <Image source={BackIcon} style={{width: 30, height: 30}} />
 );
 
 const CloseButton = ({navigation}) => (
@@ -49,7 +45,7 @@ const CloseButton = ({navigation}) => (
     style={{marginRight: 20}}>
     <Image
       source={CloseIcon}
-      style={{width: 18, height: 18}}
+      style={{width: 35, height: 35}}
       resizeMode="contain"
     />
   </TouchableOpacity>

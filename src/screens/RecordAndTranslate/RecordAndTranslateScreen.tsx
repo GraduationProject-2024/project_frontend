@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
+import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
@@ -11,8 +11,8 @@ const RecordAndTranslateScreen = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
-  const [transcript, setTranscript] = useState('');
-  const [translations, setTranslations] = useState({});
+  const [messages, setMessages] = useState([]);
+  let speakerIndex = 0;
 
   const BASE_URL = 'http://52.78.79.53:5002/transapi';
 
@@ -63,6 +63,24 @@ const RecordAndTranslateScreen = () => {
     }
   };
 
+  const endSession = async () => {
+    try {
+      if (!sessionId || !accessToken) {
+        return;
+      }
+      const response = await axios.post(
+        `${BASE_URL}/end_session`,
+        {session_id: sessionId},
+        {headers: {Authorization: `Bearer ${accessToken}`}},
+      );
+      console.log('🛑 세션 종료:', response.data.message);
+      setSessionId(null);
+      speakerIndex++;
+    } catch (error) {
+      console.error('🚨 세션 종료 실패:', error);
+    }
+  };
+
   const sendAudioChunk = async filePath => {
     try {
       if (!sessionId || !accessToken) {
@@ -75,8 +93,10 @@ const RecordAndTranslateScreen = () => {
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
       console.log('📝 인식된 문장:', response.data.transcript);
-      setTranscript(response.data.transcript);
-      setTranslations(response.data.translations);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {text: response.data.transcript, speaker: speakerIndex % 2},
+      ]);
     } catch (error) {
       console.error('🚨 오디오 전송 실패:', error);
     }
@@ -97,7 +117,7 @@ const RecordAndTranslateScreen = () => {
       setIsPaused(false);
       const filePath = await AudioRecord.stop();
       await sendAudioChunk(filePath);
-      setSessionId(null);
+      await endSession();
     }
   };
 
@@ -114,9 +134,30 @@ const RecordAndTranslateScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>
-        {isRecording ? '음성 인식 중 ...' : '음성 녹음을 시작해주세요'}
-      </Text>
+      {!isRecording && messages.length === 0 && (
+        <Text style={styles.titleText}>
+          의료진과 환자의 원활한 소통을 돕기 위해서 {'\n'}음성 녹음 및 실시간
+          번역을 제공합니다.
+        </Text>
+      )}
+      {!isRecording && messages.length === 0 && (
+        <Text style={styles.infoText}>아이콘을 눌러 녹음을 시작해주세요.</Text>
+      )}
+      <ScrollView
+        style={styles.messageContainer}
+        contentContainerStyle={styles.scrollContent}>
+        {messages.map((msg, index) => (
+          <View
+            key={index}
+            style={[
+              styles.messageBubble,
+              msg.speaker === 0 ? styles.speakerA : styles.speakerB,
+            ]}>
+            <Text style={styles.messageText}>{msg.text}</Text>
+          </View>
+        ))}
+      </ScrollView>
+      <View style={styles.buttonBackground} />
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.iconButton}>
           <Image
@@ -151,7 +192,6 @@ const RecordAndTranslateScreen = () => {
           />
         </TouchableOpacity>
       </View>
-      <Text style={styles.transcript}>🎤 인식된 문장: {transcript}</Text>
     </View>
   );
 };
