@@ -22,6 +22,9 @@ const AdditionalInformationScreen = () => {
   const route = useRoute();
   const symptomId = route.params?.symptomId;
 
+  // symptomId 값 확인
+  console.log('📌 Received symptomId:', symptomId);
+
   if (!symptomId) {
     Alert.alert('Error', '증상 ID가 없습니다.');
     return null;
@@ -64,7 +67,6 @@ const AdditionalInformationScreen = () => {
             updateButtonState();
             return updatedImages;
           });
-          await uploadImages(newImages);
         }
       },
     );
