@@ -25,7 +25,7 @@ export const initializeI18n = async () => {
     let savedLanguage = await AsyncStorage.getItem('appLanguage');
     console.log('📦 저장된 언어:', savedLanguage);
 
-    // ✅ 저장된 언어가 없으면 기본값('en') 사용
+    // ✅ 저장된 언어가 없으면 기본값('ko') 사용
     const defaultLanguage = savedLanguage || 'ko';
     console.log('🌍 적용할 언어:', defaultLanguage);
 
@@ -37,7 +37,7 @@ export const initializeI18n = async () => {
     await i18n.use(initReactI18next).init({
       resources,
       lng: defaultLanguage,
-      fallbackLng: 'en',
+      fallbackLng: 'ko',
       compatibilityJSON: 'v3',
       interpolation: {escapeValue: false},
       react: {useSuspense: false},
