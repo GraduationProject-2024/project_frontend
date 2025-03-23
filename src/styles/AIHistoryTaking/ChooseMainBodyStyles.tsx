@@ -7,9 +7,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#2527BF',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   bodyPartContainer: {
     marginBottom: 16,

@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
   titleText: {
     textAlign: 'center',
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#2527BF',
     marginTop: 20,
   },
@@ -30,15 +29,16 @@ const styles = StyleSheet.create({
   messageContainer: {
     flex: 1,
     width: '90%',
-    marginBottom: 20,
-    paddingBottom: 120,
+    marginBottom: 160,
+    paddingBottom: 220,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'flex-end',
+    paddingBottom: 30,
   },
   messageBubble: {
-    padding: 10,
+    padding: 12,
     borderRadius: 10,
     marginVertical: 5,
     maxWidth: '80%',
@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '80%',
     position: 'absolute',
-    bottom: 30, // 화면 하단 여백 조정
-    zIndex: 10, // 버튼이 메시지 위에 보이도록 설정
+    bottom: 30,
+    zIndex: 10,
   },
   iconButton: {
     width: 80,

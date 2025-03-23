@@ -55,6 +55,10 @@ const RecordAndTranslateScreen = () => {
         {member_id: '3'},
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
+
+      // 응답 전체를 출력
+      console.log('🚀 세션 시작 응답:', response.data);
+
       setSessionId(response.data.session_id);
       return response.data.session_id;
     } catch (error) {
@@ -73,7 +77,10 @@ const RecordAndTranslateScreen = () => {
         {session_id: sessionId},
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
-      console.log('🛑 세션 종료:', response.data.message);
+
+      // 응답 데이터를 콘솔에 전체 출력
+      console.log('🛑 세션 종료 응답:', response.data);
+
       setSessionId(null);
       speakerIndex++;
     } catch (error) {
@@ -92,7 +99,10 @@ const RecordAndTranslateScreen = () => {
         {session_id: sessionId, audio: audioData},
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
-      console.log('📝 인식된 문장:', response.data.transcript);
+
+      // 응답 전체를 출력
+      console.log('🔊 오디오 청크 전송 응답:', response.data);
+
       setMessages(prevMessages => [
         ...prevMessages,
         {text: response.data.transcript, speaker: speakerIndex % 2},
