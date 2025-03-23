@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,30 +12,99 @@ import {useTranslation} from 'react-i18next';
 import TranslateLanguageStyles from '../../styles/TranslateLanguage/TranslateLanguageStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
 import RNRestart from 'react-native-restart';
-import {changeAppLanguage} from '../../locales/i18n'; // ✅ 변경된 언어 변경 함수 가져오기
+import {changeAppLanguage} from '../../locales/i18n';
 
 const TranslateLanguageScreen = ({navigation}) => {
   const {t, i18n} = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const [pendingLanguage, setPendingLanguage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const languages = [
-    {label: '한국어', value: 'ko'},
-    {label: 'English', value: 'en'},
-    {label: 'Tiếng Việt', value: 'vi'},
-    {label: '中国人(简体)', value: 'zh-cn'},
-    {label: '中国人(繁体)', value: 'zh-tw'},
+    {label: '한국어', value: 'ko', apiValue: 'KO'},
+    {label: 'English', value: 'en', apiValue: 'EN'},
+    {label: 'Tiếng Việt', value: 'vi', apiValue: 'VI'},
+    {label: '中国人(简体)', value: 'zh-cn', apiValue: 'ZH_CN'},
+    {label: '中国人(繁体)', value: 'zh-tw', apiValue: 'ZH_TW'},
   ];
 
-  const handleLanguageChange = async language => {
-    console.log(`🌍 언어 변경 요청: ${language.value}`);
+  const getAccessToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+      return token;
+    } catch (error) {
+      console.error('❌ 액세스 토큰 가져오기 실패:', error.message);
+      return null;
+    }
+  };
 
-    // ✅ 현재 언어와 동일한 경우 변경하지 않음
-    if (i18n.language === language.value) {
-      console.log('ℹ️ 동일한 언어 선택됨, 변경하지 않음.');
+  const updateLanguageOnServer = async apiLanguage => {
+    try {
+      setLoading(true);
+      console.log(`🌍 서버에 언어 변경 요청 중... ${apiLanguage}`);
+
+      const token = await getAccessToken();
+      if (!token) {
+        Alert.alert(t('오류'), t('로그인이 필요합니다.'));
+        return null;
+      }
+
+      const response = await fetch(
+        'http://52.78.79.53:8081/api/v1/basicInfo/language',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({language: apiLanguage}),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `서버 응답 오류: ${response.status}, 메시지: ${errorText}`,
+        );
+      }
+
+      const responseData = await response.json();
+      console.log('✅ 서버 언어 변경 성공:', responseData);
+      return responseData.language;
+    } catch (error) {
+      console.error('❌ 서버 언어 변경 실패:', error.message);
+      Alert.alert(
+        '오류',
+        `서버와 통신 중 오류가 발생했습니다. \n ${error.message}`,
+      );
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmLanguageChange = async () => {
+    if (!pendingLanguage) {
+      Alert.alert(t('오류'), t('변경할 언어를 선택해주세요.'));
       return;
     }
 
-    await changeAppLanguage(language.value); // ✅ `i18n.ts`에 정의된 변경 함수 사용
+    if (i18n.language === pendingLanguage.value) {
+      Alert.alert(t('알림'), t('이미 선택된 언어입니다.'));
+      return;
+    }
+
+    const updatedLanguage = await updateLanguageOnServer(
+      pendingLanguage.apiValue,
+    );
+    if (!updatedLanguage) {
+      return;
+    }
+
+    await changeAppLanguage(pendingLanguage.value);
 
     Alert.alert(
       t('언어 변경'),
@@ -64,14 +133,15 @@ const TranslateLanguageScreen = ({navigation}) => {
           <TouchableOpacity
             style={[
               TranslateLanguageStyles.languageItem,
-              selectedLanguage === item.value &&
+              pendingLanguage?.value === item.value &&
                 TranslateLanguageStyles.selectedLanguageItem,
             ]}
-            onPress={() => handleLanguageChange(item)}>
+            onPress={() => setPendingLanguage(item)}
+            disabled={loading}>
             <Text style={TranslateLanguageStyles.languageText}>
               {item.label}
             </Text>
-            {selectedLanguage === item.value && (
+            {pendingLanguage?.value === item.value && (
               <Image
                 source={CheckIcon}
                 style={TranslateLanguageStyles.languageIcon}
@@ -87,14 +157,14 @@ const TranslateLanguageScreen = ({navigation}) => {
         <TouchableOpacity
           style={[
             TranslateLanguageStyles.button,
-            selectedLanguage
+            pendingLanguage
               ? TranslateLanguageStyles.activeButton
               : TranslateLanguageStyles.disabledButton,
           ]}
-          disabled={!selectedLanguage}
-          onPress={() => handleLanguageChange({value: selectedLanguage})}>
+          disabled={!pendingLanguage || loading}
+          onPress={handleConfirmLanguageChange}>
           <Text style={TranslateLanguageStyles.buttonText}>
-            {t('언어 변환')}
+            {loading ? t('변경 중...') : t('언어 변환')}
           </Text>
         </TouchableOpacity>
       </View>
