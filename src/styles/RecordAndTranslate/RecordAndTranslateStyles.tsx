@@ -51,6 +51,11 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     backgroundColor: '#FDD7AA',
   },
+  translationText: {
+    color: '#2527BF',
+    fontSize: 14,
+    marginTop: 4,
+  },
   messageText: {
     fontSize: 16,
     color: '#000',

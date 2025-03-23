@@ -56,7 +56,6 @@ const RecordAndTranslateScreen = () => {
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
 
-      // 응답 전체를 출력
       console.log('🚀 세션 시작 응답:', response.data);
 
       setSessionId(response.data.session_id);
@@ -78,7 +77,6 @@ const RecordAndTranslateScreen = () => {
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
 
-      // 응답 데이터를 콘솔에 전체 출력
       console.log('🛑 세션 종료 응답:', response.data);
 
       setSessionId(null);
@@ -100,12 +98,37 @@ const RecordAndTranslateScreen = () => {
         {headers: {Authorization: `Bearer ${accessToken}`}},
       );
 
-      // 응답 전체를 출력
       console.log('🔊 오디오 청크 전송 응답:', response.data);
+
+      const transcript = response.data.transcript;
+
+      const translations = response.data.translations || {};
+      const englishTranslation = translations.English?.text || '';
+      const koreanTranslation = translations.Korean?.text || '';
+
+      let translatedText = '';
+
+      if (
+        transcript !== englishTranslation &&
+        transcript === koreanTranslation
+      ) {
+        translatedText = englishTranslation;
+      } else if (
+        transcript !== koreanTranslation &&
+        transcript === englishTranslation
+      ) {
+        translatedText = koreanTranslation;
+      }
+
+      console.log('📖 최종 번역된 텍스트:', translatedText);
 
       setMessages(prevMessages => [
         ...prevMessages,
-        {text: response.data.transcript, speaker: speakerIndex % 2},
+        {
+          text: transcript,
+          translation: translatedText,
+          speaker: speakerIndex % 2,
+        },
       ]);
     } catch (error) {
       console.error('🚨 오디오 전송 실패:', error);
@@ -164,9 +187,13 @@ const RecordAndTranslateScreen = () => {
               msg.speaker === 0 ? styles.speakerA : styles.speakerB,
             ]}>
             <Text style={styles.messageText}>{msg.text}</Text>
+            {msg.translation ? (
+              <Text style={styles.translationText}>{msg.translation}</Text>
+            ) : null}
           </View>
         ))}
       </ScrollView>
+
       <View style={styles.buttonBackground} />
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.iconButton}>
