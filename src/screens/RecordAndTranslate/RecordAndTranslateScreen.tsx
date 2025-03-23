@@ -21,16 +21,12 @@ const RecordAndTranslateScreen = () => {
       try {
         let token = await AsyncStorage.getItem('accessToken');
         if (!token) {
-          console.log('🔑 액세스 토큰이 없음. 새로 요청 중...');
           const response = await axios.post(`${BASE_URL}/auth/login`, {
             username: 'your-username',
             password: 'your-password',
           });
           token = response.data.access_token;
           await AsyncStorage.setItem('accessToken', token);
-          console.log('✅ 새 액세스 토큰 저장 완료:', token);
-        } else {
-          console.log('✅ 저장된 액세스 토큰 로드 완료:', token);
         }
         setAccessToken(token);
       } catch (error) {
@@ -52,38 +48,42 @@ const RecordAndTranslateScreen = () => {
   const startSession = async () => {
     try {
       if (!accessToken) {
-        console.warn('⚠️ 액세스 토큰이 없어 API 요청을 중단합니다.');
         return null;
       }
-      console.log('🔹 세션 시작 요청 중...');
       const response = await axios.post(
         `${BASE_URL}/start_session`,
         {member_id: '3'},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          timeout: 10000,
-        },
+        {headers: {Authorization: `Bearer ${accessToken}`}},
       );
-      if (response.data.session_id) {
-        console.log('✅ 세션 시작 성공:', response.data);
-        setSessionId(response.data.session_id);
-        return response.data.session_id;
-      } else {
-        console.warn('⚠️ 세션 ID를 받지 못함:', response.data);
-        return null;
-      }
+      setSessionId(response.data.session_id);
+      return response.data.session_id;
     } catch (error) {
-      console.error('🚨 세션 시작 실패:', error.message);
+      console.error('🚨 세션 시작 실패:', error);
       return null;
+    }
+  };
+
+  const sendAudioChunk = async filePath => {
+    try {
+      if (!sessionId || !accessToken) {
+        return;
+      }
+      const audioData = await RNFS.readFile(filePath, 'base64');
+      const response = await axios.post(
+        `${BASE_URL}/audio_chunk`,
+        {session_id: sessionId, audio: audioData},
+        {headers: {Authorization: `Bearer ${accessToken}`}},
+      );
+      console.log('📝 인식된 문장:', response.data.transcript);
+      setTranscript(response.data.transcript);
+      setTranslations(response.data.translations);
+    } catch (error) {
+      console.error('🚨 오디오 전송 실패:', error);
     }
   };
 
   const handleRecordPress = async () => {
     if (!isRecording) {
-      console.log('🎬 녹음 시작 버튼 클릭');
       let currentSessionId = sessionId || (await startSession());
       if (!currentSessionId) {
         return;
@@ -93,23 +93,22 @@ const RecordAndTranslateScreen = () => {
       setIsPaused(false);
       AudioRecord.start();
     } else {
-      console.log('🛑 녹음 중지 및 세션 종료');
       setIsRecording(false);
       setIsPaused(false);
-      AudioRecord.stop();
+      const filePath = await AudioRecord.stop();
+      await sendAudioChunk(filePath);
       setSessionId(null);
     }
   };
 
-  const handlePausePress = () => {
+  const handlePausePress = async () => {
     if (isPaused) {
-      console.log('🎙 녹음 다시 시작');
       setIsPaused(false);
       AudioRecord.start();
     } else {
-      console.log('⏸ 녹음 일시 중지');
       setIsPaused(true);
-      AudioRecord.stop();
+      const filePath = await AudioRecord.stop();
+      await sendAudioChunk(filePath);
     }
   };
 
