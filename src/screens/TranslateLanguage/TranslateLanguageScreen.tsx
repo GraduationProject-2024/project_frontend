@@ -24,8 +24,8 @@ const TranslateLanguageScreen = ({navigation}) => {
     {label: '한국어', value: 'ko', apiValue: 'KO'},
     {label: 'English', value: 'en', apiValue: 'EN'},
     {label: 'Tiếng Việt', value: 'vi', apiValue: 'VI'},
-    {label: '中国人(简体)', value: 'zh-cn', apiValue: 'ZH_CN'},
-    {label: '中国人(繁体)', value: 'zh-tw', apiValue: 'ZH_TW'},
+    {label: '简体中文', value: 'zhCN', apiValue: 'ZH_CN'},
+    {label: '繁體中文', value: 'zhTW', apiValue: 'ZH_TW'},
   ];
 
   const getAccessToken = async () => {
