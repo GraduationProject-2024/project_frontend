@@ -14,7 +14,7 @@ const RecordAndTranslateScreen = () => {
   const [transcript, setTranscript] = useState('');
   const [translations, setTranslations] = useState({});
 
-  const BASE_URL = 'http://52.78.79.53:5002';
+  const BASE_URL = 'http://52.78.79.53:5002/transapi';
 
   useEffect(() => {
     const getAccessToken = async () => {
