@@ -142,12 +142,12 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
             <Text style={styles.hospitalName}>{hospital.name}</Text>
             {hospital.telephone && (
               <Text style={styles.hospitalInfo}>
-                🗺️ {t('주소')}: {hospital.telephone}
+                ☎️ {t('전화 번호')}: {hospital.telephone}
               </Text>
             )}
             {hospital.address && (
               <Text style={styles.hospitalInfo}>
-                ☎️ {t('전화 번호')}: {hospital.address}
+                🗺️ {t('주소')}: {hospital.address}
               </Text>
             )}
             <Text style={styles.hospitalInfo}>
