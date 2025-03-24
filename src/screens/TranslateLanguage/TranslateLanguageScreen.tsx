@@ -11,8 +11,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTranslation} from 'react-i18next';
 import TranslateLanguageStyles from '../../styles/TranslateLanguage/TranslateLanguageStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
-import RNRestart from 'react-native-restart';
 import {changeAppLanguage} from '../../locales/i18n';
+import {CommonActions} from '@react-navigation/native';
+import {LogBox} from 'react-native';
+
+LogBox.ignoreLogs([
+  "The action 'RESET' with payload",
+  "initialScrollIndex '-1' is not valid",
+]);
 
 const TranslateLanguageScreen = ({navigation}) => {
   const {t, i18n} = useTranslation();
@@ -104,27 +110,28 @@ const TranslateLanguageScreen = ({navigation}) => {
       return;
     }
 
-    await changeAppLanguage(pendingLanguage.value);
+    await AsyncStorage.setItem('appLanguage', pendingLanguage.value);
+    await i18n.changeLanguage(pendingLanguage.value);
 
-    Alert.alert(
-      t('언어 변경'),
-      t('언어가 변경되었습니다. 앱이 재시작됩니다.'),
-      [
-        {
-          text: t('취소'),
-          style: 'cancel',
+    Alert.alert(t('언어 변경'), t('언어가 변경되었습니다.'), [
+      {
+        text: t('확인'),
+        onPress: () => {
+          setSelectedLanguage(pendingLanguage.value);
+          setPendingLanguage(null);
+
+          navigation.navigate('Home');
+
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'Home'}],
+            }),
+          );
         },
-        {
-          text: t('확인'),
-          onPress: () => {
-            console.log('🔥 앱을 재시작합니다.');
-            RNRestart.restart();
-          },
-        },
-      ],
-    );
+      },
+    ]);
   };
-
   return (
     <View style={TranslateLanguageStyles.container}>
       <FlatList

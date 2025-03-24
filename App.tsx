@@ -4,19 +4,23 @@ import {View, Text} from 'react-native';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {initializeI18n} from './src/locales/i18n';
 import AppNavigator from './src/navigation/AppNavigator';
-import RNRestart from 'react-native-restart';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-console.log('RNRestart:', RNRestart);
 
 const App = () => {
   const [isI18nLoaded, setIsI18nLoaded] = useState(false);
 
   useEffect(() => {
-    const loadI18n = async () => {
+    const loadLanguage = async () => {
       try {
         console.log('🔄 i18n 로딩 시작');
         await initializeI18n();
+
+        const storedLang = await AsyncStorage.getItem('appLanguage');
+        if (storedLang && storedLang !== i18n.language) {
+          await i18n.changeLanguage(storedLang);
+          console.log(`✅ 저장된 언어 적용 완료: ${storedLang}`);
+        }
+
         console.log(`✅ i18n 로딩 완료, 현재 언어: ${i18n.language}`);
         setIsI18nLoaded(true);
       } catch (error) {
@@ -24,31 +28,8 @@ const App = () => {
       }
     };
 
-    loadI18n();
-
-    const handleLanguageChange = async () => {
-      console.log(`🌍 현재 앱 언어 변경됨: ${i18n.language}`);
-
-      const storedLang = await AsyncStorage.getItem('appLanguage');
-      if (storedLang !== i18n.language) {
-        console.log('🔥 앱을 재시작합니다.');
-        await AsyncStorage.setItem('appLanguage', i18n.language);
-        setTimeout(() => RNRestart.restart(), 500);
-      } else {
-        console.log(
-          'ℹ️ 언어 변경 감지됨, 하지만 동일한 언어이므로 재시작하지 않음.',
-        );
-      }
-    };
-
-    i18n.on('languageChanged', handleLanguageChange);
-
-    return () => {
-      i18n.off('languageChanged', handleLanguageChange);
-    };
+    loadLanguage();
   }, []);
-
-  console.log('🔄 isI18nLoaded 상태:', isI18nLoaded);
 
   if (!isI18nLoaded) {
     return (

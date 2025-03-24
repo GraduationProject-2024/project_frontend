@@ -14,12 +14,14 @@ const HomeScreen = () => {
   const [bodyParts, setBodyParts] = useState([]);
   const [accessToken, setAccessToken] = useState(null);
   const navigation = useNavigation();
-  const [_, setForceUpdate] = useState(0);
 
-  // ✅ 언어 변경 감지 및 강제 리렌더링
+  // ✅ 언어 변경 시 홈 화면만 새로고침
   useEffect(() => {
     const languageChangedHandler = () => {
-      setForceUpdate(prev => prev + 1);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'HomeScreen'}], // 홈 화면을 다시 로드
+      });
     };
 
     i18n.on('languageChanged', languageChangedHandler);
@@ -27,7 +29,7 @@ const HomeScreen = () => {
     return () => {
       i18n.off('languageChanged', languageChangedHandler);
     };
-  }, []);
+  }, [navigation, i18n]);
 
   // ✅ 로그인 후 액세스 토큰을 받아와 AsyncStorage에 저장
   const getAccessToken = async () => {

@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import RecommendPharmacyListStyles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy';
@@ -21,7 +20,6 @@ const RecommendPharmacyListScreen = () => {
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ 고정된 위도, 경도 설정 (서울특별시 용산구 한강대로 366 근처)
   const latitude = 37.546584;
   const longitude = 126.964649;
 
@@ -50,7 +48,7 @@ const RecommendPharmacyListScreen = () => {
     }
 
     try {
-      const requestData = {lat, lon}; // ✅ 고정된 위도, 경도 사용
+      const requestData = {lat, lon};
       console.log('📌 약국 조회 요청 데이터:', requestData);
 
       const response = await fetch(API_URL, {
@@ -109,37 +107,48 @@ const RecommendPharmacyListScreen = () => {
 
   return (
     <View style={RecommendPharmacyListStyles.container}>
+      {/* 🔹 TitleText 추가 */}
+      <Text style={RecommendPharmacyListStyles.titleText}>
+        가까운 위치에 있는 약국을 추천해드립니다{'\n'}운영 시간과 예상 소요
+        시간을 참고해주세요.
+      </Text>
+
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator
+          size="large"
+          color="#2527BF"
+          style={RecommendPharmacyListStyles.loadingIndicator}
+        />
       ) : (
         <ScrollView style={RecommendPharmacyListStyles.pharmacyList}>
           {pharmacies.length > 0 ? (
             pharmacies.map((pharmacy, index) => (
               <TouchableOpacity
                 key={index}
+                style={RecommendPharmacyListStyles.pharmacyCard}
                 onPress={() => fetchPharmacyMapUrl(pharmacy.id)}>
-                <View style={RecommendPharmacyListStyles.pharmacyContainer}>
+                <View style={RecommendPharmacyListStyles.pharmacyCardContent}>
                   <Text style={RecommendPharmacyListStyles.pharmacyName}>
                     {pharmacy.dutyname}
                   </Text>
+
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    <Icon name="place" size={16} color="gray" />{' '}
-                    {pharmacy.address}
+                    🗺️ 주소: {pharmacy.address}
                   </Text>
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    <Icon name="call" size={16} color="gray" />
-                    전화번호: {pharmacy.dutytel1 || '정보 없음'}
+                    ☎️ 전화번호: {pharmacy.dutytel1 || '정보 없음'}
                   </Text>
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    <Icon name="directions-walk" size={16} color="gray" /> 거리:{' '}
-                    {pharmacy.transit_travel_distance_km?.toFixed(2)} km
+                    🚶 거리:{' '}
+                    {pharmacy.transit_travel_distance_km?.toFixed(2) || '-'} km
                   </Text>
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    <Icon name="timer" size={16} color="gray" />
-                    예상 이동 시간: {pharmacy.transit_travel_time_m} 분
+                    ⏳ 예상 소요 시간: {pharmacy.transit_travel_time_m || '-'}{' '}
+                    분
                   </Text>
+
                   <Text style={RecommendPharmacyListStyles.pharmacyHours}>
-                    운영 시간:
+                    🕒 운영 시간:
                   </Text>
                   {['월', '화', '수', '목', '금', '토', '일', '공휴일'].map(
                     (day, i) => {
@@ -158,7 +167,7 @@ const RecommendPharmacyListScreen = () => {
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={{textAlign: 'center', marginTop: 20}}>
+            <Text style={RecommendPharmacyListStyles.noPharmaciesText}>
               근처 약국을 찾을 수 없습니다.
             </Text>
           )}

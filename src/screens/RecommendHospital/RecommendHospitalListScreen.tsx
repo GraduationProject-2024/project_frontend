@@ -124,14 +124,12 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
       </Text>
 
       {loading ? (
-        // ✅ 병원 리스트를 불러오는 동안 로딩 표시 추가
         <ActivityIndicator
           size="large"
           color="#2527BF"
           style={styles.loadingIndicator}
         />
       ) : hospitals.length === 0 ? (
-        // ✅ 병원이 하나도 없을 때 메시지 표시
         <Text style={styles.noHospitalsText}>
           {t('추천할 병원이 없습니다.')}
         </Text>
