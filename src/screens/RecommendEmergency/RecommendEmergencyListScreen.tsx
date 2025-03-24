@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import {useTranslation} from 'react-i18next'; // ✅ 번역 훅 추가
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecommendEmergency/RecommendEmergencyListStyles';
 
 const RecommendEmergencyListScreen = () => {
-  const {t} = useTranslation(); // ✅ 번역 훅 사용
+  const {t} = useTranslation();
   const [emergencyList, setEmergencyList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
@@ -52,8 +52,8 @@ const RecommendEmergencyListScreen = () => {
         body: JSON.stringify({
           isCondition: isCondition,
           conditions: conditions,
-          lat: latitude, // ✅ 고정된 값 사용
-          lon: longitude, // ✅ 고정된 값 사용
+          lat: latitude,
+          lon: longitude,
         }),
       });
 
@@ -69,8 +69,8 @@ const RecommendEmergencyListScreen = () => {
           id: item.id,
           name: item.dutyName,
           number: item.dutyTel3 || t('번호 없음'),
-          time: `${item.transit_travel_time_m}${t('분')}`,
-          distance: `${item.transit_travel_distance_km}${t('km')}`,
+          time: `${item.transit_travel_time_m} ${t('분')}`,
+          distance: `${item.transit_travel_distance_km} ${t('km')}`,
           address: item.dutyAddr,
         })),
       );
@@ -134,21 +134,34 @@ const RecommendEmergencyListScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.titleText}>
+        {t(
+          '가까운 위치에 있는 응급실을 추천해드립니다\n운영 시간과 예상 소요 시간을 참고해주세요\n원하는 응급실을 눌러 지도를 확인하세요',
+        )}
+      </Text>
+
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#2527BF" />
       ) : (
         <ScrollView style={styles.EmergencyList}>
           {emergencyList.map((Emergency, index) => (
             <TouchableOpacity
               key={index}
+              style={styles.emergencyCard}
               onPress={() => fetchEmergencyMap(Emergency.id)}>
-              <View style={styles.EmergencyContainer}>
-                <Text style={styles.EmergencyName}>{Emergency.name}</Text>
-                <Text style={styles.EmergencyNumber}>{Emergency.number}</Text>
-                <Text style={styles.EmergencyInfo}>
-                  {Emergency.time} | {Emergency.distance}
-                </Text>
-                <Text style={styles.EmergencyAddress}>{Emergency.address}</Text>
+              <View style={styles.emergencyCardContent}>
+                <Text style={styles.emergencyName}>{Emergency.name}</Text>
+                <Text style={styles.emergencyLabel}>{t('전화 번호')}</Text>
+                <Text style={styles.emergencyInfo}>{Emergency.number}</Text>
+
+                <Text style={styles.emergencyLabel}>{t('주소')}</Text>
+                <Text style={styles.emergencyInfo}>{Emergency.address}</Text>
+
+                <Text style={styles.emergencyLabel}>{t('이동 거리')}</Text>
+                <Text style={styles.emergencyInfo}>{Emergency.distance}</Text>
+
+                <Text style={styles.emergencyLabel}>{t('예상 소요 시간')}</Text>
+                <Text style={styles.emergencyInfo}>{Emergency.time}</Text>
               </View>
             </TouchableOpacity>
           ))}

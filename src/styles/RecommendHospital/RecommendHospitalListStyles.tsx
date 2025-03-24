@@ -37,6 +37,12 @@ export default StyleSheet.create({
     color: '#000000',
     marginBottom: 6,
   },
+  hospitalLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2527BF',
+    marginTop: 10,
+  },
   hospitalInfo: {
     fontSize: 15,
     color: '#000000',

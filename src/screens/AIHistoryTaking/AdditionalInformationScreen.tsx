@@ -77,31 +77,71 @@ const AdditionalInformationScreen = () => {
         return;
       }
 
-      const requestBody = {
-        additional: additionalInfo.trim().length > 0 ? additionalInfo : null,
-      };
+      const formData = new FormData();
 
+      // 추가 정보 텍스트 추가
+      if (additionalInfo.trim().length > 0) {
+        formData.append('additional', additionalInfo.trim());
+      }
+
+      // 이미지 추가
+      images.forEach((uri, index) => {
+        const filename = uri.split('/').pop(); // 파일명 추출
+        const fileType = filename.split('.').pop(); // 확장자 추출
+
+        formData.append('images', {
+          uri,
+          name: filename,
+          type: `image/${fileType}`, // image/png, image/jpeg 등으로 설정
+        });
+      });
+
+      // 🔍 디버깅: FormData 내용을 entries()로 출력
+      console.log('📤 [Request Body] FormData Contents:');
+      for (const pair of formData.entries()) {
+        if (pair[1] instanceof Object && pair[1].uri) {
+          console.log(
+            `  ${pair[0]}: { uri: ${pair[1].uri}, name: ${pair[1].name}, type: ${pair[1].type} }`,
+          );
+        } else {
+          console.log(`  ${pair[0]}: ${pair[1]}`);
+        }
+      }
+
+      // fetch 요청 (Content-Type 제거)
       const response = await fetch(
         `http://52.78.79.53:8081/api/v1/symptom/additional/${symptomId}`,
         {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(requestBody),
+          body: formData,
         },
       );
 
-      if (!response.ok) {
-        throw new Error('추가 정보 저장 실패');
+      console.log('📥 [Response Status]:', response.status);
+
+      const responseBody = await response.text();
+      console.log('📥 [Response Body Raw Text]:', responseBody);
+
+      try {
+        const responseData = JSON.parse(responseBody);
+        console.log(
+          '✅ [Parsed Response JSON]:',
+          JSON.stringify(responseData, null, 2),
+        );
+      } catch (error) {
+        console.log('⚠️ [Response is not JSON]:', responseBody);
       }
 
-      const result = await response.json();
-      console.log('✅ 추가 정보 저장 완료:', result);
+      if (!response.ok) {
+        throw new Error(`추가 정보 저장 실패: ${response.status}`);
+      }
+
       Alert.alert('Success', '추가 정보가 저장되었습니다.');
     } catch (error) {
-      console.error('❌ 추가 정보 저장 오류:', error);
+      console.error('❌ [Error Saving Additional Info]:', error);
       Alert.alert('Error', `추가 정보 저장 중 오류 발생: ${error.message}`);
     }
   };

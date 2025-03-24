@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
-import RecommendPharmacyListStyles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
+import {useTranslation} from 'react-i18next';
+import styles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy';
 const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy-map';
@@ -141,71 +141,64 @@ const RecommendPharmacyListScreen = () => {
   };
 
   return (
-    <View style={RecommendPharmacyListStyles.container}>
-      <Text style={RecommendPharmacyListStyles.titleText}>
+    <View style={styles.container}>
+      <Text style={styles.titleText}>
         {t(
-          '가까운 위치에 있는 약국을 추천해드립니다\n운영 시간과 예상 소요\n시간을 참고해주세요.',
+          '가까운 위치에 있는 약국을 추천해드립니다\n운영 시간과 예상 소요 시간을 참고해주세요.',
         )}
       </Text>
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#2527BF"
-          style={RecommendPharmacyListStyles.loadingIndicator}
-        />
+        <ActivityIndicator size="large" color="#2527BF" />
+      ) : pharmacies.length === 0 ? (
+        <Text style={styles.noPharmaciesText}>
+          {t('근처 약국을 찾을 수 없습니다.')}
+        </Text>
       ) : (
-        <ScrollView style={RecommendPharmacyListStyles.pharmacyList}>
-          {pharmacies.length > 0 ? (
-            pharmacies.map((pharmacy, index) => (
-              <TouchableOpacity
-                key={index}
-                style={RecommendPharmacyListStyles.pharmacyCard}
-                onPress={() => fetchPharmacyMapUrl(pharmacy.id)}>
-                <View style={RecommendPharmacyListStyles.pharmacyCardContent}>
-                  <Text style={RecommendPharmacyListStyles.pharmacyName}>
-                    {pharmacy.dutyname}
-                  </Text>
+        <ScrollView style={styles.pharmacyList}>
+          {pharmacies.map((pharmacy, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.pharmacyCard}
+              onPress={() => fetchPharmacyMapUrl(pharmacy.id)}>
+              <View style={styles.pharmacyCardContent}>
+                <Text style={styles.pharmacyName}>{pharmacy.dutyname}</Text>
 
-                  <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    🗺️ {t('주소')}: {pharmacy.address}
-                  </Text>
-                  <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    ☎️ {t('전화 번호')}: {pharmacy.dutytel1 || t('정보 없음')}
-                  </Text>
-                  <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    🚶 {t('거리')}:{' '}
-                    {pharmacy.transit_travel_distance_km?.toFixed(2) || '-'} km
-                  </Text>
-                  <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    ⏳ {t('예상 소요 시간')}:{' '}
-                    {pharmacy.transit_travel_time_m || '-'} {t('분')}
-                  </Text>
+                <Text style={styles.pharmacyLabel}>{t('전화 번호')}</Text>
+                <Text style={styles.pharmacyInfo}>
+                  {pharmacy.dutytel1 || t('정보 없음')}
+                </Text>
 
-                  <Text style={RecommendPharmacyListStyles.pharmacyHours}>
-                    🕒 {t('운영 시간')}:
-                  </Text>
-                  {['월', '화', '수', '목', '금', '토', '일', '공휴일'].map(
-                    (day, i) => {
-                      const start = pharmacy[`dutytime${i + 1}s`];
-                      const close = pharmacy[`dutytime${i + 1}c`];
-                      return start && close ? (
-                        <Text
-                          key={i}
-                          style={RecommendPharmacyListStyles.hoursText}>
-                          {t(day)}: {start} - {close}
-                        </Text>
-                      ) : null;
-                    },
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text style={RecommendPharmacyListStyles.noPharmaciesText}>
-              {t('근처 약국을 찾을 수 없습니다.')}
-            </Text>
-          )}
+                <Text style={styles.pharmacyLabel}>{t('주소')}</Text>
+                <Text style={styles.pharmacyInfo}>
+                  {pharmacy.address || t('정보 없음')}
+                </Text>
+
+                <Text style={styles.pharmacyLabel}>{t('이동 거리')}</Text>
+                <Text style={styles.pharmacyInfo}>
+                  {pharmacy.transit_travel_distance_km?.toFixed(2) || '-'} km
+                </Text>
+
+                <Text style={styles.pharmacyLabel}>{t('예상 소요 시간')}</Text>
+                <Text style={styles.pharmacyInfo}>
+                  {pharmacy.transit_travel_time_m || '-'} {t('분')}
+                </Text>
+
+                <Text style={styles.pharmacyLabel}>{t('운영 시간')}</Text>
+                {['월', '화', '수', '목', '금', '토', '일', '공휴일'].map(
+                  (day, i) => {
+                    const start = pharmacy[`dutytime${i + 1}s`];
+                    const close = pharmacy[`dutytime${i + 1}c`];
+                    return start && close ? (
+                      <Text key={i} style={styles.hoursText}>
+                        {t(day)}: {start} - {close}
+                      </Text>
+                    ) : null;
+                  },
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       )}
     </View>

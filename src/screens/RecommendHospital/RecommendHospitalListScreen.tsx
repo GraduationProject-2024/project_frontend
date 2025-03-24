@@ -133,11 +133,7 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
       </Text>
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#2527BF"
-          style={styles.loadingIndicator}
-        />
+        <ActivityIndicator size="large" color="#2527BF" />
       ) : hospitals.length === 0 ? (
         <Text style={styles.noHospitalsText}>
           {t('추천할 병원이 없습니다.')}
@@ -151,22 +147,24 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
               onPress={() => onHospitalSelect(hospital.id)}>
               <View style={styles.hospitalCardContent}>
                 <Text style={styles.hospitalName}>{hospital.name}</Text>
-                {hospital.telephone && (
-                  <Text style={styles.hospitalInfo}>
-                    ☎️ {t('전화 번호')}: {hospital.telephone}
-                  </Text>
-                )}
-                {hospital.address && (
-                  <Text style={styles.hospitalInfo}>
-                    🗺️ {t('주소')}: {hospital.address}
-                  </Text>
-                )}
+
+                <Text style={styles.hospitalLabel}>{t('전화 번호')}</Text>
                 <Text style={styles.hospitalInfo}>
-                  🚆 {t('이동 거리')}:{' '}
+                  {hospital.telephone || t('정보 없음')}
+                </Text>
+
+                <Text style={styles.hospitalLabel}>{t('주소')}</Text>
+                <Text style={styles.hospitalInfo}>
+                  {hospital.address || t('정보 없음')}
+                </Text>
+
+                <Text style={styles.hospitalLabel}>{t('이동 거리')}</Text>
+                <Text style={styles.hospitalInfo}>
                   {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
                 </Text>
+
+                <Text style={styles.hospitalLabel}>{t('예상 소요 시간')}</Text>
                 <Text style={styles.hospitalInfo}>
-                  ⏳ {t('예상 소요 시간')}:{' '}
                   {hospital.transit_travel_time_m || '-'} {t('분')}
                 </Text>
               </View>

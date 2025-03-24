@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-const RecommendPharmacyListStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -40,21 +40,20 @@ const RecommendPharmacyListStyles = StyleSheet.create({
     color: '#000000',
     marginBottom: 6,
   },
+  pharmacyLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2527BF',
+    marginTop: 10,
+  },
   pharmacyInfo: {
     fontSize: 15,
     color: '#000000',
     marginBottom: 4,
   },
-  pharmacyHours: {
-    fontSize: 15,
-    marginTop: 8,
-    fontWeight: 'bold',
-    color: '#000000',
-  },
   hoursText: {
     fontSize: 15,
     color: '#666666',
-    paddingLeft: 8,
   },
   noPharmaciesText: {
     textAlign: 'center',
@@ -64,4 +63,4 @@ const RecommendPharmacyListStyles = StyleSheet.create({
   },
 });
 
-export default RecommendPharmacyListStyles;
+export default styles;
