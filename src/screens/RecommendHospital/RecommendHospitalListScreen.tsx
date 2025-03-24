@@ -123,36 +123,50 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
         )}
       </Text>
 
-      <ScrollView style={styles.hospitalList}>
-        {hospitals.map((hospital, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.hospitalCard}
-            onPress={() => onHospitalSelect(hospital.id)}>
-            <View style={styles.hospitalCardContent}>
-              <Text style={styles.hospitalName}>{hospital.name}</Text>
-              {hospital.telephone && (
+      {loading ? (
+        // ✅ 병원 리스트를 불러오는 동안 로딩 표시 추가
+        <ActivityIndicator
+          size="large"
+          color="#2527BF"
+          style={styles.loadingIndicator}
+        />
+      ) : hospitals.length === 0 ? (
+        // ✅ 병원이 하나도 없을 때 메시지 표시
+        <Text style={styles.noHospitalsText}>
+          {t('추천할 병원이 없습니다.')}
+        </Text>
+      ) : (
+        <ScrollView style={styles.hospitalList}>
+          {hospitals.map((hospital, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.hospitalCard}
+              onPress={() => onHospitalSelect(hospital.id)}>
+              <View style={styles.hospitalCardContent}>
+                <Text style={styles.hospitalName}>{hospital.name}</Text>
+                {hospital.telephone && (
+                  <Text style={styles.hospitalInfo}>
+                    ☎️ {t('전화 번호')}: {hospital.telephone}
+                  </Text>
+                )}
+                {hospital.address && (
+                  <Text style={styles.hospitalInfo}>
+                    🗺️ {t('주소')}: {hospital.address}
+                  </Text>
+                )}
                 <Text style={styles.hospitalInfo}>
-                  ☎️ {t('전화 번호')}: {hospital.telephone}
+                  🚆 {t('이동 거리')}:{' '}
+                  {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
                 </Text>
-              )}
-              {hospital.address && (
                 <Text style={styles.hospitalInfo}>
-                  🗺️ {t('주소')}: {hospital.address}
+                  ⏳ {t('예상 소요 시간')}:{' '}
+                  {hospital.transit_travel_time_m || '-'} {t('분')}
                 </Text>
-              )}
-              <Text style={styles.hospitalInfo}>
-                🚆 {t('이동 거리')}:{' '}
-                {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
-              </Text>
-              <Text style={styles.hospitalInfo}>
-                ⏳ {t('예상 소요 시간')}:{' '}
-                {hospital.transit_travel_time_m || '-'} {t('분')}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
       {selectedHospital && (
         <View style={styles.selectedHospitalContainer}>
