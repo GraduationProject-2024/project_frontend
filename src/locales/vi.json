@@ -656,5 +656,14 @@
     "금": "Thứ Sáu",
     "토": "Thứ Bảy",
     "일": "Chủ Nhật",
-    "공휴일": "Ngày lễ"
+    "공휴일": "Ngày lễ",
+    "예상하는 현재의 응급 상태를 선택해주세요.": "Vui lòng chọn tình trạng khẩn cấp dự kiến.",
+    "해당하는 상태가 없다면 건너뛰십시오.": "Nếu không có tình trạng phù hợp, vui lòng bỏ qua.",
+    "선택된 복용하는 약:": "Thuốc đã chọn:",
+    "선택 완료": "Hoàn tất lựa chọn",
+    "건너뛰기": "Bỏ qua",
+    "조산산모": "Phụ nữ mang thai sinh non",
+    "정신질환자": "Bệnh nhân tâm thần",
+    "신생아": "Trẻ sơ sinh",
+    "중증화상": "Bỏng nặng"
 }

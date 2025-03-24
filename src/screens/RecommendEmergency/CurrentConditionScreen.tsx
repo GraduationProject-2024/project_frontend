@@ -8,21 +8,20 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import {useTranslation} from 'react-i18next'; // ✅ 번역 추가
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecommendEmergency/CurrentConditionStyles';
 
 const CurrentConditionScreen = () => {
-  const {t, i18n} = useTranslation(); // ✅ 번역 훅 추가
+  const {t, i18n} = useTranslation();
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [medicalConditions, setMedicalConditions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
-  const [_, setForceUpdate] = useState(0); // 🔥 강제 리렌더링 추가
+  const [_, setForceUpdate] = useState(0);
 
-  // ✅ 언어 변경 감지 및 강제 리렌더링
   useEffect(() => {
     const languageChangedHandler = () => {
-      setForceUpdate(prev => prev + 1); // 🔥 강제 리렌더링
+      setForceUpdate(prev => prev + 1);
     };
 
     i18n.on('languageChanged', languageChangedHandler);
@@ -32,7 +31,6 @@ const CurrentConditionScreen = () => {
     };
   }, []);
 
-  // 🔹 비동기로 액세스 토큰을 가져오는 함수
   const getToken = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -43,7 +41,6 @@ const CurrentConditionScreen = () => {
     }
   };
 
-  // 🔹 API 호출 함수
   const fetchMedicalConditions = async () => {
     setLoading(true);
     try {
@@ -62,7 +59,7 @@ const CurrentConditionScreen = () => {
       }
 
       const data = await response.json();
-      setMedicalConditions(data); // ✅ 응급 상태 목록 업데이트
+      setMedicalConditions(data);
     } catch (error) {
       console.error('Error fetching medical conditions:', error);
     } finally {
@@ -70,7 +67,6 @@ const CurrentConditionScreen = () => {
     }
   };
 
-  // 🔹 컴포넌트 마운트 시 API 요청 실행
   useEffect(() => {
     fetchMedicalConditions();
   }, []);
@@ -115,7 +111,7 @@ const CurrentConditionScreen = () => {
                   selectedConditions.includes(condition) &&
                     styles.conditionTextSelected,
                 ]}>
-                {t(condition)} {/* ✅ 번역 적용 */}
+                {t(condition)}
               </Text>
             </TouchableOpacity>
           ))}

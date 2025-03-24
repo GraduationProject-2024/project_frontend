@@ -11,9 +11,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#2527BF',
-    marginBottom: 16,
+    marginBottom: 15,
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
   tabs: {
     flexDirection: 'row',

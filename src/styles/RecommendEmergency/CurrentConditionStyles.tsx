@@ -8,9 +8,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
+    color: '#2527BF',
+    marginBottom: 15,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    textAlign: 'left',
   },
   scrollContainer: {
     flexDirection: 'row',

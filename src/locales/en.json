@@ -653,5 +653,14 @@
     "금": "Friday",
     "토": "Saturday",
     "일": "Sunday",
-    "공휴일": "Public Holiday"
+    "공휴일": "Public Holiday",
+    "예상하는 현재의 응급 상태를 선택해주세요.": "Please select the expected emergency condition.",
+    "해당하는 상태가 없다면 건너뛰십시오.": "If none apply, please skip.",
+    "선택된 복용하는 약:": "Selected medication:",
+    "선택 완료": "Selection complete",
+    "건너뛰기": "Skip",
+    "조산산모": "Preterm pregnant woman",
+    "정신질환자": "Mentally ill patient",
+    "신생아": "Newborn",
+    "중증화상": "Severe burn"
 }
