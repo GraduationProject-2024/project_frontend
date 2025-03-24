@@ -42,8 +42,8 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
           report_id: '',
           department: selectedDepartment,
           suspected_disease: [''],
-          secondary_hospital: true,
-          tertiary_hospital: true,
+          secondary_hospital: false,
+          tertiary_hospital: false,
         };
 
         const response = await axios.post(API_URL, requestData, {

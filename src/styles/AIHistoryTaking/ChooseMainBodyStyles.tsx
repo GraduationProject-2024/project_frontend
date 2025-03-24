@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#2527BF',
     marginBottom: 10,
+    fontWeight: 'bold',
   },
   bodyPartContainer: {
     marginBottom: 16,

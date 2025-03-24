@@ -15,12 +15,11 @@ const HomeScreen = () => {
   const [accessToken, setAccessToken] = useState(null);
   const navigation = useNavigation();
 
-  // ✅ 언어 변경 시 홈 화면만 새로고침
   useEffect(() => {
     const languageChangedHandler = () => {
       navigation.reset({
         index: 0,
-        routes: [{name: 'HomeScreen'}], // 홈 화면을 다시 로드
+        routes: [{name: 'HomeScreen'}],
       });
     };
 
@@ -31,7 +30,6 @@ const HomeScreen = () => {
     };
   }, [navigation, i18n]);
 
-  // ✅ 로그인 후 액세스 토큰을 받아와 AsyncStorage에 저장
   const getAccessToken = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -57,7 +55,6 @@ const HomeScreen = () => {
     }
   };
 
-  // ✅ API에서 신체 부위 목록 가져오기
   const fetchBodyParts = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -85,7 +82,6 @@ const HomeScreen = () => {
     }
   };
 
-  // ✅ 앱이 시작될 때 저장된 토큰 불러와 API 호출
   useEffect(() => {
     const initializeApp = async () => {
       const token = await AsyncStorage.getItem('accessToken');
@@ -98,7 +94,6 @@ const HomeScreen = () => {
     initializeApp();
   }, []);
 
-  // ✅ 액세스 토큰이 설정되면 신체 부위 목록 요청
   useEffect(() => {
     if (accessToken) {
       fetchBodyParts();
@@ -115,11 +110,40 @@ const HomeScreen = () => {
     }
   };
 
-  const handleStartPress = () => {
+  const handleStartPress = async () => {
     if (selectedButtons.length > 0) {
-      navigation.navigate('ChooseDetailBody', {
-        selectedBodyParts: selectedButtons,
-      });
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+          throw new Error('액세스 토큰이 없습니다.');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/selected-mbp`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({description: selectedButtons}),
+        });
+
+        if (!response.ok) {
+          throw new Error('주요 신체 부위 저장 실패');
+        }
+
+        const responseData = await response.json();
+        console.log(
+          '📤 주요 신체 부위 저장 성공:',
+          JSON.stringify(responseData, null, 2),
+        );
+
+        navigation.navigate('ChooseDetailBody', {
+          selectedBodyParts: selectedButtons,
+          selectedMBPId: responseData.selectedMBPId,
+        });
+      } catch (error) {
+        console.error('주요 신체 부위 저장 중 오류 발생:', error);
+      }
     }
   };
 
