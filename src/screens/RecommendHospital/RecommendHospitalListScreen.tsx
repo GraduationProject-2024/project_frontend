@@ -24,7 +24,6 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [mapUrls, setMapUrls] = useState(null);
 
-  // ✅ 고정된 위도, 경도 설정 (서울특별시 용산구 한강대로 366 근처)
   const latitude = 37.546584;
   const longitude = 126.964649;
 
@@ -42,8 +41,8 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
         }
 
         const requestData = {
-          lat: latitude, // ✅ 고정된 위도 사용
-          lon: longitude, // ✅ 고정된 경도 사용
+          lat: latitude,
+          lon: longitude,
           is_report: false,
           report_id: '',
           department: selectedDepartment,
@@ -65,7 +64,7 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
         setHospitals(response.data);
       } catch (err) {
         console.error('❌ 병원 추천 API 요청 실패:', err.message);
-        setError(`데이터를 불러오는 데 실패했습니다: ${err.message}`);
+        setError(`${t('데이터를 불러오는 데 실패했습니다')}: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -116,16 +115,6 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
     }
   };
 
-  if (loading) {
-    return (
-      <ActivityIndicator
-        size="large"
-        color="#0000ff"
-        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-      />
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>
@@ -133,31 +122,34 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
           '선택하신 진료과에 맞는 병원을 추천해 드립니다\n이동 거리와 예상 소요 시간을 참고해주세요',
         )}
       </Text>
+
       <ScrollView style={styles.hospitalList}>
         {hospitals.map((hospital, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.hospitalContainer}
+            style={styles.hospitalCard}
             onPress={() => onHospitalSelect(hospital.id)}>
-            <Text style={styles.hospitalName}>{hospital.name}</Text>
-            {hospital.telephone && (
+            <View style={styles.hospitalCardContent}>
+              <Text style={styles.hospitalName}>{hospital.name}</Text>
+              {hospital.telephone && (
+                <Text style={styles.hospitalInfo}>
+                  ☎️ {t('전화 번호')}: {hospital.telephone}
+                </Text>
+              )}
+              {hospital.address && (
+                <Text style={styles.hospitalInfo}>
+                  🗺️ {t('주소')}: {hospital.address}
+                </Text>
+              )}
               <Text style={styles.hospitalInfo}>
-                ☎️ {t('전화 번호')}: {hospital.telephone}
+                🚆 {t('이동 거리')}:{' '}
+                {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
               </Text>
-            )}
-            {hospital.address && (
               <Text style={styles.hospitalInfo}>
-                🗺️ {t('주소')}: {hospital.address}
+                ⏳ {t('예상 소요 시간')}:{' '}
+                {hospital.transit_travel_time_m || '-'} {t('분')}
               </Text>
-            )}
-            <Text style={styles.hospitalInfo}>
-              🚆 {t('이동 거리')}:{' '}
-              {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
-            </Text>
-            <Text style={styles.hospitalInfo}>
-              ⏳ {t('예상 소요 시간')}: {hospital.transit_travel_time_m || '-'}{' '}
-              분
-            </Text>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
