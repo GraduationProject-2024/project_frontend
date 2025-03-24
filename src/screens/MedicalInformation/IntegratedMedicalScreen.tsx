@@ -10,9 +10,11 @@ import {
   Platform,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/MedicalInformation/IntegratedMedicalStyles';
 
 const IntegratedMedicalScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const route = useRoute();
   const memberId = Number(route.params?.memberId);
 
@@ -21,10 +23,10 @@ const IntegratedMedicalScreen = ({navigation}) => {
   }, [memberId]);
 
   if (!memberId) {
-    Alert.alert('오류', '회원 ID가 존재하지 않습니다.', [
-      {text: '확인', onPress: () => navigation.goBack()},
+    Alert.alert(t('오류'), t('회원 ID가 존재하지 않습니다.'), [
+      {text: t('확인'), onPress: () => navigation.goBack()},
     ]);
-    return null; // 화면 렌더링 중단
+    return null;
   }
 
   const [pastMedicalHistory, setPastMedicalHistory] = useState('');
@@ -67,7 +69,7 @@ const IntegratedMedicalScreen = ({navigation}) => {
       console.log('📡 Server Response:', responseText);
 
       if (!response.ok) {
-        let errorMessage = `서버 오류: ${response.status}`;
+        let errorMessage = `${t('서버 오류')}: ${response.status}`;
         try {
           const errorData = JSON.parse(responseText);
           errorMessage = errorData.message || errorMessage;
@@ -77,14 +79,14 @@ const IntegratedMedicalScreen = ({navigation}) => {
         throw new Error(errorMessage);
       }
 
-      Alert.alert('성공', '건강 정보가 저장되었습니다.', [
-        {text: '확인', onPress: () => navigation.navigate('Home')},
+      Alert.alert(t('성공'), t('건강 정보가 저장되었습니다.'), [
+        {text: t('확인'), onPress: () => navigation.navigate('Home')},
       ]);
     } catch (error) {
       console.error('API 요청 오류:', error);
       Alert.alert(
-        '네트워크 오류',
-        error.message || '건강 정보를 저장하는 동안 오류가 발생했습니다.',
+        t('네트워크 오류'),
+        error.message || t('건강 정보를 저장하는 동안 오류가 발생했습니다.'),
       );
     } finally {
       setLoading(false);
@@ -97,45 +99,46 @@ const IntegratedMedicalScreen = ({navigation}) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.titleText}>
-          보다 정확한 서비스 제공을 위해 가지고 있는 과거병력, {'\n'}
-          가족력, 현재 복용하는 약, 알레르기를 입력해주세요
+          {t(
+            '보다 정확한 서비스 제공을 위해 가지고 있는 과거병력, 가족력, 현재 복용하는 약, 알레르기를 입력해주세요',
+          )}
         </Text>
 
-        <Text style={styles.label}>과거병력</Text>
+        <Text style={styles.label}>{t('과거병력')}</Text>
         <View style={styles.unitInputContainer}>
           <TextInput
             style={styles.unitInput}
-            placeholder="과거병력 입력"
+            placeholder={t('과거병력 입력')}
             value={pastMedicalHistory}
             onChangeText={setPastMedicalHistory}
           />
         </View>
 
-        <Text style={styles.label}>가족력</Text>
+        <Text style={styles.label}>{t('가족력')}</Text>
         <View style={styles.unitInputContainer}>
           <TextInput
             style={styles.unitInput}
-            placeholder="가족력 입력"
+            placeholder={t('가족력 입력')}
             value={familyHistory}
             onChangeText={setFamilyHistory}
           />
         </View>
 
-        <Text style={styles.label}>현재 복용하는 약</Text>
+        <Text style={styles.label}>{t('현재 복용하는 약')}</Text>
         <View style={styles.unitInputContainer}>
           <TextInput
             style={styles.unitInput}
-            placeholder="현재 복용하는 약 입력"
+            placeholder={t('현재 복용하는 약 입력')}
             value={currentMedications}
             onChangeText={setCurrentMedications}
           />
         </View>
 
-        <Text style={styles.label}>알레르기</Text>
+        <Text style={styles.label}>{t('알레르기')}</Text>
         <View style={styles.unitInputContainer}>
           <TextInput
             style={styles.unitInput}
-            placeholder="알레르기 입력"
+            placeholder={t('알레르기 입력')}
             value={allergies}
             onChangeText={setAllergies}
           />
@@ -154,10 +157,10 @@ const IntegratedMedicalScreen = ({navigation}) => {
           disabled={loading}>
           <Text style={styles.buttonText}>
             {loading
-              ? '저장 중...'
+              ? t('저장 중...')
               : isAnyFieldFilled
-              ? '등록 완료'
-              : '건너뛰기'}
+              ? t('등록 완료')
+              : t('건너뛰기')}
           </Text>
         </TouchableOpacity>
       </View>

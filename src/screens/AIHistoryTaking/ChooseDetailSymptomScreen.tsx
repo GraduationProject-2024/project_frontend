@@ -9,12 +9,14 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/AIHistoryTaking/ChooseDetailSymptomStyles';
 
 const DETAILED_SIGN_API_URL = 'http://52.78.79.53:8081/api/v1/detailed-sign';
 const SAVE_SIGN_API_URL = 'http://52.78.79.53:8081/api/v1/selected-sign';
 
 const ChooseDetailSymptomScreen = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -220,7 +222,7 @@ const ChooseDetailSymptomScreen = () => {
         style={styles.confirmButton}
         onPress={saveSelectedSymptoms}
         disabled={isSaving}>
-        <Text style={styles.confirmButtonText}>선택 완료</Text>
+        <Text style={styles.confirmButtonText}>{t('선택 완료')}</Text>
       </TouchableOpacity>
     </View>
   );

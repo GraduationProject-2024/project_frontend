@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/AIHistoryTaking/ChooseDetailBodyStyles';
 
 const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
@@ -16,6 +17,7 @@ const SELECTED_MBP_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
 const SELECTED_SBP_API_URL = 'http://52.78.79.53:8081/api/v1/selected-sbp';
 
 const ChooseDetailBodyScreen = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
   const selectedMBPId = route.params?.selectedMBPId;
@@ -191,8 +193,9 @@ const ChooseDetailBodyScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>
-        선택하신 주요 신체 부위의 세부 신체 부위입니다{'\n'}
-        치료가 필요하신 부위를 선택해주세요
+        {t(
+          '선택하신 주요 신체 부위의 세부 신체 부위입니다\n치료가 필요하신 부위를 선택해주세요',
+        )}
       </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (
@@ -234,7 +237,7 @@ const ChooseDetailBodyScreen = () => {
           {isSaving ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
-            <Text style={styles.confirmButtonText}>선택 완료</Text>
+            <Text style={styles.confirmButtonText}>{t('선택 완료')}</Text>
           )}
         </TouchableOpacity>
       </View>

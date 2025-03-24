@@ -589,5 +589,51 @@
  "언어 변환": "Language Translation",
  "녹음 및 번역": "Record and Translate",
  "119 신고": "Emergency Call",
- "개인 정보": "Personal Information"
+ "개인 정보": "Personal Information",
+ "의료진과 환자의 원활한 소통을 돕기 위해서 음성 녹음 및 실시간 번역을 제공합니다.": 
+ "We provide voice recording and real-time translation to facilitate smooth communication between medical staff and patients.",
+"아이콘을 눌러 녹음을 시작해주세요.": 
+ "Press the icon to start recording.",
+ "프로필 섹션": "Profile Section",
+ "눈송이님": "Noonsong",
+ "119 문자 신고 비밀번호": "119 Text Report Password",
+ "비밀번호": "Password",
+ "계정 정보": "Account Information",
+ "닉네임": "Nickname",
+ "이메일": "Email",
+ "전화 번호": "Phone Number",
+ "본인 인증": "Identity Verification",
+ "주소 인증": "Address Verification",
+ "언어 설정": "Language Settings",
+ "건강 정보": "Health Information",
+ "키 · 몸무게 · 나이": "Height · Weight · Age",
+ "과거 병력 · 가족력 · 복용하는 약 · 알레르기": "Past Medical History · Family History · Medications · Allergies",
+ "보다 정확한 서비스 제공을 위해 가지고 있는 과거병력, 가족력, 현재 복용하는 약, 알레르기를 입력해주세요": 
+ "For more accurate service, please enter your past medical history, family history, current medications, and allergies.",
+"과거병력": "Past Medical History",
+"과거병력 입력": "Enter past medical history",
+"가족력": "Family History",
+"가족력 입력": "Enter family history",
+"현재 복용하는 약": "Current Medications",
+"현재 복용하는 약 입력": "Enter current medications",
+"알레르기": "Allergies",
+"알레르기 입력": "Enter allergies",
+"저장 중...": "Saving...",
+"등록 완료": "Register Completed",
+"건너뛰기": "Skip",
+"먼저 통증을 느끼는 신체 부위를 선택해주세요\n신체 부위는 최대 두 군데를 선택할 수 있습니다": 
+"Please select the body part where you feel pain first.\nYou can select up to two body parts.",
+"선택 완료": "Confirm Selection",
+  "선택하신 주요 신체 부위의 세부 신체 부위입니다\n치료가 필요하신 부위를 선택해주세요": 
+    "These are the detailed body parts of the selected main body part.\nPlease select the area that requires treatment.",
+    "선택하신 신체 부위에 주로 발생하는 증상입니다\n정확한 사전문진을 위해서 아래 증상 중 해당하는 사항이 있다면 선택해주세요": 
+    "These are the symptoms that commonly occur in the selected body part.\nFor an accurate preliminary examination, please select any applicable symptoms from the list below.",
+    "분": "minutes",
+  "시간": "hours",
+  "일": "days",
+  "주": "weeks",
+  "달": "months",
+  "년": "years",
+  "언제부터 증상이 발생했나요?": "When did the symptoms start?",
+  "다음": "Next"
 }

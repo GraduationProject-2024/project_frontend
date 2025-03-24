@@ -4,9 +4,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import axios from 'axios';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecordAndTranslate/RecordAndTranslateStyles';
 
 const RecordAndTranslateScreen = () => {
+  const {t} = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [sessionId, setSessionId] = useState(null);
@@ -177,13 +179,17 @@ const RecordAndTranslateScreen = () => {
     <View style={styles.container}>
       {!isRecording && messages.length === 0 && (
         <Text style={styles.titleText}>
-          의료진과 환자의 원활한 소통을 돕기 위해서 {'\n'}음성 녹음 및 실시간
-          번역을 제공합니다.
+          {t(
+            '의료진과 환자의 원활한 소통을 돕기 위해서 음성 녹음 및 실시간 번역을 제공합니다.',
+          )}
         </Text>
       )}
       {!isRecording && messages.length === 0 && (
-        <Text style={styles.infoText}>아이콘을 눌러 녹음을 시작해주세요.</Text>
+        <Text style={styles.infoText}>
+          {t('아이콘을 눌러 녹음을 시작해주세요.')}
+        </Text>
       )}
+
       <ScrollView
         style={styles.messageContainer}
         contentContainerStyle={styles.scrollContent}>
@@ -192,13 +198,10 @@ const RecordAndTranslateScreen = () => {
             key={index}
             style={[
               styles.messageBubble,
-              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB, // 영어 → 한국어 (오른쪽)
-              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft, // 위치 반전
+              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB,
+              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft,
             ]}>
-            {/* 원본 문장 */}
             <Text style={styles.messageText}>{msg.text}</Text>
-
-            {/* 번역된 문장 (파란색) */}
             {msg.translation ? (
               <Text style={styles.translationText}>{msg.translation}</Text>
             ) : null}
@@ -220,7 +223,7 @@ const RecordAndTranslateScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.recordButton}
-          onPress={handleRecordPress}>
+          onPress={() => console.log('녹음 시작')}>
           <Image
             source={
               !isRecording
@@ -230,7 +233,7 @@ const RecordAndTranslateScreen = () => {
             style={styles.recordIcon}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={handlePausePress}>
+        <TouchableOpacity style={styles.iconButton}>
           <Image
             source={
               !sessionId

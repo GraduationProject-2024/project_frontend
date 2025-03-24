@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
 import styles from '../../styles/AIHistoryTaking/ChooseMainBodyStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
@@ -18,6 +19,7 @@ const SAVE_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
 const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
 
 const ChooseMainBodyScreen: React.FC = () => {
+  const {t} = useTranslation(); // ✅ 다국어 번역 적용
   const navigation = useNavigation();
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const [mainBodyParts, setMainBodyParts] = useState<
@@ -32,7 +34,7 @@ const ChooseMainBodyScreen: React.FC = () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         if (!token) {
-          Alert.alert('Error', '로그인이 필요합니다.');
+          Alert.alert('Error', t('로그인이 필요합니다.'));
           return;
         }
 
@@ -45,7 +47,7 @@ const ChooseMainBodyScreen: React.FC = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`서버 오류: ${response.status}`);
+          throw new Error(`${t('서버 오류')}: ${response.status}`);
         }
 
         const data = await response.json();
@@ -73,7 +75,7 @@ const ChooseMainBodyScreen: React.FC = () => {
       );
     } else {
       if (selectedParts.length >= 2) {
-        Alert.alert('선택 제한', '최대 2개까지만 선택할 수 있습니다.');
+        Alert.alert(t('선택 제한'), t('최대 2개까지만 선택할 수 있습니다.'));
         return;
       }
       setSelectedParts([...selectedParts, matchedPart.description]);
@@ -83,7 +85,7 @@ const ChooseMainBodyScreen: React.FC = () => {
 
   const handleConfirm = async () => {
     if (selectedParts.length === 0) {
-      Alert.alert('선택 필요', '최소 1개 이상의 신체 부위를 선택하세요.');
+      Alert.alert(t('선택 필요'), t('최소 1개 이상의 신체 부위를 선택하세요.'));
       return;
     }
 
@@ -92,7 +94,7 @@ const ChooseMainBodyScreen: React.FC = () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
-        Alert.alert('Error', '로그인이 필요합니다.');
+        Alert.alert('Error', t('로그인이 필요합니다.'));
         return;
       }
 
@@ -116,20 +118,22 @@ const ChooseMainBodyScreen: React.FC = () => {
       console.log('✅ 서버 응답:', result);
 
       if (!response.ok) {
-        throw new Error(result.message || `서버 오류: ${response.status}`);
+        throw new Error(
+          result.message || `${t('서버 오류')}: ${response.status}`,
+        );
       }
 
       if (!result.selectedMBPId) {
-        throw new Error('서버 응답에 selectedMBPId가 없습니다.');
+        throw new Error(t('서버 응답에 selectedMBPId가 없습니다.'));
       }
 
-      Alert.alert('Success', '선택한 부위가 저장되었습니다.');
+      Alert.alert(t('성공'), t('선택한 부위가 저장되었습니다.'));
       navigation.navigate('ChooseDetailBody', {
         selectedMBPId: result.selectedMBPId,
       });
     } catch (error) {
       console.error('❌ 저장 오류:', error);
-      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+      Alert.alert('Error', `${t('저장 중 오류 발생')}: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -139,8 +143,9 @@ const ChooseMainBodyScreen: React.FC = () => {
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.titleText}>
-          먼저 통증을 느끼는 신체 부위를 선택해주세요{'\n'}
-          신체 부위는 최대 두 군데를 선택할 수 있습니다
+          {t(
+            '먼저 통증을 느끼는 신체 부위를 선택해주세요\n신체 부위는 최대 두 군데를 선택할 수 있습니다',
+          )}
         </Text>
         {mainBodyParts.map((part, index) => (
           <TouchableOpacity
@@ -159,21 +164,8 @@ const ChooseMainBodyScreen: React.FC = () => {
         ))}
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.confirmButton,
-            {
-              backgroundColor:
-                selectedParts.length > 0 && !isSaving ? '#2527BF' : '#d1d1d1',
-            },
-          ]}
-          onPress={handleConfirm}
-          disabled={selectedParts.length === 0 || isSaving}>
-          {isSaving ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Text style={styles.confirmButtonText}>선택 완료</Text>
-          )}
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+          <Text style={styles.confirmButtonText}>{t('선택 완료')}</Text>
         </TouchableOpacity>
       </View>
     </View>
