@@ -164,9 +164,8 @@ const ChooseDetailSymptomScreen = () => {
       console.log('✅ 모든 저장된 signId 리스트:', selectedSignIds);
       Alert.alert('Success', '선택한 증상이 저장되었습니다.');
 
-      // ✅ SymptomOnsetTimeScreen으로 `selectedSignIds` 전달
       navigation.navigate('SymptomOnsetTime', {
-        selectedSignIds: selectedSignIds.join(','), // 콤마로 연결하여 전달
+        selectedSignIds: selectedSignIds.join(','),
       });
     } catch (error) {
       console.error('❌ 저장 오류:', error);
@@ -178,6 +177,11 @@ const ChooseDetailSymptomScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.titleText}>
+        선택하신 신체 부위에 주로 발생하는 증상입니다{'\n'}
+        정확한 사전문진을 위해서 아래 증상 중 해당하는 사항이 있다면
+        선택해주세요
+      </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (
           <ActivityIndicator size="large" color="#2527BF" />

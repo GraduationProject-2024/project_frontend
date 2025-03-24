@@ -77,6 +77,10 @@ const RecommendDepartmentScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <Text style={styles.titleText}>
+        증상에 맞는 적절한 진료과를 선택해 주세요.{'\n'}
+        선택하신 진료과에 맞는 병원을 안내해 드립니다
+      </Text>
       {departments.map((department, index) => (
         <TouchableOpacity
           key={index}
@@ -84,7 +88,7 @@ const RecommendDepartmentScreen = () => {
           onPress={() => {
             console.log('📌 선택된 진료과:', department);
             navigation.navigate('RecommendHospitalList', {
-              selectedDepartment: department.title, // ✅ `title`을 넘기도록 수정
+              selectedDepartment: department.title,
             });
           }}>
           <Text style={styles.title}>{t(department.title)}</Text>

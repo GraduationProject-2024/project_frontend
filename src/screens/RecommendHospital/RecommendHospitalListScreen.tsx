@@ -127,6 +127,10 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.titleText}>
+        선택하신 진료과에 맞는 병원을 추천해 드립니다{'\n'}
+        이동 거리와 예상 소요 시간을 참고해주세요
+      </Text>
       <ScrollView style={styles.hospitalList}>
         {hospitals.map((hospital, index) => (
           <TouchableOpacity

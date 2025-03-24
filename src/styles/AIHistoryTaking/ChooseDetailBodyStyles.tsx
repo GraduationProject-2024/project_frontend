@@ -9,6 +9,11 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
+  titleText: {
+    fontSize: 18,
+    color: '#2527BF',
+    marginBottom: 10,
+  },
   groupContainer: {
     marginBottom: 20,
   },
@@ -52,7 +57,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   confirmButton: {
     width: '100%',

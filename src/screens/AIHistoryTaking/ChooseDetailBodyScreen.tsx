@@ -190,6 +190,10 @@ const ChooseDetailBodyScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.titleText}>
+        선택하신 주요 신체 부위의 세부 신체 부위입니다{'\n'}
+        치료가 필요하신 부위를 선택해주세요
+      </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (
           <ActivityIndicator size="large" color="#2527BF" />

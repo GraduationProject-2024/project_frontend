@@ -6,6 +6,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 16,
   },
+  titleText: {
+    fontSize: 18,
+    color: '#2527BF',
+    marginBottom: 10,
+  },
   scrollContainer: {
     flexGrow: 1,
   },
@@ -46,7 +51,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 20,
   },
   confirmButton: {
     width: '100%',
@@ -56,6 +60,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
+    marginBottom: 10,
   },
   confirmButtonText: {
     color: '#FFFFFF',

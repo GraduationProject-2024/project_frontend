@@ -28,6 +28,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 4,
   },
+  titleText: {
+    fontSize: 18,
+    color: '#2527BF',
+    marginBottom: 15,
+  },
 });
 
 export default styles;
