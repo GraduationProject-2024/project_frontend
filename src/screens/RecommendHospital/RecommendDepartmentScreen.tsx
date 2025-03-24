@@ -78,8 +78,9 @@ const RecommendDepartmentScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.titleText}>
-        증상에 맞는 적절한 진료과를 선택해 주세요.{'\n'}
-        선택하신 진료과에 맞는 병원을 안내해 드립니다
+        {t(
+          '증상에 맞는 적절한 진료과를 선택해 주세요.\n선택하신 진료과에 맞는 병원을 안내해 드립니다',
+        )}
       </Text>
       {departments.map((department, index) => (
         <TouchableOpacity

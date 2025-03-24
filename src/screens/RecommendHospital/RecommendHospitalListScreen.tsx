@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecommendHospital/RecommendHospitalListStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/hospital';
@@ -17,6 +17,7 @@ const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/hospital-map';
 
 const RecommendHospitalListScreen = ({route, navigation}) => {
   const {selectedDepartment} = route.params;
+  const {t} = useTranslation();
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -128,8 +129,9 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>
-        선택하신 진료과에 맞는 병원을 추천해 드립니다{'\n'}
-        이동 거리와 예상 소요 시간을 참고해주세요
+        {t(
+          '선택하신 진료과에 맞는 병원을 추천해 드립니다\n이동 거리와 예상 소요 시간을 참고해주세요',
+        )}
       </Text>
       <ScrollView style={styles.hospitalList}>
         {hospitals.map((hospital, index) => (
@@ -139,15 +141,22 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
             onPress={() => onHospitalSelect(hospital.id)}>
             <Text style={styles.hospitalName}>{hospital.name}</Text>
             {hospital.telephone && (
-              <Text style={styles.hospitalInfo}>☎️ {hospital.telephone}</Text>
+              <Text style={styles.hospitalInfo}>
+                🗺️ {t('주소')}: {hospital.telephone}
+              </Text>
             )}
-            <Text style={styles.hospitalInfo}>{hospital.address}</Text>
+            {hospital.address && (
+              <Text style={styles.hospitalInfo}>
+                ☎️ {t('전화 번호')}: {hospital.address}
+              </Text>
+            )}
             <Text style={styles.hospitalInfo}>
-              🚆 이동 거리:{' '}
+              🚆 {t('이동 거리')}:{' '}
               {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
             </Text>
             <Text style={styles.hospitalInfo}>
-              ⏳ 예상 소요 시간: {hospital.transit_travel_time_m || '-'} 분
+              ⏳ {t('예상 소요 시간')}: {hospital.transit_travel_time_m || '-'}{' '}
+              분
             </Text>
           </TouchableOpacity>
         ))}

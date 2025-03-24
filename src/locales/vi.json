@@ -638,5 +638,13 @@
     "달": "tháng",
     "년": "năm",
     "언제부터 증상이 발생했나요?": "Các triệu chứng bắt đầu từ khi nào?",
-    "다음": "Tiếp theo"
+    "다음": "Tiếp theo",
+      "증상에 맞는 적절한 진료과를 선택해 주세요.\n선택하신 진료과에 맞는 병원을 안내해 드립니다": 
+    "Vui lòng chọn khoa khám phù hợp với triệu chứng của bạn.\nChúng tôi sẽ hướng dẫn bạn đến bệnh viện phù hợp với khoa đã chọn.",
+    "선택하신 진료과에 맞는 병원을 추천해 드립니다\n이동 거리와 예상 소요 시간을 참고해주세요": "Chúng tôi khuyến nghị bệnh viện phù hợp với khoa bạn đã chọn.\nVui lòng tham khảo khoảng cách và thời gian ước tính.",
+    "주소": "Địa chỉ",
+    "전화 번호": "Số điện thoại",
+    "이동 거리": "Khoảng cách di chuyển",
+    "예상 소요 시간": "Thời gian dự kiến",
+    "분": "phút"
 }
