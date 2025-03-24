@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#2527BF',
     marginBottom: 8,
   },
   sectionContent: {

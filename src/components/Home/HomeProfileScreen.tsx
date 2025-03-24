@@ -8,9 +8,11 @@ import {
   Easing,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next'; // ✅ 다국어 번역 추가
 import styles from '../../styles/Home/HomeProfileStyles';
 
 const HomeProfileScreen = () => {
+  const {t} = useTranslation(); // ✅ 번역 함수 추가
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnim = useRef(new Animated.Value(0)).current;
 
@@ -22,7 +24,6 @@ const HomeProfileScreen = () => {
   const [nowMedicine, setNowMedicine] = useState('');
   const [allergy, setAllergy] = useState('');
 
-  // 닉네임 조회 API 호출
   const fetchNickname = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -44,11 +45,10 @@ const HomeProfileScreen = () => {
       const data = await response.json();
       setNickname(data.nickname);
     } catch (error) {
-      console.error('Error fetching nickname:', error);
+      console.error(t('Error fetching nickname:'), error);
     }
   };
 
-  // 기본 정보 조회 API 호출
   const fetchBasicInfo = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -65,10 +65,10 @@ const HomeProfileScreen = () => {
       }
 
       const data = await response.json();
-      setGender(data.gender === 'MALE' ? '남성' : '여성');
+      setGender(data.gender === 'MALE' ? t('남성') : t('여성'));
       setAge(data.age);
     } catch (error) {
-      console.error('Error fetching basic info:', error);
+      console.error(t('Error fetching basic info:'), error);
     }
   };
 
@@ -96,11 +96,10 @@ const HomeProfileScreen = () => {
       setNowMedicine(data.nowMedicine);
       setAllergy(data.allergy);
     } catch (error) {
-      console.error('Error fetching health info:', error);
+      console.error(t('Error fetching health info:'), error);
     }
   };
 
-  // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
     fetchNickname();
     fetchBasicInfo();
@@ -152,9 +151,11 @@ const HomeProfileScreen = () => {
             style={styles.profileImage}
           />
           <View>
-            <Text style={styles.profileText}>{nickname} 님</Text>
+            <Text style={styles.profileText}>
+              {nickname} {t('님')}
+            </Text>
             <Text style={styles.profileSubText}>
-              {gender}, 만 {age}세
+              {gender}, {t('만')} {age} {t('세')}
             </Text>
           </View>
         </View>
@@ -179,19 +180,19 @@ const HomeProfileScreen = () => {
         </TouchableOpacity>
         <View style={styles.healthInfo}>
           <View style={styles.healthRow}>
-            <Text style={styles.healthLabel}>과거병력</Text>
+            <Text style={styles.healthLabel}>{t('과거병력')}</Text>
             <Text style={styles.healthValue}>{pastHistory}</Text>
           </View>
           <View style={styles.healthRow}>
-            <Text style={styles.healthLabel}>가족력</Text>
+            <Text style={styles.healthLabel}>{t('가족력')}</Text>
             <Text style={styles.healthValue}>{familyHistory}</Text>
           </View>
           <View style={styles.healthRow}>
-            <Text style={styles.healthLabel}>복용하는 약</Text>
+            <Text style={styles.healthLabel}>{t('복용하는 약')}</Text>
             <Text style={styles.healthValue}>{nowMedicine}</Text>
           </View>
           <View style={styles.healthRow}>
-            <Text style={styles.healthLabel}>알레르기</Text>
+            <Text style={styles.healthLabel}>{t('알레르기')}</Text>
             <Text style={styles.healthValue}>{allergy}</Text>
           </View>
         </View>
