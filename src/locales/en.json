@@ -643,5 +643,15 @@
     "전화 번호": "Phone Number",
     "이동 거리": "Travel Distance",
     "예상 소요 시간": "Estimated Time",
-    "분": "minutes"
+    "분": "minutes",
+    "가까운 위치에 있는 약국을 추천해드립니다\n운영 시간과 예상 소요\n시간을 참고해주세요.": "We recommend nearby pharmacies\nCheck the operating hours and estimated time.",
+    "운영 시간": "Operating Hours",
+    "월": "Monday",
+    "화": "Tuesday",
+    "수": "Wednesday",
+    "목": "Thursday",
+    "금": "Friday",
+    "토": "Saturday",
+    "일": "Sunday",
+    "공휴일": "Public Holiday"
 }

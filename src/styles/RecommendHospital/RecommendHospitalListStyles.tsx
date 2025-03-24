@@ -39,7 +39,7 @@ export default StyleSheet.create({
   },
   hospitalInfo: {
     fontSize: 15,
-    color: '#666666',
+    color: '#000000',
     marginBottom: 4,
   },
 });

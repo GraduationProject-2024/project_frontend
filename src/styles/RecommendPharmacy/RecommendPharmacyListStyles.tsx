@@ -8,9 +8,10 @@ const RecommendPharmacyListStyles = StyleSheet.create({
   },
   titleText: {
     fontSize: 18,
+    color: '#2527BF',
+    marginBottom: 15,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
+    textAlign: 'left',
   },
   loadingIndicator: {
     marginTop: 20,
@@ -20,15 +21,15 @@ const RecommendPharmacyListStyles = StyleSheet.create({
     marginBottom: 16,
   },
   pharmacyCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
+    backgroundColor: 'white',
+    borderRadius: 12,
     padding: 16,
-    marginVertical: 8,
-    marginHorizontal: 4,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 6,
+    shadowOffset: {width: 0, height: 3},
+    elevation: 4,
   },
   pharmacyCardContent: {
     flexDirection: 'column',
@@ -41,7 +42,7 @@ const RecommendPharmacyListStyles = StyleSheet.create({
   },
   pharmacyInfo: {
     fontSize: 15,
-    color: '#666666',
+    color: '#000000',
     marginBottom: 4,
   },
   pharmacyHours: {

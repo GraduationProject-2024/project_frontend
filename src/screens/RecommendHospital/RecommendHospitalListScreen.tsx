@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   ActivityIndicator,
+  Alert,
   TouchableOpacity,
   Linking,
 } from 'react-native';
@@ -21,23 +22,17 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHospital, setSelectedHospital] = useState(null);
   const [mapUrls, setMapUrls] = useState(null);
 
   const latitude = 37.546584;
   const longitude = 126.964649;
 
   useEffect(() => {
-    console.log('📌 선택된 진료과:', selectedDepartment);
-    console.log('📍 고정된 위치: 위도', latitude, '경도', longitude);
-
     const fetchHospitals = async () => {
       try {
         const accessToken = await AsyncStorage.getItem('accessToken');
-        console.log('✅ 액세스 토큰:', accessToken);
-
         if (!accessToken) {
-          throw new Error('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.');
+          throw new Error(t('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.'));
         }
 
         const requestData = {
@@ -51,8 +46,6 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
           tertiary_hospital: true,
         };
 
-        console.log('📌 API 요청 파라미터:', requestData);
-
         const response = await axios.post(API_URL, requestData, {
           headers: {
             'Content-Type': 'application/json',
@@ -60,10 +53,8 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
           },
         });
 
-        console.log('✅ 병원 데이터 수신:', response.data);
         setHospitals(response.data);
       } catch (err) {
-        console.error('❌ 병원 추천 API 요청 실패:', err.message);
         setError(`${t('데이터를 불러오는 데 실패했습니다')}: ${err.message}`);
       } finally {
         setLoading(false);
@@ -79,7 +70,7 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
 
       const accessToken = await AsyncStorage.getItem('accessToken');
       if (!accessToken) {
-        throw new Error('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.');
+        throw new Error(t('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.'));
       }
 
       const response = await axios.get(`${MAP_API_URL}/${hospitalId}`, {
@@ -89,29 +80,47 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
         },
       });
 
-      console.log('✅ 병원 상세 정보:', response.data);
-      setSelectedHospital(response.data.hospital_info);
       setMapUrls(response.data.map_urls);
+
+      showMapSelectionAlert(response.data.map_urls);
     } catch (err) {
-      console.error('❌ 병원 지도 API 요청 실패:', err.message);
-
-      if (err.response) {
-        console.log('📌 서버 응답 상태 코드:', err.response.status);
-        console.log(
-          '📌 서버 응답 데이터:',
-          JSON.stringify(err.response.data, null, 2),
-        );
-
-        if (err.response.status === 403) {
-          setError('접근 권한이 없습니다. 다시 로그인해주세요.');
-        } else {
-          setError(`병원 정보를 불러오는 데 실패했습니다: ${err.message}`);
-        }
-      } else {
-        setError('서버 응답이 없습니다.');
-      }
+      setError(t('병원 정보를 불러오는 데 실패했습니다.'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const showMapSelectionAlert = urls => {
+    const options = [];
+
+    if (urls.naver_map) {
+      options.push({
+        text: 'Naver',
+        onPress: () => Linking.openURL(urls.naver_map),
+      });
+    }
+    if (urls.kakao_map) {
+      options.push({
+        text: 'Kakao',
+        onPress: () => Linking.openURL(urls.kakao_map),
+      });
+    }
+    if (urls.google_map) {
+      options.push({
+        text: 'Google',
+        onPress: () => Linking.openURL(urls.google_map),
+      });
+    }
+
+    if (options.length > 0) {
+      Alert.alert(
+        t('지도 선택'),
+        t('어떤 지도를 사용하시겠습니까?'),
+        [...options, {text: t('취소'), style: 'cancel'}],
+        {cancelable: true},
+      );
+    } else {
+      Alert.alert(t('오류'), t('이용 가능한 지도 URL이 없습니다.'));
     }
   };
 
@@ -164,36 +173,6 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      )}
-
-      {selectedHospital && (
-        <View style={styles.selectedHospitalContainer}>
-          <Text style={styles.hospitalName}>{selectedHospital.name}</Text>
-          <Text style={styles.hospitalInfo}>
-            ☎️ {selectedHospital.telephone}
-          </Text>
-          <Text style={styles.hospitalInfo}>📍 {selectedHospital.address}</Text>
-          <View style={styles.mapLinks}>
-            {mapUrls?.naver_map && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(mapUrls.naver_map)}>
-                <Text style={styles.mapLinkText}>🗺️ 네이버 지도</Text>
-              </TouchableOpacity>
-            )}
-            {mapUrls?.kakao_map && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(mapUrls.kakao_map)}>
-                <Text style={styles.mapLinkText}>🗺️ 카카오 지도</Text>
-              </TouchableOpacity>
-            )}
-            {mapUrls?.google_map && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(mapUrls.google_map)}>
-                <Text style={styles.mapLinkText}>🗺️ 구글 지도</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
       )}
     </View>
   );

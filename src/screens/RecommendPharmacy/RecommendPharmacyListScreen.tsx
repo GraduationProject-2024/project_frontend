@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
 import RecommendPharmacyListStyles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy';
@@ -17,8 +18,10 @@ const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy-map';
 
 const RecommendPharmacyListScreen = () => {
   const navigation = useNavigation();
+  const {t} = useTranslation();
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mapUrls, setMapUrls] = useState(null);
 
   const latitude = 37.546584;
   const longitude = 126.964649;
@@ -31,11 +34,11 @@ const RecommendPharmacyListScreen = () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
-        throw new Error('액세스 토큰이 없습니다.');
+        throw new Error(t('액세스 토큰이 없습니다.'));
       }
       return token;
     } catch (error) {
-      Alert.alert('로그인이 필요합니다.');
+      Alert.alert(t('로그인이 필요합니다.'));
       setLoading(false);
       return null;
     }
@@ -69,7 +72,7 @@ const RecommendPharmacyListScreen = () => {
       setPharmacies(data);
     } catch (error) {
       console.error('❌ 약국 API 요청 실패:', error.message);
-      Alert.alert('서버 요청 중 오류가 발생했습니다.');
+      Alert.alert(t('서버 요청 중 오류가 발생했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -94,23 +97,55 @@ const RecommendPharmacyListScreen = () => {
       }
 
       const data = await response.json();
-      const mapUrls = data.map_urls;
-      if (mapUrls.google_map) {
-        Linking.openURL(mapUrls.google_map);
-      } else {
-        Alert.alert('지도 URL을 가져올 수 없습니다.');
-      }
+      console.log('✅ 지도 데이터 수신:', data);
+      setMapUrls(data.map_urls);
+
+      showMapSelectionAlert(data.map_urls);
     } catch (error) {
-      Alert.alert('지도 데이터를 가져오는 중 오류가 발생했습니다.');
+      Alert.alert(t('지도 데이터를 가져오는 중 오류가 발생했습니다.'));
+    }
+  };
+
+  const showMapSelectionAlert = urls => {
+    const options = [];
+
+    if (urls.naver_map) {
+      options.push({
+        text: 'Naver',
+        onPress: () => Linking.openURL(urls.naver_map),
+      });
+    }
+    if (urls.kakao_map) {
+      options.push({
+        text: 'Kakao',
+        onPress: () => Linking.openURL(urls.kakao_map),
+      });
+    }
+    if (urls.google_map) {
+      options.push({
+        text: 'Google',
+        onPress: () => Linking.openURL(urls.google_map),
+      });
+    }
+
+    if (options.length > 0) {
+      Alert.alert(
+        t('지도 선택'),
+        t('어떤 지도를 사용하시겠습니까?'),
+        [...options, {text: t('취소'), style: 'cancel'}],
+        {cancelable: true},
+      );
+    } else {
+      Alert.alert(t('오류'), t('이용 가능한 지도 URL이 없습니다.'));
     }
   };
 
   return (
     <View style={RecommendPharmacyListStyles.container}>
-      {/* 🔹 TitleText 추가 */}
       <Text style={RecommendPharmacyListStyles.titleText}>
-        가까운 위치에 있는 약국을 추천해드립니다{'\n'}운영 시간과 예상 소요
-        시간을 참고해주세요.
+        {t(
+          '가까운 위치에 있는 약국을 추천해드립니다\n운영 시간과 예상 소요\n시간을 참고해주세요.',
+        )}
       </Text>
 
       {loading ? (
@@ -133,22 +168,22 @@ const RecommendPharmacyListScreen = () => {
                   </Text>
 
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    🗺️ 주소: {pharmacy.address}
+                    🗺️ {t('주소')}: {pharmacy.address}
                   </Text>
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    ☎️ 전화번호: {pharmacy.dutytel1 || '정보 없음'}
+                    ☎️ {t('전화 번호')}: {pharmacy.dutytel1 || t('정보 없음')}
                   </Text>
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    🚶 거리:{' '}
+                    🚶 {t('거리')}:{' '}
                     {pharmacy.transit_travel_distance_km?.toFixed(2) || '-'} km
                   </Text>
                   <Text style={RecommendPharmacyListStyles.pharmacyInfo}>
-                    ⏳ 예상 소요 시간: {pharmacy.transit_travel_time_m || '-'}{' '}
-                    분
+                    ⏳ {t('예상 소요 시간')}:{' '}
+                    {pharmacy.transit_travel_time_m || '-'} {t('분')}
                   </Text>
 
                   <Text style={RecommendPharmacyListStyles.pharmacyHours}>
-                    🕒 운영 시간:
+                    🕒 {t('운영 시간')}:
                   </Text>
                   {['월', '화', '수', '목', '금', '토', '일', '공휴일'].map(
                     (day, i) => {
@@ -158,7 +193,7 @@ const RecommendPharmacyListScreen = () => {
                         <Text
                           key={i}
                           style={RecommendPharmacyListStyles.hoursText}>
-                          {day}: {start} - {close}
+                          {t(day)}: {start} - {close}
                         </Text>
                       ) : null;
                     },
@@ -168,7 +203,7 @@ const RecommendPharmacyListScreen = () => {
             ))
           ) : (
             <Text style={RecommendPharmacyListStyles.noPharmaciesText}>
-              근처 약국을 찾을 수 없습니다.
+              {t('근처 약국을 찾을 수 없습니다.')}
             </Text>
           )}
         </ScrollView>

@@ -646,5 +646,15 @@
     "전화 번호": "Số điện thoại",
     "이동 거리": "Khoảng cách di chuyển",
     "예상 소요 시간": "Thời gian dự kiến",
-    "분": "phút"
+    "분": "phút",
+    "가까운 위치에 있는 약국을 추천해드립니다\n운영 시간과 예상 소요\n시간을 참고해주세요.": "Chúng tôi giới thiệu các hiệu thuốc gần bạn\nVui lòng tham khảo giờ làm việc và thời gian ước tính.",
+    "운영 시간": "Giờ hoạt động",
+    "월": "Thứ Hai",
+    "화": "Thứ Ba",
+    "수": "Thứ Tư",
+    "목": "Thứ Năm",
+    "금": "Thứ Sáu",
+    "토": "Thứ Bảy",
+    "일": "Chủ Nhật",
+    "공휴일": "Ngày lễ"
 }
