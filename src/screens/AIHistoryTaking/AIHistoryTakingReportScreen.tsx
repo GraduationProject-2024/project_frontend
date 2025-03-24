@@ -15,6 +15,71 @@ import styles from '../../styles/AIHistoryTaking/AIHistoryTakingReportStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/report';
 
+const DUMMY_DATA = {
+  patient: {
+    department: {KO: '정형외과'},
+    possible_conditions: [
+      {KO: '슬관절염'},
+      {KO: '비타민 D 결핍증'},
+      {KO: '골절'},
+      {KO: '퇴행성 관절염'},
+      {KO: '통풍'},
+    ],
+    questions_to_doctor: [
+      {KO: '슬관절염의 가능성은 얼마나 됩니까?'},
+      {KO: '비타민 D 결핍증이 이런 증상을 일으킬 수 있나요?'},
+      {KO: '골절의 가능성은 얼마나 됩니까?'},
+      {KO: '퇴행성 관절염이 이런 증상을 일으킬 수 있나요?'},
+      {KO: '통풍이 이런 증상을 일으킬 수 있나요?'},
+    ],
+    symptom_checklist: [
+      {
+        symptoms: [
+          {KO: '통증'},
+          {KO: '부종'},
+          {KO: '형태의 변화'},
+          {KO: '운동 불능'},
+          {KO: '감각 장애'},
+        ],
+      },
+    ],
+  },
+  doctor: {
+    possible_conditions: [{KO: '슬관절염'}],
+    body_info: [
+      {
+        sbp_body: ['무릎'],
+        mbp_body: ['다리'],
+      },
+    ],
+    symptom_info: [
+      {
+        intensity: '중간',
+        start: '1주일 전',
+        duration: '3일',
+        additional: '운동 후 악화',
+      },
+    ],
+    image_info: [],
+    basic_info: [
+      {
+        age: 45,
+        height: 170,
+        gender: '남성',
+        weight: 70,
+      },
+    ],
+    health_info: [
+      {
+        past_history: '없음',
+        allergy: '없음',
+        family_history: '슬관절염 병력 있음',
+        now_medicine: '없음',
+      },
+    ],
+  },
+};
+
 const getAccessToken = async () => {
   try {
     const token = await AsyncStorage.getItem('accessToken');
@@ -33,7 +98,7 @@ const getAccessToken = async () => {
 const AIHistoryTakingReportScreen = ({route}) => {
   const {t} = useTranslation();
   const [isPatientView, setIsPatientView] = useState(true);
-  const [reportData, setReportData] = useState(null);
+  const [reportData, setReportData] = useState(DUMMY_DATA);
   const [loading, setLoading] = useState(true);
   const pan = useRef(new Animated.Value(0)).current;
   const symptomId = route.params?.symptomId;
@@ -42,25 +107,10 @@ const AIHistoryTakingReportScreen = ({route}) => {
     if (symptomId) {
       console.log('📌 Navigated with symptomId:', symptomId);
       submitReport(symptomId);
+    } else {
+      setLoading(false);
     }
   }, [symptomId]);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (_, gesture) => {
-        if (gesture.dx > 50) {
-          setIsPatientView(true);
-        }
-        if (gesture.dx < -50) {
-          setIsPatientView(false);
-        }
-      },
-      onPanResponderRelease: () => {
-        Animated.spring(pan, {toValue: 0, useNativeDriver: true}).start();
-      },
-    }),
-  ).current;
 
   const submitReport = async symptomId => {
     setLoading(true);
@@ -71,10 +121,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
       return;
     }
 
-    const requestBody = {
-      symptomId: symptomId,
-    };
-
+    const requestBody = {symptomId};
     try {
       console.log('📌 Sending request:', JSON.stringify(requestBody));
       const response = await fetch(API_URL, {
@@ -87,145 +134,26 @@ const AIHistoryTakingReportScreen = ({route}) => {
       });
       const responseData = await response.json();
       console.log('📌 Response:', JSON.stringify(responseData, null, 2));
-      setReportData(responseData);
+      setReportData(responseData || DUMMY_DATA);
     } catch (error) {
       console.error('Error submitting report:', error);
+      setReportData(DUMMY_DATA);
     }
     setLoading(false);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[styles.toggleButton, isPatientView && styles.activeToggle]}
-          onPress={() => setIsPatientView(true)}>
-          <Text
-            style={[
-              styles.toggleText,
-              isPatientView && styles.activeToggleText,
-            ]}>
-            {t('환자용')}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.toggleButton, !isPatientView && styles.activeToggle]}
-          onPress={() => setIsPatientView(false)}>
-          <Text
-            style={[
-              styles.toggleText,
-              !isPatientView && styles.activeToggleText,
-            ]}>
-            {t('의사용')}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <Animated.View
-        style={[styles.swipeContainer, {transform: [{translateX: pan}]}]}
-        {...panResponder.panHandlers}>
-        <ScrollView contentContainerStyle={styles.contentContainer}>
-          {loading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
-          ) : isPatientView ? (
-            reportData?.patient ? (
-              <>
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('진료과')}</Text>
-                  <Text style={styles.sectionContent}>
-                    {reportData.patient.department?.KO}
-                  </Text>
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('예상 질병')}</Text>
-                  <Text style={styles.sectionContent}>
-                    {reportData.patient.possible_conditions?.[0]?.KO}
-                  </Text>
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>
-                    {t('의사에게 할 질문 추천')}
-                  </Text>
-                  {reportData.patient.questions_to_doctor?.map((q, i) => (
-                    <Text key={i} style={styles.sectionContent}>
-                      {q.KO}
-                    </Text>
-                  ))}
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>
-                    {t('예상 질병 체크리스트')}
-                  </Text>
-                  {reportData.patient.symptom_checklist?.[0]?.symptoms?.map(
-                    (s, i) => (
-                      <Text key={i} style={styles.sectionContent}>
-                        {s.KO}
-                      </Text>
-                    ),
-                  )}
-                </View>
-              </>
-            ) : (
-              <Text>{t('데이터 없음')}</Text>
-            )
-          ) : reportData?.doctor ? (
-            <>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>{t('예상 질병')}</Text>
-                <Text style={styles.sectionContent}>
-                  {reportData.doctor.possible_conditions?.[0]?.KO}
-                </Text>
-              </View>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>{t('환자 신체 선택')}</Text>
-                {reportData.doctor.body_info?.[0]?.sbp_body
-                  ?.concat(reportData.doctor.body_info?.[0]?.mbp_body || [])
-                  .map((part, i) => (
-                    <Text key={i} style={styles.sectionContent}>
-                      {part}
-                    </Text>
-                  ))}
-              </View>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>{t('세부 증상 선택')}</Text>
-                {reportData.doctor.symptom_info?.map((info, i) => (
-                  <Text
-                    key={i}
-                    style={
-                      styles.sectionContent
-                    }>{`강도: ${info.intensity}, 시작: ${info.start}, 지속: ${info.duration}, 추가정보: ${info.additional}`}</Text>
-                ))}
-              </View>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>{t('이미지 업로드')}</Text>
-                {reportData.doctor.image_info?.length > 0 ? (
-                  reportData.doctor.image_info.map((img, i) => (
-                    <Image key={i} source={{uri: img}} style={styles.image} />
-                  ))
-                ) : (
-                  <Text>{t('이미지 없음')}</Text>
-                )}
-              </View>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>{t('환자 기본 정보')}</Text>
-                <Text
-                  style={
-                    styles.sectionContent
-                  }>{`나이: ${reportData.doctor.basic_info?.[0]?.age}, 키: ${reportData.doctor.basic_info?.[0]?.height}, 성별: ${reportData.doctor.basic_info?.[0]?.gender}, 체중: ${reportData.doctor.basic_info?.[0]?.weight}`}</Text>
-              </View>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>{t('환자 건강 정보')}</Text>
-                <Text
-                  style={
-                    styles.sectionContent
-                  }>{`과거 병력: ${reportData.doctor.health_info?.[0]?.past_history}, 알레르기: ${reportData.doctor.health_info?.[0]?.allergy}, 가족력: ${reportData.doctor.health_info?.[0]?.family_history}, 현재 복용 약물: ${reportData.doctor.health_info?.[0]?.now_medicine}`}</Text>
-              </View>
-            </>
-          ) : (
-            <Text>{t('데이터 없음')}</Text>
-          )}
-        </ScrollView>
-      </Animated.View>
+      <Text>{isPatientView ? t('환자용') : t('의사용')}</Text>
+      <ScrollView>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <View>
+            <Text>{JSON.stringify(reportData, null, 2)}</Text>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };

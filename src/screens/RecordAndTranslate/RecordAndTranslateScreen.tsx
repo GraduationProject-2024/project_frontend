@@ -1,22 +1,32 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  PermissionsAndroid,
+  Animated,
+  Easing,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import axios from 'axios';
-import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecordAndTranslate/RecordAndTranslateStyles';
 
 const RecordAndTranslateScreen = () => {
-  const {t} = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [isAudioInitialized, setIsAudioInitialized] = useState(false);
   let speakerIndex = 0;
 
   const BASE_URL = 'http://52.78.79.53:5002/transapi';
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const getAccessToken = async () => {
@@ -38,14 +48,76 @@ const RecordAndTranslateScreen = () => {
     getAccessToken();
   }, []);
 
+  // 🔹 마이크 권한 확인 및 요청
   useEffect(() => {
-    AudioRecord.init({
-      sampleRate: 16000,
-      channels: 1,
-      bitsPerSample: 16,
-      wavFile: 'recorded_audio.wav',
-    });
+    const requestMicrophonePermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: '마이크 권한 요청',
+            message: '녹음을 위해 마이크 권한이 필요합니다.',
+            buttonNeutral: '나중에',
+            buttonNegative: '거부',
+            buttonPositive: '허용',
+          },
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('🎤 마이크 권한 허용됨');
+        } else {
+          console.log('🚨 마이크 권한 거부됨');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    };
+
+    requestMicrophonePermission();
   }, []);
+
+  // 🔹 AudioRecord 초기화
+  useEffect(() => {
+    try {
+      console.log('🎤 AudioRecord 초기화 시작');
+
+      AudioRecord.init({
+        sampleRate: 16000, // 🔹 16000 -> 44100 변경 (기기 호환 문제 해결)
+        channels: 1,
+        bitsPerSample: 16,
+        wavFile: 'recorded_audio.wav',
+      });
+
+      setIsAudioInitialized(true); // 🔹 AudioRecord 초기화 완료 후 상태 변경
+      console.log('✅ AudioRecord 초기화 완료');
+    } catch (error) {
+      console.error('❌ AudioRecord 초기화 실패:', error);
+    }
+  }, []);
+
+  // 🎯 녹음 중일 때 애니메이션 실행
+  useEffect(() => {
+    if (isRecording) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scaleAnim, {
+            toValue: 1.2, // 🎯 버튼이 1.3배 커짐
+            duration: 500,
+            easing: Easing.ease,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleAnim, {
+            toValue: 1, // 🎯 원래 크기로 돌아옴
+            duration: 500,
+            easing: Easing.ease,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      scaleAnim.setValue(1); // 🎯 녹음이 끝나면 애니메이션 멈추고 원래 크기로
+    }
+  }, [isRecording]);
 
   const startSession = async () => {
     try {
@@ -144,52 +216,71 @@ const RecordAndTranslateScreen = () => {
     }
   };
 
+  // 🔹 AudioRecord 시작 시 초기화 완료 여부 확인
   const handleRecordPress = async () => {
+    if (!isAudioInitialized) {
+      console.log('🚨 AudioRecord가 아직 초기화되지 않았습니다!');
+      return;
+    }
+
     if (!isRecording) {
-      let currentSessionId = sessionId || (await startSession());
+      // 🔹 녹음 시작
+      setIsRecording(true);
+      const currentSessionId = sessionId || (await startSession());
       if (!currentSessionId) {
         return;
       }
       setSessionId(currentSessionId);
-      setIsRecording(true);
-      setIsPaused(false);
+
+      console.log('🎙️ 녹음 시작');
       AudioRecord.start();
     } else {
+      // 🔹 녹음 중단 (한 번만 눌러도 즉시 종료되도록 변경)
+      console.log('🛑 녹음 중단');
       setIsRecording(false);
-      setIsPaused(false);
-      const filePath = await AudioRecord.stop();
+      setSessionId(null); // 🔹 즉시 UI 상태 변경을 반영 (버튼 변경)
+
+      const filePath = await AudioRecord.stop(); // 🔹 즉시 중단
       await sendAudioChunk(filePath);
       await endSession();
     }
   };
 
+  // 🎯 DoneButton (사용자 변경 및 일시 정지/재개)
   const handlePausePress = async () => {
     if (!sessionId || !isRecording) {
       return;
     }
-    const filePath = await AudioRecord.stop();
-    await sendAudioChunk(filePath);
 
-    speakerIndex = speakerIndex === 0 ? 1 : 0;
+    if (!isPaused) {
+      // 🎯 녹음 일시 정지
+      const filePath = await AudioRecord.stop();
+      await sendAudioChunk(filePath);
 
-    AudioRecord.start();
+      speakerIndex = speakerIndex === 0 ? 1 : 0;
+      setIsPaused(true);
+      console.log('⏸️ 녹음 일시 정지됨');
+    } else {
+      // 🎯 녹음 재개
+      setIsPaused(false);
+      setTimeout(() => {
+        AudioRecord.start();
+        console.log('▶️ 녹음 재개');
+      }, 500);
+    }
   };
 
   return (
     <View style={styles.container}>
       {!isRecording && messages.length === 0 && (
         <Text style={styles.titleText}>
-          {t(
-            '의료진과 환자의 원활한 소통을 돕기 위해서 음성 녹음 및 실시간 번역을 제공합니다.',
-          )}
+          의료진과 환자의 원활한 소통을 돕기 위해서 {'\n'}음성 녹음 및 실시간
+          번역을 제공합니다.
         </Text>
       )}
       {!isRecording && messages.length === 0 && (
-        <Text style={styles.infoText}>
-          {t('아이콘을 눌러 녹음을 시작해주세요.')}
-        </Text>
+        <Text style={styles.infoText}>아이콘을 눌러 녹음을 시작해주세요.</Text>
       )}
-
       <ScrollView
         style={styles.messageContainer}
         contentContainerStyle={styles.scrollContent}>
@@ -198,10 +289,13 @@ const RecordAndTranslateScreen = () => {
             key={index}
             style={[
               styles.messageBubble,
-              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB,
-              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft,
+              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB, // 영어 → 한국어 (오른쪽)
+              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft, // 위치 반전
             ]}>
+            {/* 원본 문장 */}
             <Text style={styles.messageText}>{msg.text}</Text>
+
+            {/* 번역된 문장 (파란색) */}
             {msg.translation ? (
               <Text style={styles.translationText}>{msg.translation}</Text>
             ) : null}
@@ -221,19 +315,22 @@ const RecordAndTranslateScreen = () => {
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.recordButton}
-          onPress={() => console.log('녹음 시작')}>
-          <Image
-            source={
-              !isRecording
-                ? require('../../img/RecordAndTranslate/RecordButton.png')
-                : require('../../img/RecordAndTranslate/RecordinProgressButton.png')
-            }
-            style={styles.recordIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        {/* 🎯 Animated.View로 감싸서 애니메이션 적용 */}
+        <Animated.View style={{transform: [{scale: scaleAnim}]}}>
+          <TouchableOpacity
+            style={styles.recordButton}
+            onPress={handleRecordPress}>
+            <Image
+              source={
+                !isRecording
+                  ? require('../../img/RecordAndTranslate/RecordButton.png')
+                  : require('../../img/RecordAndTranslate/RecordinProgressButton.png')
+              }
+              style={styles.recordIcon}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+        <TouchableOpacity style={styles.iconButton} onPress={handlePausePress}>
           <Image
             source={
               !sessionId
