@@ -100,23 +100,29 @@ const RecordAndTranslateScreen = () => {
 
       console.log('🔊 오디오 청크 전송 응답:', response.data);
 
-      const transcript = response.data.transcript;
-
+      const transcript = response.data.transcript?.trim();
       const translations = response.data.translations || {};
-      const englishTranslation = translations.English?.text || '';
-      const koreanTranslation = translations.Korean?.text || '';
+      const englishTranslation = translations.English?.text?.trim() || '';
+      const koreanTranslation = translations.Korean?.text?.trim() || '';
 
       let translatedText = '';
 
+      const excludeWords = ['you', 'Thank you', 'Bye'];
       if (
-        transcript !== englishTranslation &&
-        transcript === koreanTranslation
+        excludeWords.includes(transcript) ||
+        excludeWords.includes(englishTranslation) ||
+        excludeWords.includes(koreanTranslation)
       ) {
+        console.log('⚠️ 필터링된 문장:', transcript);
+        return;
+      }
+
+      let isKoreanToEnglish = transcript === koreanTranslation;
+      let isEnglishToKorean = transcript === englishTranslation;
+
+      if (isKoreanToEnglish) {
         translatedText = englishTranslation;
-      } else if (
-        transcript !== koreanTranslation &&
-        transcript === englishTranslation
-      ) {
+      } else if (isEnglishToKorean) {
         translatedText = koreanTranslation;
       }
 
@@ -127,7 +133,8 @@ const RecordAndTranslateScreen = () => {
         {
           text: transcript,
           translation: translatedText,
-          speaker: speakerIndex % 2,
+          isEnglishToKorean: isEnglishToKorean,
+          isKoreanToEnglish: isKoreanToEnglish,
         },
       ]);
     } catch (error) {
@@ -155,14 +162,15 @@ const RecordAndTranslateScreen = () => {
   };
 
   const handlePausePress = async () => {
-    if (isPaused) {
-      setIsPaused(false);
-      AudioRecord.start();
-    } else {
-      setIsPaused(true);
-      const filePath = await AudioRecord.stop();
-      await sendAudioChunk(filePath);
+    if (!sessionId || !isRecording) {
+      return;
     }
+    const filePath = await AudioRecord.stop();
+    await sendAudioChunk(filePath);
+
+    speakerIndex = speakerIndex === 0 ? 1 : 0;
+
+    AudioRecord.start();
   };
 
   return (
@@ -184,9 +192,13 @@ const RecordAndTranslateScreen = () => {
             key={index}
             style={[
               styles.messageBubble,
-              msg.speaker === 0 ? styles.speakerA : styles.speakerB,
+              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB, // 영어 → 한국어 (오른쪽)
+              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft, // 위치 반전
             ]}>
+            {/* 원본 문장 */}
             <Text style={styles.messageText}>{msg.text}</Text>
+
+            {/* 번역된 문장 (파란색) */}
             {msg.translation ? (
               <Text style={styles.translationText}>{msg.translation}</Text>
             ) : null}

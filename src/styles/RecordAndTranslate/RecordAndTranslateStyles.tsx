@@ -44,12 +44,16 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
   },
   speakerA: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#D1E8FF',
+    backgroundColor: '#E5E5FF',
   },
   speakerB: {
+    backgroundColor: '#EFEFEF',
+  },
+  alignRight: {
     alignSelf: 'flex-end',
-    backgroundColor: '#FDD7AA',
+  },
+  alignLeft: {
+    alignSelf: 'flex-start',
   },
   translationText: {
     color: '#2527BF',
