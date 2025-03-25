@@ -135,7 +135,8 @@ const AdditionalInformationScreen = () => {
         '📤 추가 정보 저장 성공:',
         JSON.stringify(responseData, null, 2),
       );
-      Alert.alert('Success', '추가 정보가 저장되었습니다.');
+
+      navigation.navigate('AIHistoryTakingReport', {symptomId});
     } catch (error) {
       Alert.alert('Error', `추가 정보 저장 중 오류 발생: ${error.message}`);
     }

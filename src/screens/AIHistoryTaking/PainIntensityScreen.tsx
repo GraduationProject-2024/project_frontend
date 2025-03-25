@@ -155,8 +155,6 @@ const PainIntensityScreen = () => {
         result,
       );
 
-      Alert.alert('Success', '통증 강도가 저장되었습니다.');
-
       // ✅ symptomId를 다음 화면(PainDurationScreen)으로 전달
       navigation.navigate('PainDuration', {symptomId: result.symptomId});
     } catch (error) {

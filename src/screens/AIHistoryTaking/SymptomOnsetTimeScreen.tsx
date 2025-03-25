@@ -148,7 +148,6 @@ const SymptomOnsetTimeScreen = () => {
         return;
       }
 
-      Alert.alert('Success', '증상 시작 시간이 저장되었습니다.');
       navigation.navigate('PainIntensity', {symptomId});
     } catch (error) {
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);

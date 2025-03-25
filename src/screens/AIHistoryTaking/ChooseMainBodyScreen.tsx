@@ -127,7 +127,6 @@ const ChooseMainBodyScreen: React.FC = () => {
         throw new Error(t('서버 응답에 selectedMBPId가 없습니다.'));
       }
 
-      Alert.alert(t('성공'), t('선택한 부위가 저장되었습니다.'));
       navigation.navigate('ChooseDetailBody', {
         selectedMBPId: result.selectedMBPId,
       });
@@ -138,7 +137,6 @@ const ChooseMainBodyScreen: React.FC = () => {
       setIsSaving(false);
     }
   };
-
   return (
     <View style={styles.container}>
       <ScrollView>

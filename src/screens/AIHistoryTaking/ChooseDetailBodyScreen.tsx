@@ -176,7 +176,6 @@ const ChooseDetailBodyScreen = () => {
       }
 
       setSelectedSBPId(result.selectedSBPId);
-      Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
 
       navigation.navigate('ChooseDetailSymptom', {
         selectedDetails: selectedSubParts,

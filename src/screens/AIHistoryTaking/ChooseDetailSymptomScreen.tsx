@@ -164,7 +164,6 @@ const ChooseDetailSymptomScreen = () => {
       }
 
       console.log('✅ 모든 저장된 signId 리스트:', selectedSignIds);
-      Alert.alert('Success', '선택한 증상이 저장되었습니다.');
 
       navigation.navigate('SymptomOnsetTime', {
         selectedSignIds: selectedSignIds.join(','),

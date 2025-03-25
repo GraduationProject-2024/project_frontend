@@ -159,7 +159,6 @@ const PainDurationScreen = () => {
         result,
       );
 
-      Alert.alert('Success', '증상 지속 시간이 저장되었습니다.');
       navigation.navigate('AdditionalInformation', {symptomId});
     } catch (error) {
       console.error('❌ 저장 오류:', error);
