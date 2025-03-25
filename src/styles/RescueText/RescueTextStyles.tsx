@@ -7,8 +7,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#2527BF',
+    fontWeight: 'bold',
     marginBottom: 20,
   },
   sectionContainer: {

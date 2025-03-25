@@ -9,15 +9,16 @@ const styles = StyleSheet.create({
   },
   titleText: {
     textAlign: 'center',
-    fontSize: 18,
+    fontWeight: 'bold',
     color: '#2527BF',
     marginTop: 20,
+    fontSize: 18,
   },
   infoText: {
     textAlign: 'center',
     fontSize: 18,
     color: '#B5B5B5',
-    marginTop: 400,
+    marginTop: 600,
   },
   buttonBackground: {
     position: 'absolute',
