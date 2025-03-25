@@ -10,29 +10,31 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
 import styles from '../../styles/AIHistoryTaking/ChooseMainBodyStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
 const FETCH_API_URL = 'http://52.78.79.53:8081/api/v1/main-body/all';
 const SAVE_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
+const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
 
 const ChooseMainBodyScreen: React.FC = () => {
+  const {t} = useTranslation(); // ✅ 다국어 번역 적용
   const navigation = useNavigation();
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const [mainBodyParts, setMainBodyParts] = useState<
-    {body: string; description: string}[]
+    {body: string; description: string; mainBodyPartId: number}[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ 주요 신체 부위 리스트 가져오기
   useEffect(() => {
     const fetchMainBodyParts = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         if (!token) {
-          Alert.alert('Error', '로그인이 필요합니다.');
+          Alert.alert('Error', t('로그인이 필요합니다.'));
           return;
         }
 
@@ -45,10 +47,11 @@ const ChooseMainBodyScreen: React.FC = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`서버 오류: ${response.status}`);
+          throw new Error(`${t('서버 오류')}: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('📥 주요 신체 부위 조회 응답:', data);
         setMainBodyParts(data);
       } catch (err) {
         setError(err.message);
@@ -60,23 +63,29 @@ const ChooseMainBodyScreen: React.FC = () => {
     fetchMainBodyParts();
   }, []);
 
-  // ✅ 선택한 부위 토글 (최대 2개)
   const toggleSelection = (body: string) => {
-    if (selectedParts.includes(body)) {
-      setSelectedParts(selectedParts.filter(item => item !== body));
+    const matchedPart = mainBodyParts.find(p => p.body === body);
+    if (!matchedPart) {
+      return;
+    }
+
+    if (selectedParts.includes(matchedPart.description)) {
+      setSelectedParts(
+        selectedParts.filter(item => item !== matchedPart.description),
+      );
     } else {
       if (selectedParts.length >= 2) {
-        Alert.alert('선택 제한', '최대 2개까지만 선택할 수 있습니다.');
+        Alert.alert(t('선택 제한'), t('최대 2개까지만 선택할 수 있습니다.'));
         return;
       }
-      setSelectedParts([...selectedParts, body]);
+      setSelectedParts([...selectedParts, matchedPart.description]);
     }
+    console.log('📌 현재 선택한 신체 부위:', selectedParts);
   };
 
-  // ✅ 선택한 부위 저장 API 호출 및 다음 화면으로 이동
   const handleConfirm = async () => {
     if (selectedParts.length === 0) {
-      Alert.alert('선택 필요', '최소 1개 이상의 신체 부위를 선택하세요.');
+      Alert.alert(t('선택 필요'), t('최소 1개 이상의 신체 부위를 선택하세요.'));
       return;
     }
 
@@ -85,12 +94,12 @@ const ChooseMainBodyScreen: React.FC = () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
-        Alert.alert('Error', '로그인이 필요합니다.');
+        Alert.alert('Error', t('로그인이 필요합니다.'));
         return;
       }
 
       const requestBody = {
-        body: selectedParts,
+        description: selectedParts,
       };
 
       console.log('📤 서버에 전송할 데이터:', requestBody);
@@ -109,55 +118,32 @@ const ChooseMainBodyScreen: React.FC = () => {
       console.log('✅ 서버 응답:', result);
 
       if (!response.ok) {
-        throw new Error(result.message || `서버 오류: ${response.status}`);
+        throw new Error(
+          result.message || `${t('서버 오류')}: ${response.status}`,
+        );
       }
 
-      Alert.alert('Success', '선택한 부위가 저장되었습니다.');
+      if (!result.selectedMBPId) {
+        throw new Error(t('서버 응답에 selectedMBPId가 없습니다.'));
+      }
 
-      // ✅ 선택한 부위를 객체 배열로 변환하여 전달
-      const selectedDetails = selectedParts.map(bodyPart => {
-        const part = mainBodyParts.find(p => p.body === bodyPart);
-        return {
-          title: part?.body || '',
-          description: part?.description || '',
-          details: [], // 상세 증상은 이후 추가될 예정
-        };
+      navigation.navigate('ChooseDetailBody', {
+        selectedMBPId: result.selectedMBPId,
       });
-
-      console.log('📌 다음 화면으로 전달할 데이터:', selectedDetails);
-
-      navigation.navigate('ChooseDetailBody', {selectedDetails});
     } catch (error) {
       console.error('❌ 저장 오류:', error);
-      Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
+      Alert.alert('Error', `${t('저장 중 오류 발생')}: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
   };
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2527BF" />
-        <Text>데이터를 불러오는 중...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>오류 발생: {error}</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.titleText}>
-          먼저 통증을 느끼는 신체 부위를 선택해주세요{'\n'}
-          신체 부위는 최대 두 군데를 선택할 수 있습니다
+          {t(
+            '먼저 통증을 느끼는 신체 부위를 선택해주세요\n신체 부위는 최대 두 군데를 선택할 수 있습니다',
+          )}
         </Text>
         {mainBodyParts.map((part, index) => (
           <TouchableOpacity
@@ -168,7 +154,7 @@ const ChooseMainBodyScreen: React.FC = () => {
               <View>
                 <Text style={styles.title}>{part.description}</Text>
               </View>
-              {selectedParts.includes(part.body) && (
+              {selectedParts.includes(part.description) && (
                 <Image source={CheckIcon} style={styles.checkIcon} />
               )}
             </View>
@@ -176,21 +162,8 @@ const ChooseMainBodyScreen: React.FC = () => {
         ))}
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.confirmButton,
-            {
-              backgroundColor:
-                selectedParts.length > 0 && !isSaving ? '#2527BF' : '#d1d1d1',
-            },
-          ]}
-          onPress={handleConfirm}
-          disabled={selectedParts.length === 0 || isSaving}>
-          {isSaving ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Text style={styles.confirmButtonText}>선택 완료</Text>
-          )}
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+          <Text style={styles.confirmButtonText}>{t('선택 완료')}</Text>
         </TouchableOpacity>
       </View>
     </View>

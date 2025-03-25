@@ -12,24 +12,17 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/RescueText/RescueTextStyles';
 import ConsentModal from '../../components/RescueText/ConsentModal';
 
 const USER_API_URL = 'http://52.78.79.53:8081/api/v1/member/form';
-const REPORT_API_URL = 'http://52.78.79.53:5001/fill_form';
-
-const emergencyTypes = [
-  '화재',
-  '구조 요청',
-  '응급 상황',
-  '교통 사고',
-  '재난',
-  '기타',
-];
+const REPORT_API_URL = 'http://52.78.79.53:5001/reportapi/fill_form';
 
 const RescueTextScreen = () => {
+  const {t} = useTranslation();
   const [userData, setUserData] = useState({});
   const [address, setAddress] = useState('');
   const [detailedAddress, setDetailedAddress] = useState('');
@@ -38,6 +31,19 @@ const RescueTextScreen = () => {
   const [selectedEmergencyType, setSelectedEmergencyType] = useState(null);
   const [isConsentModalVisible, setConsentModalVisible] = useState(true);
   const [images, setImages] = useState([]);
+
+  const emergencyTypes = [
+    {label: t('화재'), value: 'Fire'},
+    {label: t('구조 요청'), value: 'Salvage'},
+    {label: t('응급 상황'), value: 'Emergency'},
+    {label: t('교통 사고'), value: 'Traffic Accident'},
+    {label: t('재난'), value: 'Disaster'},
+    {label: t('기타'), value: 'Etc'},
+  ];
+
+  const handleEmergencyTypeSelect = selectedValue => {
+    setSelectedEmergencyType(selectedValue);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,9 +56,50 @@ const RescueTextScreen = () => {
     setConsentModalVisible(false);
   };
 
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        console.log('⚠️ 액세스 토큰이 없습니다.');
+        return;
+      }
+
+      const response = await fetch(USER_API_URL, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log('📌 사용자 데이터 응답 상태 코드:', response.status);
+
+      let responseBody;
+      try {
+        responseBody = await response.json();
+      } catch (jsonError) {
+        responseBody = await response.text(); // JSON 파싱이 실패하면 텍스트 그대로 출력
+      }
+
+      console.log('📨 사용자 데이터 응답 바디:', responseBody);
+
+      if (response.ok) {
+        setUserData(responseBody);
+      } else {
+        console.error('❌ 사용자 데이터 가져오기 실패:', responseBody);
+      }
+    } catch (error) {
+      console.error('❌ 사용자 데이터 요청 중 오류 발생:', error);
+    }
+  };
+
+  // ✅ useEffect에서 fetchUserData 호출 유지
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   const pickImage = async () => {
     if (images.length >= 3) {
-      alert('이미지는 최대 3개까지 첨부할 수 있습니다.');
+      Alert.alert(t('이미지는 최대 3개까지 첨부할 수 있습니다.'));
       return;
     }
 
@@ -71,51 +118,30 @@ const RescueTextScreen = () => {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const fetchUserData = async () => {
-    try {
-      const token = await AsyncStorage.getItem('accessToken');
-      if (!token) {
-        console.log('🚨 액세스 토큰이 없습니다.');
-        return;
-      }
-
-      const response = await fetch(USER_API_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setUserData(data);
-      console.log('✅ 사용자 정보:', data);
-    } catch (error) {
-      console.error('❌ 사용자 정보 조회 오류:', error);
-    }
-  };
-
   const handleSubmitReport = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
-        alert('🚨 액세스 토큰이 없습니다. 로그인이 필요합니다.');
+        Alert.alert(t('🚨 액세스 토큰이 없습니다. 로그인이 필요합니다.'));
         return;
       }
 
       const formData = new FormData();
-      formData.append('name', userData.name);
-      formData.append('number', userData.number);
-      formData.append('119_gen_pw', userData.password);
-      formData.append('incident_location', address);
-      formData.append('address', detailedAddress);
-      formData.append('emergency_type', selectedEmergencyType);
-      formData.append('title', title);
-      formData.append('content', additionalInfo);
+
+      const appendIfNotEmpty = (key, value) => {
+        formData.append(key, value ? value : null);
+      };
+
+      appendIfNotEmpty('name', userData.name);
+      appendIfNotEmpty('number', userData.number);
+      appendIfNotEmpty('119_gen_pw', userData.password);
+
+      appendIfNotEmpty('incident_location', address.trim() || userData.address);
+      appendIfNotEmpty('address', detailedAddress.trim() || userData.address);
+
+      appendIfNotEmpty('emergency_type', selectedEmergencyType);
+      appendIfNotEmpty('title', title.trim());
+      appendIfNotEmpty('content', additionalInfo.trim());
 
       images.forEach((uri, index) => {
         formData.append(`file_${index + 1}`, {
@@ -124,6 +150,10 @@ const RescueTextScreen = () => {
           type: 'image/jpeg',
         });
       });
+
+      // 🔹 FormData가 제대로 생성되었는지 확인
+      console.log('📌 수정된 FormData 내용:');
+      console.log(JSON.stringify(formData, null, 2));
 
       const response = await fetch(REPORT_API_URL, {
         method: 'POST',
@@ -134,18 +164,28 @@ const RescueTextScreen = () => {
         body: formData,
       });
 
-      const data = await response.json();
+      // 🔹 서버 응답 출력
+      console.log('📌 서버 응답 상태 코드:', response.status);
 
-      if (data.status === 'success') {
-        alert('🚨 신고가 성공적으로 접수되었습니다.');
-      } else {
-        alert('❌ 신고 실패: ' + data.message);
+      let responseBody;
+      try {
+        responseBody = await response.json();
+      } catch (jsonError) {
+        responseBody = await response.text(); // JSON 파싱이 실패하면 텍스트 출력
       }
 
-      console.log('📨 신고 응답:', data);
+      console.log('📨 서버 응답 바디:', responseBody);
+
+      if (responseBody.status === 'success') {
+        Alert.alert(t('🚨 신고가 성공적으로 접수되었습니다.'));
+      } else {
+        Alert.alert(
+          t('❌ 신고 실패: ') + (responseBody.message || '알 수 없는 오류'),
+        );
+      }
     } catch (error) {
       console.error('❌ 신고 요청 중 오류 발생:', error);
-      alert('🚨 신고 요청 중 오류가 발생했습니다.');
+      Alert.alert(t('🚨 신고 요청 중 오류가 발생했습니다.'));
     }
   };
 
@@ -164,46 +204,47 @@ const RescueTextScreen = () => {
             <ScrollView
               contentContainerStyle={{flexGrow: 1, paddingBottom: 50}}>
               <Text style={styles.titleText}>
-                <Text style={{color: 'red', fontWeight: 'bold'}}>
-                  119 웹 신고
-                </Text>
-                를 할 수 있습니다. {'\n'}
-                신고 접수를 위해 정보를 입력해주세요.
+                {t(
+                  '119 웹 신고를 할 수 있습니다. 신고 접수를 위해 정보를 입력해주세요. 입력하지 않고 신고 버튼만 누르셔도 신고가 가능합니다.',
+                )}
               </Text>
 
               <View style={styles.addressContainer}>
-                <Text style={styles.labelText}>주소 입력</Text>
+                <Text style={styles.labelText}>{t('주소 입력')}</Text>
                 <TextInput
                   style={styles.addressInput}
-                  placeholder="도로명 주소 입력"
+                  placeholder={t('도로명 주소 입력')}
+                  placeholderTextColor="#B1B1B1"
                   value={address}
                   onChangeText={setAddress}
                 />
                 <TextInput
                   style={styles.detailedAddressInput}
-                  placeholder="상세 주소 입력"
+                  placeholder={t('상세 주소 입력')}
+                  placeholderTextColor="#B1B1B1"
                   value={detailedAddress}
                   onChangeText={setDetailedAddress}
                 />
               </View>
 
               <View style={styles.sectionContainer}>
-                <Text style={styles.labelText}>제목 입력</Text>
+                <Text style={styles.labelText}>{t('제목 입력')}</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="제목을 입력해주세요"
+                  placeholder={t('제목을 입력해주세요')}
+                  placeholderTextColor="#B1B1B1"
                   value={title}
                   onChangeText={setTitle}
                 />
               </View>
 
               <View style={styles.additionalInfoContainer}>
-                <Text style={styles.labelText}>신고 내용 입력</Text>
+                <Text style={styles.labelText}>{t('신고 내용 입력')}</Text>
                 <View style={styles.inputWithIconAndCounterContainer}>
                   <TextInput
                     style={styles.textInputWithIconAndCounter}
                     multiline
-                    placeholder="신고 내용을 입력해주세요"
+                    placeholder={t('신고 내용을 입력해주세요')}
                     placeholderTextColor="#B1B1B1"
                     value={additionalInfo}
                     onChangeText={setAdditionalInfo}
@@ -220,24 +261,24 @@ const RescueTextScreen = () => {
               </View>
 
               <View style={styles.sectionContainer}>
-                <Text style={styles.labelText}>응급 사항 유형</Text>
+                <Text style={styles.labelText}>{t('응급 사항 유형')}</Text>
                 <View style={styles.toggleContainer}>
                   {emergencyTypes.map(type => (
                     <TouchableOpacity
-                      key={type}
+                      key={type.value}
                       style={[
                         styles.toggleButton,
-                        selectedEmergencyType === type &&
+                        selectedEmergencyType === type.value &&
                           styles.selectedToggleButton,
                       ]}
-                      onPress={() => setSelectedEmergencyType(type)}>
+                      onPress={() => handleEmergencyTypeSelect(type.value)}>
                       <Text
                         style={
-                          selectedEmergencyType === type
+                          selectedEmergencyType === type.value
                             ? styles.selectedToggleText
                             : styles.toggleText
                         }>
-                        {type}
+                        {type.label}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -245,9 +286,11 @@ const RescueTextScreen = () => {
               </View>
 
               <View style={styles.imageUploadContainer}>
-                <Text style={styles.labelText}>신고 관련 이미지 추가</Text>
+                <Text style={styles.labelText}>
+                  {t('신고 관련 이미지 추가')}
+                </Text>
                 <Text style={styles.titleText}>
-                  *이미지는 3개 이하로 첨부 가능합니다
+                  {t('*이미지는 3개 이하로 첨부 가능합니다')}
                 </Text>
                 <ScrollView horizontal>
                   {images.length < 3 && (
@@ -279,7 +322,7 @@ const RescueTextScreen = () => {
           <TouchableOpacity
             style={styles.submitButton}
             onPress={handleSubmitReport}>
-            <Text style={styles.submitButtonText}>119 신고하기</Text>
+            <Text style={styles.submitButtonText}>{t('119 신고하기')}</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
       )}

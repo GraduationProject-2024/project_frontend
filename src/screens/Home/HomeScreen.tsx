@@ -2,18 +2,34 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import HomeStyles from '../../styles/Home/HomeStyles';
 import HomeProfileScreen from '../../components/Home/HomeProfileScreen';
 
 const API_BASE_URL = 'http://52.78.79.53:8081/api/v1';
 
 const HomeScreen = () => {
+  const {t, i18n} = useTranslation();
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [bodyParts, setBodyParts] = useState([]);
   const [accessToken, setAccessToken] = useState(null);
   const navigation = useNavigation();
 
-  // ✅ 로그인 후 액세스 토큰을 받아와 AsyncStorage에 저장
+  useEffect(() => {
+    const languageChangedHandler = () => {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'HomeScreen'}],
+      });
+    };
+
+    i18n.on('languageChanged', languageChangedHandler);
+
+    return () => {
+      i18n.off('languageChanged', languageChangedHandler);
+    };
+  }, [navigation, i18n]);
+
   const getAccessToken = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -39,7 +55,6 @@ const HomeScreen = () => {
     }
   };
 
-  // ✅ API에서 신체 부위 목록 가져오기
   const fetchBodyParts = async () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
@@ -67,7 +82,6 @@ const HomeScreen = () => {
     }
   };
 
-  // ✅ 앱이 시작될 때 저장된 토큰 불러와 API 호출
   useEffect(() => {
     const initializeApp = async () => {
       const token = await AsyncStorage.getItem('accessToken');
@@ -80,7 +94,6 @@ const HomeScreen = () => {
     initializeApp();
   }, []);
 
-  // ✅ 액세스 토큰이 설정되면 신체 부위 목록 요청
   useEffect(() => {
     if (accessToken) {
       fetchBodyParts();
@@ -97,11 +110,40 @@ const HomeScreen = () => {
     }
   };
 
-  const handleStartPress = () => {
+  const handleStartPress = async () => {
     if (selectedButtons.length > 0) {
-      navigation.navigate('ChooseDetailBody', {
-        selectedBodyParts: selectedButtons,
-      });
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+          throw new Error('액세스 토큰이 없습니다.');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/selected-mbp`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({description: selectedButtons}),
+        });
+
+        if (!response.ok) {
+          throw new Error('주요 신체 부위 저장 실패');
+        }
+
+        const responseData = await response.json();
+        console.log(
+          '📤 주요 신체 부위 저장 성공:',
+          JSON.stringify(responseData, null, 2),
+        );
+
+        navigation.navigate('ChooseDetailBody', {
+          selectedBodyParts: selectedButtons,
+          selectedMBPId: responseData.selectedMBPId,
+        });
+      } catch (error) {
+        console.error('주요 신체 부위 저장 중 오류 발생:', error);
+      }
     }
   };
 
@@ -124,9 +166,11 @@ const HomeScreen = () => {
 
       {/* AI Pre-Diagnosis Section */}
       <View style={HomeStyles.diagnosisSection}>
-        <Text style={HomeStyles.sectionTitle}>AI 사전 문진 바로 시작하기</Text>
+        <Text style={HomeStyles.sectionTitle}>
+          {t('AI 사전 문진 바로 시작하기')}
+        </Text>
         <Text style={HomeStyles.sectionSubtitle}>
-          치료가 필요하신 부분을 선택해주세요
+          {t('치료가 필요하신 부분을 선택해주세요')}
         </Text>
         <View style={HomeStyles.buttonGrid}>
           {bodyParts.length > 0 ? (
@@ -144,13 +188,13 @@ const HomeScreen = () => {
                     selectedButtons.includes(label) &&
                       HomeStyles.selectedButtonText,
                   ]}>
-                  {label}
+                  {t(label)}
                 </Text>
               </TouchableOpacity>
             ))
           ) : (
             <Text style={HomeStyles.loadingText}>
-              신체 데이터를 불러오는 중...
+              {t('신체 데이터를 불러오는 중...')}
             </Text>
           )}
         </View>
@@ -161,53 +205,53 @@ const HomeScreen = () => {
           ]}
           onPress={handleStartPress}
           disabled={!isStartButtonActive}>
-          <Text style={HomeStyles.startButtonText}>시작하기</Text>
+          <Text style={HomeStyles.startButtonText}>{t('시작하기')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Menu Section */}
       <View style={HomeStyles.menuSection}>
-        <Text style={HomeStyles.sectionTitle}>메뉴 바로 가기</Text>
+        <Text style={HomeStyles.sectionTitle}>{t('메뉴 바로 가기')}</Text>
         <View style={HomeStyles.menuGrid}>
           {[
             {
               icon: require('../../img/Home/aidiagnosisIcon.png'),
-              label: 'AI 사전 문진',
+              label: t('AI 사전 문진'),
               onPress: () => navigation.navigate('ChooseMainBody'),
             },
             {
               icon: require('../../img/Home/recommendhospitalIcon.png'),
-              label: '병원 추천',
+              label: t('병원 추천'),
               onPress: () => navigation.navigate('RecommendDepartment'),
             },
             {
               icon: require('../../img/Home/recommendpharmacyIcon.png'),
-              label: '약국 추천',
+              label: t('약국 추천'),
               onPress: () => navigation.navigate('RecommendPharmacyList'),
             },
             {
               icon: require('../../img/Home/recommendemergencyIcon.png'),
-              label: '응급실 추천',
+              label: t('응급실 추천'),
               onPress: () => navigation.navigate('CurrentCondition'),
             },
             {
               icon: require('../../img/Home/translatelanguageIcon.png'),
-              label: '언어 변환',
+              label: t('언어 변환'),
               onPress: () => navigation.navigate('TranslateLanguage'),
             },
             {
               icon: require('../../img/Home/recordtranslateIcon.png'),
-              label: '녹음 및 번역',
+              label: t('녹음 및 번역'),
               onPress: () => navigation.navigate('RecordAndTranslate'),
             },
             {
               icon: require('../../img/Home/rescuemessageIcon.png'),
-              label: '119 신고',
+              label: t('119 신고'),
               onPress: () => navigation.navigate('RescueText'),
             },
             {
               icon: require('../../img/Home/profileIcon.png'),
-              label: '개인 정보',
+              label: t('개인 정보'),
               onPress: () => navigation.navigate('MyInformation'),
             },
           ].map((item, index) => (
@@ -216,7 +260,7 @@ const HomeScreen = () => {
               style={HomeStyles.menuItem}
               onPress={item.onPress}>
               <Image source={item.icon} style={HomeStyles.menuIcon} />
-              <Text style={HomeStyles.menuText}>{item.label}</Text>
+              <Text style={HomeStyles.menuText}>{t(item.label)}</Text>
             </TouchableOpacity>
           ))}
         </View>

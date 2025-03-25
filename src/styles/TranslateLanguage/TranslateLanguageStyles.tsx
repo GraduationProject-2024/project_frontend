@@ -43,8 +43,8 @@ const ChooseLanguageStyles = StyleSheet.create({
     height: 20,
   },
   buttonContainer: {
-    marginBottom: 40,
-    width: '95%',
+    marginBottom: 30,
+    width: '100%',
   },
   button: {
     height: 50,

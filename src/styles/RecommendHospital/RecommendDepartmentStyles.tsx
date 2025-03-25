@@ -17,6 +17,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000000',
   },
+  titleText: {
+    fontSize: 18,
+    color: '#2527BF',
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
   description: {
     fontSize: 15,
     color: '#666666',

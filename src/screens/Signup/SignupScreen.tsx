@@ -51,13 +51,13 @@ const SignupScreen = ({navigation}) => {
       const result = text ? JSON.parse(text) : {};
 
       if (response.ok) {
-        const memberId = result.memberId; // 서버에서 반환된 memberId 저장
+        const memberId = result.memberId;
         if (!memberId) {
           throw new Error('회원가입 성공했지만 memberId를 받지 못했습니다.');
         }
 
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('ChooseLanguage', {memberId}); // memberId 전달
+        navigation.navigate('ChooseLanguage', {memberId});
       } else {
         Alert.alert('Error', result.msg || 'Signup failed');
       }

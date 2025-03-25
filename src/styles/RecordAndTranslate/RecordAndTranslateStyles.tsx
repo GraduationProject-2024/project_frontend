@@ -5,14 +5,65 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 20,
   },
-  header: {
-    fontSize: 20,
+  titleText: {
+    textAlign: 'center',
     fontWeight: 'bold',
     color: '#2527BF',
+    marginTop: 20,
+    fontSize: 18,
+  },
+  infoText: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: '#B5B5B5',
+    marginTop: 600,
+  },
+  buttonBackground: {
     position: 'absolute',
-    top: 50,
+    bottom: 0,
+    width: '100%',
+    height: 140,
+    backgroundColor: '#FFFFFF',
+  },
+  messageContainer: {
+    flex: 1,
+    width: '90%',
+    marginBottom: 160,
+    paddingBottom: 220,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: 30,
+  },
+  messageBubble: {
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 5,
+    maxWidth: '80%',
+  },
+  speakerA: {
+    backgroundColor: '#E5E5FF',
+  },
+  speakerB: {
+    backgroundColor: '#EFEFEF',
+  },
+  alignRight: {
+    alignSelf: 'flex-end',
+  },
+  alignLeft: {
+    alignSelf: 'flex-start',
+  },
+  translationText: {
+    color: '#2527BF',
+    fontSize: 14,
+    marginTop: 4,
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#000',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -20,7 +71,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '80%',
     position: 'absolute',
-    bottom: 50,
+    bottom: 30,
+    zIndex: 10,
   },
   iconButton: {
     width: 80,

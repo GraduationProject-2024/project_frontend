@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,31 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/AdditionalInformationStyles';
 
 const AdditionalInformationScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const symptomId = route.params?.symptomId;
+
+  if (!symptomId) {
+    Alert.alert('Error', '증상 ID가 없습니다.');
+    return null;
+  }
+
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [images, setImages] = useState([]);
+  const [isButtonActive, setIsButtonActive] = useState(false);
+
+  useEffect(() => {
+    updateButtonState();
+  }, [additionalInfo, images]);
+
+  const updateButtonState = () => {
+    setIsButtonActive(additionalInfo.trim().length > 0 || images.length > 0);
+  };
 
   const pickImage = async () => {
     if (images.length >= 10) {
@@ -32,23 +52,98 @@ const AdditionalInformationScreen = () => {
         quality: 1,
         selectionLimit: 10 - images.length,
       },
-      response => {
-        if (response.didCancel) {
-          Alert.alert('이미지 선택이 취소되었습니다.');
-        } else if (response.errorCode) {
-          Alert.alert('에러 발생:', response.errorMessage);
-        } else if (response.assets) {
+      async response => {
+        if (response.assets) {
           const newImages = response.assets.map(asset => asset.uri);
           setImages(prevImages => [...prevImages, ...newImages].slice(0, 10));
+          uploadImagesToServer(newImages);
         }
       },
     );
   };
 
+  const uploadImagesToServer = async newImages => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const formData = new FormData();
+      newImages.forEach((uri, index) => {
+        const filename = uri.split('/').pop();
+        const fileType = filename.split('.').pop();
+        formData.append('file', {
+          uri,
+          name: filename,
+          type: `image/${fileType}`,
+        });
+      });
+
+      const response = await fetch(
+        `http://52.78.79.53:8081/api/v1/symptom/img/${symptomId}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('이미지 업로드 실패');
+      }
+
+      const responseData = await response.json();
+      console.log(
+        '📤 이미지 업로드 성공:',
+        JSON.stringify(responseData, null, 2),
+      );
+    } catch (error) {
+      Alert.alert('Error', `이미지 업로드 중 오류 발생: ${error.message}`);
+    }
+  };
+
+  const saveAdditionalInfo = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
+
+      const response = await fetch(
+        `http://52.78.79.53:8081/api/v1/symptom/additional/${symptomId}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({additional: additionalInfo.trim()}),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`추가 정보 저장 실패: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log(
+        '📤 추가 정보 저장 성공:',
+        JSON.stringify(responseData, null, 2),
+      );
+
+      navigation.navigate('AIHistoryTakingReport', {symptomId});
+    } catch (error) {
+      Alert.alert('Error', `추가 정보 저장 중 오류 발생: ${error.message}`);
+    }
+  };
+
   const removeImage = index => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
-    setImages(updatedImages);
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
   };
 
   return (
@@ -58,12 +153,13 @@ const AdditionalInformationScreen = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <Text style={styles.headerText}>
-            증상에 대해 추가적으로{'\n'}전달하고 싶은 사항을 알려주세요
+            증상에 대해 추가적으로
+            {'\n'}
+            전달하고 싶은 사항을 알려주세요
           </Text>
 
-          {/* 이미지 업로드 섹션 */}
           <View style={styles.imageUploadContainer}>
-            <Text style={styles.labelText}>+ 증상 관련 이미지 추가</Text>
+            <Text style={styles.labelText}>증상 관련 이미지 추가</Text>
             <ScrollView horizontal>
               <TouchableOpacity
                 style={styles.imageUploadButton}
@@ -73,8 +169,6 @@ const AdditionalInformationScreen = () => {
                   style={styles.imageIcon}
                 />
               </TouchableOpacity>
-
-              {/* 업로드된 이미지 렌더링 */}
               {images.map((uri, index) => (
                 <View key={index} style={styles.uploadedImageContainer}>
                   <Image source={{uri}} style={styles.uploadedImage} />
@@ -88,16 +182,18 @@ const AdditionalInformationScreen = () => {
             </ScrollView>
           </View>
 
-          {/* 추가 정보 입력 */}
           <View style={styles.additionalInfoContainer}>
-            <Text style={styles.labelText}>+ 증상 관련 추가 사항 작성</Text>
+            <Text style={styles.labelText}>증상 관련 추가 사항 작성</Text>
             <TextInput
               style={styles.textInput}
               multiline
               placeholder="증상에 대해 추가적으로 전달하고 싶은 사항을 작성해주세요"
               placeholderTextColor="#B1B1B1"
               value={additionalInfo}
-              onChangeText={setAdditionalInfo}
+              onChangeText={text => {
+                setAdditionalInfo(text);
+                updateButtonState();
+              }}
               maxLength={200}
             />
             <Text style={styles.characterCount}>
@@ -107,9 +203,17 @@ const AdditionalInformationScreen = () => {
         </ScrollView>
       </TouchableWithoutFeedback>
 
-      {/* 건너뛰기 버튼 */}
-      <TouchableOpacity style={styles.skipButton}>
-        <Text style={styles.skipButtonText}>건너뛰기</Text>
+      <TouchableOpacity
+        style={[
+          styles.skipButton,
+          {backgroundColor: isButtonActive ? '#2527BF' : '#B5B5B5'},
+        ]}
+        onPress={() =>
+          navigation.navigate('AIHistoryTakingReport', {symptomId})
+        }>
+        <Text style={styles.skipButtonText}>
+          {isButtonActive ? 'AI 사전문진 확인하기' : '건너뛰기'}
+        </Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

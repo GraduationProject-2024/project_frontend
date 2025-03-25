@@ -2,51 +2,55 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
-  Alert,
+  TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/AIHistoryTaking/ChooseDetailBodyStyles';
 
 const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
-const SAVE_SELECTED_SBP_URL = 'http://52.78.79.53:8081/api/v1/selected-sbp'; // ✅ 저장 API URL
+const SELECTED_MBP_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
+const SELECTED_SBP_API_URL = 'http://52.78.79.53:8081/api/v1/selected-sbp';
 
 const ChooseDetailBodyScreen = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
+  const selectedMBPId = route.params?.selectedMBPId;
 
-  // ✅ 선택한 주요 신체 부위 데이터 (ChooseMainBodyScreen에서 전달됨)
-  const selectedDetails = route.params?.selectedDetails || [];
-
-  // ✅ 세부 신체 부위 저장 (API 결과)
   const [subBodyParts, setSubBodyParts] = useState<
     {body: string; description: string; mainBodyPartId: number}[]
   >([]);
+  const [selectedSubParts, setSelectedSubParts] = useState<string[]>([]);
+  const [selectedSBPId, setSelectedSBPId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedConditions, setSelectedConditions] = useState({});
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  // ✅ 선택된 주요 신체 부위에 해당하는 세부 신체 부위 조회
   useEffect(() => {
-    const fetchSubBodyParts = async () => {
-      setLoading(true);
+    console.log('📌 선택된 주요 신체 부위 ID:', selectedMBPId);
+
+    const fetchSelectedMainBody = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         if (!token) {
           Alert.alert('Error', '로그인이 필요합니다.');
+          setLoading(false);
           return;
         }
 
-        const bodyParams = selectedDetails
-          .map(part => `body=${part.title}`)
-          .join('&');
-        const requestUrl = `${SUB_BODY_API_URL}?${bodyParams}`;
+        if (!selectedMBPId) {
+          console.error('❌ selectedMBPId가 없습니다.');
+          setLoading(false);
+          return;
+        }
 
-        console.log('📤 세부 신체 부위 조회 요청:', requestUrl);
+        const requestUrl = `${SELECTED_MBP_API_URL}/${selectedMBPId}`;
+        console.log('📤 선택한 주요 신체 부위 조회 요청:', requestUrl);
 
         const response = await fetch(requestUrl, {
           method: 'GET',
@@ -56,53 +60,79 @@ const ChooseDetailBodyScreen = () => {
           },
         });
 
+        console.log('🛠 요청 헤더:', {
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        });
+
         if (!response.ok) {
           throw new Error(`서버 오류: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('✅ 서버 응답 (세부 신체 부위):', data);
+        console.log('✅ 서버 응답 (선택한 주요 신체 부위):', data);
 
-        setSubBodyParts(data);
+        if (!data.description || !Array.isArray(data.description)) {
+          throw new Error('서버에서 올바른 데이터를 반환하지 않았습니다.');
+        }
+
+        fetchSubBodyParts(data.description);
       } catch (err) {
+        console.error('❌ 주요 신체 부위 조회 오류:', err);
         setError(err.message);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchSubBodyParts();
-  }, [selectedDetails]);
-
-  // ✅ 주요 신체 부위별로 세부 신체 부위 그룹화
-  const groupedSubBodyParts = subBodyParts.reduce((acc, part) => {
-    if (!acc[part.mainBodyPartId]) {
-      acc[part.mainBodyPartId] = {
-        title: part.body,
-        description: part.description,
-        details: [],
-      };
+    if (selectedMBPId) {
+      fetchSelectedMainBody();
     }
-    acc[part.mainBodyPartId].details.push(part.description);
-    return acc;
-  }, {});
+  }, [selectedMBPId]);
 
-  const toggleCondition = (bodyPart, condition) => {
-    setSelectedConditions(prev => {
-      const currentConditions = prev[bodyPart] || [];
-      const updatedConditions = currentConditions.includes(condition)
-        ? currentConditions.filter(item => item !== condition)
-        : [...currentConditions, condition];
+  const fetchSubBodyParts = async (bodies: string[]) => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        Alert.alert('Error', '로그인이 필요합니다.');
+        return;
+      }
 
-      const newState = {...prev, [bodyPart]: updatedConditions};
+      const query = bodies
+        .map(body => `body=${encodeURIComponent(body)}`)
+        .join('&');
+      const requestUrl = `${SUB_BODY_API_URL}?${query}`;
+      console.log('📤 세부 신체 부위 조회 요청:', requestUrl);
 
-      console.log(`🔹 ${bodyPart} 선택됨:`, updatedConditions);
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      return newState;
-    });
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ 서버 응답 (세부 신체 부위):', data);
+      setSubBodyParts(data);
+    } catch (err) {
+      console.error('❌ 세부 신체 부위 조회 오류:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // ✅ 선택한 세부 신체 부위 저장 API 연동
+  const toggleSubPartSelection = (description: string) => {
+    setSelectedSubParts(prev =>
+      prev.includes(description)
+        ? prev.filter(item => item !== description)
+        : [...prev, description],
+    );
+  };
+
   const saveSelectedSubBodyParts = async () => {
     setIsSaving(true);
     try {
@@ -112,43 +142,44 @@ const ChooseDetailBodyScreen = () => {
         return;
       }
 
-      for (const mainBodyPart of selectedDetails) {
-        const selectedSubBodyParts =
-          selectedConditions[mainBodyPart.title] || [];
-        if (selectedSubBodyParts.length === 0) {
-          continue;
-        } // 선택한 세부 부위가 없으면 건너뜀
+      const requestUrl = `${SELECTED_SBP_API_URL}/${selectedMBPId}`;
+      const requestBody = {description: selectedSubParts};
+      console.log('📤 서버에 전송할 데이터:', JSON.stringify(requestBody));
 
-        const requestBody = {
-          body: selectedSubBodyParts,
-          selectedMBPId: mainBodyPart.selectedMBPId, // 주요 신체 부위 ID
-          selectedSBPId: 0, // 필요하면 수정
-        };
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Accept: 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-        const requestUrl = `${SAVE_SELECTED_SBP_URL}/${mainBodyPart.selectedMBPId}`;
-        console.log('📤 저장 API 요청:', requestUrl, requestBody);
+      console.log('🛠 요청 URL:', requestUrl);
+      console.log('🛠 요청 메서드: POST');
+      console.log('🛠 요청 헤더:', {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Accept: 'application/json;charset=UTF-8',
+        Authorization: `Bearer ${token}`,
+      });
 
-        const response = await fetch(requestUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            Accept: 'application/json;charset=UTF-8',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        });
+      const result = await response.json();
+      console.log('✅ 서버 응답:', result);
 
-        const result = await response.json();
-        console.log('✅ 저장 응답:', result);
-
-        if (!response.ok) {
-          throw new Error(result.message || `서버 오류: ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(result.message || `서버 오류: ${response.status}`);
       }
 
-      Alert.alert('Success', '선택한 세부 신체 부위가 저장되었습니다.');
+      if (!result.selectedSBPId) {
+        throw new Error('서버 응답에 selectedSBPId가 없습니다.');
+      }
+
+      setSelectedSBPId(result.selectedSBPId);
+
       navigation.navigate('ChooseDetailSymptom', {
-        selectedDetails,
+        selectedDetails: selectedSubParts,
+        selectedSBPId: result.selectedSBPId,
       });
     } catch (error) {
       console.error('❌ 저장 오류:', error);
@@ -160,45 +191,38 @@ const ChooseDetailBodyScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.titleText}>
+        {t(
+          '선택하신 주요 신체 부위의 세부 신체 부위입니다\n치료가 필요하신 부위를 선택해주세요',
+        )}
+      </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (
           <ActivityIndicator size="large" color="#2527BF" />
         ) : error ? (
           <Text style={styles.errorText}>❌ 오류 발생: {error}</Text>
         ) : (
-          <>
-            {Object.values(groupedSubBodyParts).map((group, index) => {
-              const selectedMainBodyPart =
-                selectedDetails[index]?.title || '주요 신체 부위 미확인';
-
-              return (
-                <View key={index} style={styles.groupContainer}>
-                  <Text style={styles.groupTitle}>{selectedMainBodyPart}</Text>
-                  <View style={styles.conditionsWrapper}>
-                    {group.details.map((detail, i) => (
-                      <TouchableOpacity
-                        key={i}
-                        style={[
-                          styles.conditionButton,
-                          selectedConditions[group.title]?.includes(detail) &&
-                            styles.conditionButtonSelected,
-                        ]}
-                        onPress={() => toggleCondition(group.title, detail)}>
-                        <Text
-                          style={[
-                            styles.conditionText,
-                            selectedConditions[group.title]?.includes(detail) &&
-                              styles.conditionTextSelected,
-                          ]}>
-                          {detail}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              );
-            })}
-          </>
+          <View style={styles.toggleContainer}>
+            {subBodyParts.map((part, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.toggleButton,
+                  selectedSubParts.includes(part.description) &&
+                    styles.selectedToggleButton,
+                ]}
+                onPress={() => toggleSubPartSelection(part.description)}>
+                <Text
+                  style={[
+                    styles.toggleText,
+                    selectedSubParts.includes(part.description) &&
+                      styles.selectedToggleText,
+                  ]}>
+                  {part.description}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         )}
       </ScrollView>
       <View style={styles.buttonContainer}>
@@ -212,7 +236,7 @@ const ChooseDetailBodyScreen = () => {
           {isSaving ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
-            <Text style={styles.confirmButtonText}>선택 완료</Text>
+            <Text style={styles.confirmButtonText}>{t('선택 완료')}</Text>
           )}
         </TouchableOpacity>
       </View>

@@ -6,78 +6,47 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 16,
   },
-  header: {
-    marginBottom: 16,
-  },
-  headerTitle: {
+  titleText: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#2527BF',
-    marginBottom: 16,
-  },
-  tabs: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  tabButtonText: {
-    fontSize: 14,
-    color: '#fffff',
+    marginBottom: 15,
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
   EmergencyList: {
     flex: 1,
     marginBottom: 16,
   },
-  EmergencyContainer: {
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 10,
-    marginHorizontal: 4,
+  emergencyCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: {width: 0, height: 3},
+    elevation: 4,
   },
-  EmergencyName: {
+  emergencyCardContent: {
+    flexDirection: 'column',
+  },
+  emergencyName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
+    marginBottom: 6,
   },
-  EmergencyNumber: {
-    fontSize: 18,
-    color: '#2527BF',
-    marginTop: 4,
-  },
-  EmergencyInfo: {
-    fontSize: 15,
-    color: '#666666',
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  EmergencyAddress: {
-    fontSize: 15,
-    color: '#666666',
-    marginBottom: 4,
-  },
-  mapButton: {
-    position: 'absolute',
-    bottom: 30,
-    left: 16,
-    right: 16,
-    height: 50,
-    backgroundColor: '#2527BF',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mapButtonText: {
-    fontSize: 16,
-    color: '#FFFFFF',
+  emergencyLabel: {
+    fontSize: 14,
     fontWeight: 'bold',
+    color: '#2527BF',
+    marginTop: 10,
+  },
+  emergencyInfo: {
+    fontSize: 15,
+    color: '#000000',
+    marginBottom: 4,
   },
 });
 

@@ -7,9 +7,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#2527BF',
-    marginBottom: 20,
+    marginBottom: 10,
+    fontWeight: 'bold',
   },
   bodyPartContainer: {
     marginBottom: 16,
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   confirmButton: {
     width: '100%',

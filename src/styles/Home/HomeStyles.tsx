@@ -23,28 +23,28 @@ const HomeStyles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2527BF',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   sectionSubtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#777',
     marginBottom: 20,
   },
   diagnosisSection: {
     width: '90%',
-    marginTop: 120,
+    marginTop: 150,
     alignSelf: 'center',
     backgroundColor: '#FFFFFF',
     padding: 20,
-    borderRadius: 15,
+    borderRadius: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    shadowRadius: 10,
+    elevation: 4,
   },
   buttonGrid: {
     flexDirection: 'row',
@@ -61,7 +61,7 @@ const HomeStyles = StyleSheet.create({
     marginBottom: 15,
   },
   diagnosisButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#000000',
     textAlign: 'center',
     fontWeight: 'bold',
@@ -85,7 +85,7 @@ const HomeStyles = StyleSheet.create({
   },
   startButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   menuSection: {
@@ -97,10 +97,10 @@ const HomeStyles = StyleSheet.create({
     padding: 20,
     borderRadius: 15,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    shadowRadius: 10,
+    elevation: 4,
   },
   menuGrid: {
     flexDirection: 'row',
@@ -119,9 +119,10 @@ const HomeStyles = StyleSheet.create({
     resizeMode: 'contain',
   },
   menuText: {
-    fontSize: 12,
-    color: '#333',
+    fontSize: 13,
+    color: '#000000',
     textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
 

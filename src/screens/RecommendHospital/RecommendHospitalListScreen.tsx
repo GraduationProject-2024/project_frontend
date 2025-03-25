@@ -4,13 +4,13 @@ import {
   Text,
   ScrollView,
   ActivityIndicator,
+  Alert,
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecommendHospital/RecommendHospitalListStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/hospital';
@@ -18,63 +18,50 @@ const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/hospital-map';
 
 const RecommendHospitalListScreen = ({route, navigation}) => {
   const {selectedDepartment} = route.params;
+  const {t} = useTranslation();
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHospital, setSelectedHospital] = useState(null);
   const [mapUrls, setMapUrls] = useState(null);
 
+  const latitude = 37.546584;
+  const longitude = 126.964649;
+
   useEffect(() => {
-    console.log('📌 선택된 진료과:', selectedDepartment);
-
-    Geolocation.getCurrentPosition(
-      async position => {
-        const {latitude, longitude} = position.coords;
-
-        try {
-          const accessToken = await AsyncStorage.getItem('accessToken');
-          console.log('✅ 액세스 토큰:', accessToken);
-
-          if (!accessToken) {
-            throw new Error('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.');
-          }
-
-          const requestData = {
-            lat: parseFloat(latitude),
-            lon: parseFloat(longitude),
-            is_report: false,
-            report_id: '',
-            department: selectedDepartment,
-            suspected_disease: [''],
-            secondary_hospital: true,
-            tertiary_hospital: true,
-          };
-
-          console.log('📌 API 요청 파라미터:', requestData);
-
-          const response = await axios.post(API_URL, requestData, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          console.log('✅ 병원 데이터 수신:', response.data);
-          setHospitals(response.data);
-        } catch (err) {
-          console.error('❌ 병원 추천 API 요청 실패:', err.message);
-          setError(`데이터를 불러오는 데 실패했습니다: ${err.message}`);
-        } finally {
-          setLoading(false);
+    const fetchHospitals = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          throw new Error(t('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.'));
         }
-      },
-      error => {
-        console.error('❌ 위치 정보를 가져오는 데 실패했습니다.', error);
-        setError('위치 정보를 가져오는 데 실패했습니다.');
+
+        const requestData = {
+          lat: latitude,
+          lon: longitude,
+          is_report: false,
+          report_id: '',
+          department: selectedDepartment,
+          suspected_disease: [''],
+          secondary_hospital: false,
+          tertiary_hospital: false,
+        };
+
+        const response = await axios.post(API_URL, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setHospitals(response.data);
+      } catch (err) {
+        setError(`${t('데이터를 불러오는 데 실패했습니다')}: ${err.message}`);
+      } finally {
         setLoading(false);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
+      }
+    };
+
+    fetchHospitals();
   }, [selectedDepartment]);
 
   const onHospitalSelect = async hospitalId => {
@@ -83,7 +70,7 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
 
       const accessToken = await AsyncStorage.getItem('accessToken');
       if (!accessToken) {
-        throw new Error('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.');
+        throw new Error(t('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.'));
       }
 
       const response = await axios.get(`${MAP_API_URL}/${hospitalId}`, {
@@ -93,94 +80,97 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
         },
       });
 
-      console.log('✅ 병원 상세 정보:', response.data);
-      setSelectedHospital(response.data.hospital_info);
       setMapUrls(response.data.map_urls);
+
+      showMapSelectionAlert(response.data.map_urls);
     } catch (err) {
-      console.error('❌ 병원 지도 API 요청 실패:', err.message);
-
-      if (err.response) {
-        console.log('📌 서버 응답 상태 코드:', err.response.status);
-        console.log(
-          '📌 서버 응답 데이터:',
-          JSON.stringify(err.response.data, null, 2),
-        );
-
-        if (err.response.status === 403) {
-          setError('접근 권한이 없습니다. 다시 로그인해주세요.');
-        } else {
-          setError(`병원 정보를 불러오는 데 실패했습니다: ${err.message}`);
-        }
-      } else {
-        setError('서버 응답이 없습니다.');
-      }
+      setError(t('병원 정보를 불러오는 데 실패했습니다.'));
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <ActivityIndicator
-        size="large"
-        color="#0000ff"
-        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-      />
-    );
-  }
+  const showMapSelectionAlert = urls => {
+    const options = [];
+
+    if (urls.naver_map) {
+      options.push({
+        text: 'Naver',
+        onPress: () => Linking.openURL(urls.naver_map),
+      });
+    }
+    if (urls.kakao_map) {
+      options.push({
+        text: 'Kakao',
+        onPress: () => Linking.openURL(urls.kakao_map),
+      });
+    }
+    if (urls.google_map) {
+      options.push({
+        text: 'Google',
+        onPress: () => Linking.openURL(urls.google_map),
+      });
+    }
+
+    if (options.length > 0) {
+      Alert.alert(
+        t('지도 선택'),
+        t('어떤 지도를 사용하시겠습니까?'),
+        [...options, {text: t('취소'), style: 'cancel'}],
+        {cancelable: true},
+      );
+    } else {
+      Alert.alert(t('오류'), t('이용 가능한 지도 URL이 없습니다.'));
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.hospitalList}>
-        {hospitals.map((hospital, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.hospitalContainer}
-            onPress={() => onHospitalSelect(hospital.id)}>
-            <Text style={styles.hospitalName}>{hospital.name}</Text>
-            {hospital.telephone && (
-              <Text style={styles.hospitalInfo}>☎️ {hospital.telephone}</Text>
-            )}
-            <Text style={styles.hospitalInfo}>{hospital.address}</Text>
-            <Text style={styles.hospitalInfo}>
-              🚆 이동 거리:{' '}
-              {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
-            </Text>
-            <Text style={styles.hospitalInfo}>
-              ⏳ 예상 소요 시간: {hospital.transit_travel_time_m || '-'} 분
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <Text style={styles.titleText}>
+        {t(
+          '선택하신 진료과에 맞는 병원을 추천해 드립니다\n이동 거리와 예상 소요 시간을 참고해주세요',
+        )}
+      </Text>
 
-      {selectedHospital && (
-        <View style={styles.selectedHospitalContainer}>
-          <Text style={styles.hospitalName}>{selectedHospital.name}</Text>
-          <Text style={styles.hospitalInfo}>
-            ☎️ {selectedHospital.telephone}
-          </Text>
-          <Text style={styles.hospitalInfo}>📍 {selectedHospital.address}</Text>
-          <View style={styles.mapLinks}>
-            {mapUrls?.naver_map && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(mapUrls.naver_map)}>
-                <Text style={styles.mapLinkText}>🗺️ 네이버 지도</Text>
-              </TouchableOpacity>
-            )}
-            {mapUrls?.kakao_map && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(mapUrls.kakao_map)}>
-                <Text style={styles.mapLinkText}>🗺️ 카카오 지도</Text>
-              </TouchableOpacity>
-            )}
-            {mapUrls?.google_map && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(mapUrls.google_map)}>
-                <Text style={styles.mapLinkText}>🗺️ 구글 지도</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#2527BF" />
+      ) : hospitals.length === 0 ? (
+        <Text style={styles.noHospitalsText}>
+          {t('추천할 병원이 없습니다.')}
+        </Text>
+      ) : (
+        <ScrollView style={styles.hospitalList}>
+          {hospitals.map((hospital, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.hospitalCard}
+              onPress={() => onHospitalSelect(hospital.id)}>
+              <View style={styles.hospitalCardContent}>
+                <Text style={styles.hospitalName}>{hospital.name}</Text>
+
+                <Text style={styles.hospitalLabel}>{t('전화 번호')}</Text>
+                <Text style={styles.hospitalInfo}>
+                  {hospital.telephone || t('정보 없음')}
+                </Text>
+
+                <Text style={styles.hospitalLabel}>{t('주소')}</Text>
+                <Text style={styles.hospitalInfo}>
+                  {hospital.address || t('정보 없음')}
+                </Text>
+
+                <Text style={styles.hospitalLabel}>{t('이동 거리')}</Text>
+                <Text style={styles.hospitalInfo}>
+                  {hospital.transit_travel_distance_km?.toFixed(1) || '-'} km
+                </Text>
+
+                <Text style={styles.hospitalLabel}>{t('예상 소요 시간')}</Text>
+                <Text style={styles.hospitalInfo}>
+                  {hospital.transit_travel_time_m || '-'} {t('분')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       )}
     </View>
   );
