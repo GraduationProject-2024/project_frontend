@@ -13,9 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import axios from 'axios';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecordAndTranslate/RecordAndTranslateStyles';
 
 const RecordAndTranslateScreen = () => {
+  const {t} = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [sessionId, setSessionId] = useState(null);
@@ -274,12 +276,15 @@ const RecordAndTranslateScreen = () => {
     <View style={styles.container}>
       {!isRecording && messages.length === 0 && (
         <Text style={styles.titleText}>
-          의료진과 환자의 원활한 소통을 돕기 위해서 {'\n'}음성 녹음 및 실시간
-          번역을 제공합니다.
+          {t(
+            '의료진과 환자의 원활한 소통을 돕기 위해서 음성 녹음 및 실시간 번역을 제공합니다.',
+          )}
         </Text>
       )}
       {!isRecording && messages.length === 0 && (
-        <Text style={styles.infoText}>아이콘을 눌러 녹음을 시작해주세요.</Text>
+        <Text style={styles.infoText}>
+          {t('아이콘을 눌러 녹음을 시작해주세요.')}
+        </Text>
       )}
       <ScrollView
         style={styles.messageContainer}

@@ -278,7 +278,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                     <Text style={styles.labelText}>{t('추가 정보')}</Text>
                     {'  '}
                     {reportData.doctor.symptom_info?.[0]?.additional ||
-                      t('아파요')}
+                      t('최근 스트레스를 많이 받아서 관련이 있을까 싶어요')}
                   </Text>
                 </View>
 
