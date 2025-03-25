@@ -119,7 +119,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                   {/* 진료과 */}
                   <View style={styles.card}>
                     <Text style={styles.sectionTitle}>
-                      {t('이런 진료과에 가는 것을 추천해요')}
+                      📌 {t('이런 진료과에 가는 것을 추천해요')}
                     </Text>
                     <Text style={styles.sectionContent}>
                       {reportData.patient.department?.KO || t('데이터 없음')}
@@ -129,7 +129,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                   {/* 예상 질병 */}
                   <View style={styles.card}>
                     <Text style={styles.sectionTitle}>
-                      {t('이런 질병에 걸리신 것 같아요')}
+                      📌 {t('이런 질병에 걸리신 것 같아요')}
                     </Text>
                     {reportData.patient.possible_conditions?.length > 0 ? (
                       reportData.patient.possible_conditions.map((item, i) => (
@@ -147,12 +147,12 @@ const AIHistoryTakingReportScreen = ({route}) => {
                   {/* 의사에게 할 질문 */}
                   <View style={styles.card}>
                     <Text style={styles.sectionTitle}>
-                      {t('의료진에게 이런 것을 질문하세요')}
+                      📌 {t('이런 질문을 의료진에게 해보세요')}
                     </Text>
                     {reportData.patient.questions_to_doctor?.length > 0 ? (
                       reportData.patient.questions_to_doctor.map((q, i) => (
                         <Text key={i} style={styles.sectionContent}>
-                          {q.KO || t('데이터 없음')}
+                          {`${i + 1}. ${q.KO || t('데이터 없음')}`}
                         </Text>
                       ))
                     ) : (
@@ -165,21 +165,16 @@ const AIHistoryTakingReportScreen = ({route}) => {
                   {/* 증상 체크리스트 */}
                   <View style={styles.card}>
                     <Text style={styles.sectionTitle}>
-                      {t('이런 증상이 있는지 확인하세요')}
+                      📌 {t('이런 증상이 있는지 확인하세요')}
                     </Text>
                     {reportData.patient.symptom_checklist?.length > 0 ? (
-                      reportData.patient.symptom_checklist.map((item, i) => (
-                        <View key={i}>
-                          <Text style={styles.sectionContent}>
-                            {item.condition?.KO || t('데이터 없음')}
+                      reportData.patient.symptom_checklist.flatMap((data, i) =>
+                        data.symptoms?.map((s, j) => (
+                          <Text key={`${i}-${j}`} style={styles.sectionContent}>
+                            {s.KO || t('데이터 없음')}
                           </Text>
-                          {item.symptoms?.map((s, j) => (
-                            <Text key={j} style={styles.sectionContent}>
-                              - {s.KO || t('데이터 없음')}
-                            </Text>
-                          ))}
-                        </View>
-                      ))
+                        )),
+                      )
                     ) : (
                       <Text style={styles.sectionContent}>
                         {t('데이터 없음')}
@@ -194,65 +189,104 @@ const AIHistoryTakingReportScreen = ({route}) => {
               <>
                 {/* 환자 기본 정보 */}
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('환자 기본 정보')}</Text>
+                  <Text style={styles.sectionTitle}>
+                    {t('📌 환자의 기본 정보입니다')}
+                  </Text>
                   <Text style={styles.sectionContent}>
-                    {t('나이')}: {reportData.doctor.basic_info?.[0]?.age || '-'}
-                    ,{t(' 키')}:{' '}
-                    {reportData.doctor.basic_info?.[0]?.height || '-'},
-                    {t(' 성별')}:{' '}
-                    {reportData.doctor.basic_info?.[0]?.gender || '-'},
-                    {t(' 체중')}:{' '}
+                    <Text style={styles.labelText}>{t('성별')}</Text> {'  '}
+                    {reportData.doctor.basic_info?.[0]?.gender || '-'}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('나이')}</Text> {'  '}
+                    {reportData.doctor.basic_info?.[0]?.age || '-'}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('신장')}</Text> {'  '}
+                    {reportData.doctor.basic_info?.[0]?.height || '-'}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('체중')}</Text> {'  '}
                     {reportData.doctor.basic_info?.[0]?.weight || '-'}
                   </Text>
                 </View>
 
                 {/* 환자 건강 정보 */}
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('환자 건강 정보')}</Text>
+                  <Text style={styles.sectionTitle}>
+                    {t('📌 환자의 건강 정보입니다')}
+                  </Text>
                   <Text style={styles.sectionContent}>
-                    {t('과거 병력')}:{' '}
-                    {reportData.doctor.health_info?.[0]?.past_history || '-'},
-                    {t(' 알레르기')}:{' '}
-                    {reportData.doctor.health_info?.[0]?.allergy || '-'},
-                    {t(' 가족력')}:{' '}
-                    {reportData.doctor.health_info?.[0]?.family_history || '-'},
-                    {t(' 현재 복용 약물')}:{' '}
+                    <Text style={styles.labelText}>{t('과거 병력')}</Text>{' '}
+                    {'  '}
+                    {reportData.doctor.health_info?.[0]?.past_history || '-'}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('가족력')}</Text> {'  '}
+                    {reportData.doctor.health_info?.[0]?.family_history || '-'}
+                    {'\n'}
+                    <Text style={styles.labelText}>
+                      {t('현재 복용 약물')}
+                    </Text>{' '}
+                    {'  '}
                     {reportData.doctor.health_info?.[0]?.now_medicine || '-'}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('알레르기')}</Text> {'  '}
+                    {reportData.doctor.health_info?.[0]?.allergy || '-'}
                   </Text>
                 </View>
 
                 {/* 신체 부위 */}
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('신체 부위')}</Text>
+                  <Text style={styles.sectionTitle}>
+                    {t('📌 통증을 느끼는 신체 부위입니다')}
+                  </Text>
                   <Text style={styles.sectionContent}>
+                    <Text style={styles.labelText}>{t('주요 신체 부위')}</Text>
+                    {'  '}
                     {reportData.doctor.body_info?.[0]?.mbp_body?.join(', ') ||
-                      '-'}{' '}
-                    |{' '}
+                      t('-')}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('세부 신체 부위')}</Text>
+                    {'  '}
                     {reportData.doctor.body_info?.[0]?.sbp_body?.join(', ') ||
-                      '-'}{' '}
-                    |{' '}
-                    {reportData.doctor.body_info?.[0]?.sign?.join(', ') || '-'}{' '}
+                      t('-')}
+                    {'\n'}
+                    <Text style={styles.labelText}>{t('상세 증상')}</Text>
+                    {'  '}
+                    {reportData.doctor.body_info?.[0]?.sign?.join(', ') ||
+                      t('-')}
                   </Text>
                 </View>
 
                 {/* 세부 증상 */}
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('세부 증상')}</Text>
+                  <Text style={styles.sectionTitle}>
+                    {t('📌 통증 관련한 세부적인 증상입니다')}
+                  </Text>
                   <Text style={styles.sectionContent}>
-                    {t('강도')}:{' '}
-                    {reportData.doctor.symptom_info?.[0]?.intensity || '-'},
-                    {t(' 시작')}:{' '}
-                    {reportData.doctor.symptom_info?.[0]?.start || '-'},
-                    {t(' 지속')}:{' '}
-                    {reportData.doctor.symptom_info?.[0]?.duration || '-'},
-                    {t(' 추가 정보')}:{' '}
-                    {reportData.doctor.symptom_info?.[0]?.additional || '-'}
+                    <Text style={styles.labelText}>{t('강도')}</Text>
+                    {'  '}
+                    {reportData.doctor.symptom_info?.[0]?.intensity || t('-')}
+                    {'\n'}
+
+                    <Text style={styles.labelText}>{t('시작')}</Text>
+                    {'  '}
+                    {reportData.doctor.symptom_info?.[0]?.start || t('-')}
+                    {'\n'}
+
+                    <Text style={styles.labelText}>{t('지속')}</Text>
+                    {'  '}
+                    {reportData.doctor.symptom_info?.[0]?.duration || t('-')}
+                    {'\n'}
+
+                    <Text style={styles.labelText}>{t('추가 정보')}</Text>
+                    {'  '}
+                    {reportData.doctor.symptom_info?.[0]?.additional ||
+                      t('아파요')}
                   </Text>
                 </View>
 
                 {/* 예상 질병 */}
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('예상 질병')}</Text>
+                  <Text style={styles.sectionTitle}>
+                    {t('📌 예상되는 환자의 질병입니다')}
+                  </Text>
                   {reportData.doctor.possible_conditions?.length > 0 ? (
                     reportData.doctor.possible_conditions.map((item, i) => (
                       <Text key={i} style={styles.sectionContent}>
@@ -270,13 +304,16 @@ const AIHistoryTakingReportScreen = ({route}) => {
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>{t('이미지 업로드')}</Text>
                   {reportData.doctor.image_info?.length > 0 ? (
-                    reportData.doctor.image_info.map((img, i) => (
-                      <Image
-                        key={i}
-                        source={{uri: img.url}}
-                        style={styles.image}
-                      />
-                    ))
+                    reportData.doctor.image_info
+                      .filter(img => img.imgUrl) // undefined 또는 null 값 필터링
+                      .map((img, i) => (
+                        <View key={i} style={styles.imageContainer}>
+                          <Image
+                            source={{uri: img.imgUrl}}
+                            style={styles.image}
+                          />
+                        </View>
+                      ))
                   ) : (
                     <Text style={styles.sectionContent}>
                       {t('이미지 없음')}

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -14,17 +14,8 @@ import styles from '../../styles/AIHistoryTaking/SymptomOnsetTimeStyles';
 
 const SYMPTOM_START_API_URL = 'http://52.78.79.53:8081/api/v1/symptom/start';
 
-const TIME_UNIT_MAP = {
-  분: 'MINUTE',
-  시간: 'HOUR',
-  일: 'DAY',
-  주: 'WEEK',
-  달: 'MONTH',
-  년: 'YEAR',
-};
-
 const WheelPicker = ({options, selectedIndex, onChange}) => {
-  const flatListRef = React.useRef(null);
+  const flatListRef = useRef(null);
 
   const handleScrollEnd = event => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -39,7 +30,6 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
   return (
     <View style={styles.wheelPickerContainer}>
       <View style={styles.fixedSelectedIndicator} />
-
       <FlatList
         ref={flatListRef}
         data={options}
@@ -49,11 +39,7 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
         snapToInterval={50}
         decelerationRate="fast"
         contentContainerStyle={{paddingVertical: 100}}
-        getItemLayout={(_, index) => ({
-          length: 50,
-          offset: 50 * index,
-          index,
-        })}
+        getItemLayout={(_, index) => ({length: 50, offset: 50 * index, index})}
         initialScrollIndex={selectedIndex}
         onScrollEndDrag={handleScrollEnd}
         onMomentumScrollEnd={handleScrollEnd}
@@ -67,7 +53,7 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
                 style={[
                   styles.wheelPickerItem,
                   {
-                    opacity: opacity,
+                    opacity,
                     transform: [
                       {scale},
                       {rotateX: `${distanceFromCenter * 15}deg`},
@@ -94,7 +80,7 @@ const SymptomOnsetTimeScreen = () => {
 
   const selectedSignIds = route.params?.selectedSignIds;
   const [selectedNumber, setSelectedNumber] = useState(5);
-  const [selectedUnit, setSelectedUnit] = useState('분');
+  const [selectedUnit, setSelectedUnit] = useState(t('분'));
   const [isNextButtonActive, setIsNextButtonActive] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -107,13 +93,21 @@ const SymptomOnsetTimeScreen = () => {
   const numbers = Array.from({length: 11}, (_, i) => ((i + 1) * 5).toString());
   const units = [t('분'), t('시간'), t('일'), t('주'), t('달'), t('년')];
 
+  const TIME_UNIT_MAP = {
+    [t('분')]: 'MINUTE',
+    [t('시간')]: 'HOUR',
+    [t('일')]: 'DAY',
+    [t('주')]: 'WEEK',
+    [t('달')]: 'MONTH',
+    [t('년')]: 'YEAR',
+  };
+
   const handleScrollChange = () => {
     setIsNextButtonActive(true);
   };
 
   const saveSymptomStartTime = async () => {
     setLoading(true);
-
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
@@ -126,10 +120,9 @@ const SymptomOnsetTimeScreen = () => {
         startValue: selectedNumber,
         startUnit: convertedUnit,
       };
-
-      const requestUrl = `${SYMPTOM_START_API_URL}/${selectedSignIds}`;
-      console.log('📤 증상 시작 시간 저장 요청:', requestUrl);
-      console.log('📤 요청 데이터:', JSON.stringify(requestBody, null, 2));
+      const requestUrl = `${SYMPTOM_START_API_URL}/${encodeURIComponent(
+        selectedSignIds,
+      )}`;
 
       const response = await fetch(requestUrl, {
         method: 'POST',
@@ -141,41 +134,23 @@ const SymptomOnsetTimeScreen = () => {
         body: JSON.stringify(requestBody),
       });
 
-      const statusCode = response.status;
-      console.log(
-        `🔍 HTTP 응답 상태 코드 (Sign ID ${selectedSignIds}): ${statusCode}`,
-      );
-
       if (!response.ok) {
         const errorResponse = await response.json();
-        console.error(
-          `❌ 서버 오류 (Sign ID ${selectedSignIds}):`,
-          errorResponse,
-        );
         throw new Error(
-          `서버 오류: ${statusCode} - ${JSON.stringify(errorResponse)}`,
+          `서버 오류: ${response.status} - ${JSON.stringify(errorResponse)}`,
         );
       }
 
       const result = await response.json();
-      console.log(
-        `✅ 서버 응답 (증상 시작 시간 저장 - Sign ID ${selectedSignIds}):`,
-        result,
-      );
-
       const symptomId = result.symptomId;
-
       if (!symptomId) {
-        console.error('🚨 symptomId가 서버 응답에 없습니다:', result);
         Alert.alert('Error', '서버 응답에 symptomId가 없습니다.');
         return;
       }
 
       Alert.alert('Success', '증상 시작 시간이 저장되었습니다.');
-
       navigation.navigate('PainIntensity', {symptomId});
     } catch (error) {
-      console.error('❌ 저장 오류:', error);
       Alert.alert('Error', `저장 중 오류 발생: ${error.message}`);
     } finally {
       setLoading(false);
@@ -185,7 +160,6 @@ const SymptomOnsetTimeScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.question}>{t('언제부터 증상이 발생했나요?')}</Text>
-
       <View style={styles.centeredPickerWrapper}>
         <WheelPicker
           options={numbers}
@@ -204,7 +178,6 @@ const SymptomOnsetTimeScreen = () => {
           }}
         />
       </View>
-
       <TouchableOpacity
         style={[
           styles.nextButton,

@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 4, // Android 그림자 효과
+    elevation: 4,
     padding: 20,
     marginBottom: 15,
   },
@@ -56,13 +56,25 @@ const styles = StyleSheet.create({
   },
   sectionContent: {
     fontSize: 16,
-    color: '#555',
+    color: '#000000',
+  },
+  labelText: {
+    color: '#B5B5B5',
+    fontWeight: 'bold',
+  },
+  imageContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   image: {
-    width: '100%',
-    height: 150,
+    width: 300,
+    height: 300,
     borderRadius: 10,
-    marginTop: 10,
+    marginVertical: 10,
+    resizeMode: 'cover',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
