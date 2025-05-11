@@ -1,25 +1,28 @@
----
-name: Custom issue template
-about: Describe this issue template's purpose here.
-title: ''
-labels: ''
-assignees: ''
+**Check List :memo:**
+
+- [] Pull Request 제목 : [유형] 변경 사항 요약
+- [] 설명 & 이슈 번호 작성
+
+**설명 (필수)**
+
+이 PR에서 어떤 변경을 했는지 상세히 설명해주세요.
+관련된 Issue 번호를 포함하세요.
+
+1. #
+
+2. 변경 사항
+
+3. 스크린샷 (선택)
+
+ 
+<br>
 
 ---
 
----
-name: 티켓 이슈
-about: 티켓 발행을 위한 이슈입니다.
-title: ''
-labels: enhancement
-assignees: ''
+**review 참고 사항 (선택)**
 
----
+추가로 알릴 내용이 있다면 여기에 작성해주세요.
 
-### ⚠️ Issue
-- 이슈 개요를 입력해주세요.
+1.
 
-### ✏️ ToDoList
-- [ ] 할 일1
-- [ ] 할 일2
-출처: https://itchipmunk.tistory.com/548 [다람쥐의 스프링 개발 블로그:티스토리]
+2.
