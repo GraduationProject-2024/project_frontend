@@ -73,6 +73,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  mainBodyPartText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2527BF',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
 });
 
 export default styles;

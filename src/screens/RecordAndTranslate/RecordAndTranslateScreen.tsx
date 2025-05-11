@@ -181,8 +181,6 @@ const RecordAndTranslateScreen = () => {
       const englishTranslation = translations.English?.text?.trim() || '';
       const koreanTranslation = translations.Korean?.text?.trim() || '';
 
-      let translatedText = '';
-
       const excludeWords = ['you', 'Thank you', 'Bye'];
       if (
         excludeWords.includes(transcript) ||
@@ -193,13 +191,28 @@ const RecordAndTranslateScreen = () => {
         return;
       }
 
-      let isKoreanToEnglish = transcript === koreanTranslation;
-      let isEnglishToKorean = transcript === englishTranslation;
+      let isKoreanToEnglish =
+        transcript &&
+        koreanTranslation &&
+        transcript.trim().replace(/\s/g, '') ===
+          koreanTranslation.trim().replace(/\s/g, '');
 
-      if (isKoreanToEnglish) {
+      let isEnglishToKorean =
+        transcript &&
+        englishTranslation &&
+        transcript.trim().replace(/\s/g, '') ===
+          englishTranslation.trim().replace(/\s/g, '');
+
+      let translatedText = '';
+
+      // 조건별 번역문 설정
+      if (isKoreanToEnglish && englishTranslation) {
         translatedText = englishTranslation;
-      } else if (isEnglishToKorean) {
+      } else if (isEnglishToKorean && koreanTranslation) {
         translatedText = koreanTranslation;
+      } else if (englishTranslation || koreanTranslation) {
+        // fallback: 명확한 언어 방향이 없어도 번역된 텍스트가 존재하면 표시
+        translatedText = englishTranslation || koreanTranslation;
       }
 
       console.log('📖 최종 번역된 텍스트:', translatedText);
