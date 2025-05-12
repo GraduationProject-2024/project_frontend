@@ -116,7 +116,8 @@ const ChooseDetailBodyScreen = () => {
 
       const data = await response.json();
       console.log('✅ 서버 응답 (세부 신체 부위):', data);
-      setSubBodyParts(data);
+      const allParts = Object.values(data).flat();
+      setSubBodyParts(allParts);
     } catch (err) {
       console.error('❌ 세부 신체 부위 조회 오류:', err);
       setError(err.message);
