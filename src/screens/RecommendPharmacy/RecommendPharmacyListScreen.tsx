@@ -12,6 +12,8 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecommendPharmacy/RecommendPharmacyListStyles';
+import {Platform, PermissionsAndroid} from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy';
 const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/pharmacy-map';
@@ -22,13 +24,60 @@ const RecommendPharmacyListScreen = () => {
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mapUrls, setMapUrls] = useState(null);
+  const [location, setLocation] = useState({latitude: null, longitude: null});
 
-  const latitude = 37.546584;
-  const longitude = 126.964649;
+  // 위치 권한 요청 함수
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: '위치 권한 요청',
+          message: '근처 약국 추천을 위해 위치 정보가 필요합니다.',
+          buttonNeutral: '나중에 묻기',
+          buttonNegative: '취소',
+          buttonPositive: '확인',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    // iOS는 Info.plist에 권한 설명만 있으면 자동 요청됨
+    return true;
+  };
 
+  // 현재 위치 받아오기
   useEffect(() => {
-    fetchPharmacies(latitude, longitude);
+    const getLocation = async () => {
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
+        Alert.alert(t('위치 권한이 필요합니다.'));
+        setLoading(false);
+        return;
+      }
+      Geolocation.getCurrentPosition(
+        position => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        error => {
+          Alert.alert(t('위치 정보를 가져오지 못했습니다.'));
+          setLoading(false);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    };
+    getLocation();
   }, []);
+
+  // 위치가 준비되면 약국 조회
+  useEffect(() => {
+    if (location.latitude && location.longitude) {
+      fetchPharmacies(location.latitude, location.longitude);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   const getAccessToken = async () => {
     try {

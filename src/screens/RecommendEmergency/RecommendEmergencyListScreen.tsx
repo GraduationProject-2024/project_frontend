@@ -7,21 +7,78 @@ import {
   Alert,
   TouchableOpacity,
   Linking,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
+import Geolocation from 'react-native-geolocation-service';
 import styles from '../../styles/RecommendEmergency/RecommendEmergencyListStyles';
 
 const RecommendEmergencyListScreen = () => {
   const {t} = useTranslation();
   const [emergencyList, setEmergencyList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [location, setLocation] = useState<{
+    latitude: number | null;
+    longitude: number | null;
+  }>({latitude: null, longitude: null});
   const navigation = useNavigation();
 
-  // ✅ 고정된 위도, 경도 설정 (서울특별시 용산구 한강대로 366 근처)
-  const latitude = 37.546584;
-  const longitude = 126.964649;
+  // 위치 권한 요청 함수
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: t('위치 권한 요청'),
+          message: t('근처 응급실 추천을 위해 위치 정보가 필요합니다.'),
+          buttonNeutral: t('나중에 묻기'),
+          buttonNegative: t('취소'),
+          buttonPositive: t('확인'),
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    // iOS는 Info.plist에 권한 설명만 있으면 자동 요청됨
+    return true;
+  };
+
+  // 현재 위치 받아오기
+  useEffect(() => {
+    const getLocation = async () => {
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
+        Alert.alert(t('위치 권한이 필요합니다.'));
+        setLoading(false);
+        return;
+      }
+      Geolocation.getCurrentPosition(
+        position => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        error => {
+          Alert.alert(t('위치 정보를 가져오지 못했습니다.'));
+          setLoading(false);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    };
+    getLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 위치가 준비되면 응급실 리스트 조회
+  useEffect(() => {
+    if (location.latitude && location.longitude) {
+      fetchEmergencyList(location.latitude, location.longitude);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   const getStoredData = async () => {
     try {
@@ -37,7 +94,8 @@ const RecommendEmergencyListScreen = () => {
     }
   };
 
-  const fetchEmergencyList = async () => {
+  // 위도, 경도를 파라미터로 받도록 수정
+  const fetchEmergencyList = async (latitude: number, longitude: number) => {
     setLoading(true);
     try {
       const {token, conditions} = await getStoredData();
@@ -127,10 +185,6 @@ const RecommendEmergencyListScreen = () => {
       console.error(t('응급실 지도 정보를 가져오는 중 오류 발생:'), error);
     }
   };
-
-  useEffect(() => {
-    fetchEmergencyList();
-  }, []);
 
   return (
     <View style={styles.container}>

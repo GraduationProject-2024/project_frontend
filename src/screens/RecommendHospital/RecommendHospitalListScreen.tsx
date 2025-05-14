@@ -11,7 +11,9 @@ import {
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTranslation} from 'react-i18next';
+import Geolocation from 'react-native-geolocation-service';
 import styles from '../../styles/RecommendHospital/RecommendHospitalListStyles';
+import {Platform, PermissionsAndroid} from 'react-native';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/hospital';
 const MAP_API_URL = 'http://52.78.79.53:8081/api/v1/hospital-map';
@@ -24,45 +26,95 @@ const RecommendHospitalListScreen = ({route, navigation}) => {
   const [error, setError] = useState(null);
   const [mapUrls, setMapUrls] = useState(null);
 
-  const latitude = 37.546584;
-  const longitude = 126.964649;
+  // 위치 상태 추가
+  const [location, setLocation] = useState({latitude: null, longitude: null});
+
+  // 위치 권한 요청 함수
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: '위치 권한 요청',
+          message: '병원 추천을 위해 위치 정보가 필요합니다.',
+          buttonNeutral: '나중에 묻기',
+          buttonNegative: '취소',
+          buttonPositive: '확인',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    // iOS는 Info.plist에 권한 설명만 있으면 자동 요청됨
+    return true;
+  };
 
   useEffect(() => {
-    const fetchHospitals = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        if (!accessToken) {
-          throw new Error(t('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.'));
+    if (location.latitude && location.longitude) {
+      const fetchHospitals = async () => {
+        try {
+          setLoading(true);
+          const accessToken = await AsyncStorage.getItem('accessToken');
+          if (!accessToken) {
+            throw new Error(
+              t('❌ 액세스 토큰이 없습니다. 다시 로그인해주세요.'),
+            );
+          }
+
+          const requestData = {
+            lat: location.latitude,
+            lon: location.longitude,
+            is_report: false,
+            report_id: '',
+            department: selectedDepartment,
+            suspected_disease: [''],
+            secondary_hospital: false,
+            tertiary_hospital: false,
+          };
+
+          const response = await axios.post(API_URL, requestData, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+
+          setHospitals(response.data);
+        } catch (err) {
+          setError(`${t('데이터를 불러오는 데 실패했습니다')}: ${err.message}`);
+        } finally {
+          setLoading(false);
         }
+      };
 
-        const requestData = {
-          lat: latitude,
-          lon: longitude,
-          is_report: false,
-          report_id: '',
-          department: selectedDepartment,
-          suspected_disease: [''],
-          secondary_hospital: false,
-          tertiary_hospital: false,
-        };
+      fetchHospitals();
+    }
+  }, [location, selectedDepartment]);
 
-        const response = await axios.post(API_URL, requestData, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        setHospitals(response.data);
-      } catch (err) {
-        setError(`${t('데이터를 불러오는 데 실패했습니다')}: ${err.message}`);
-      } finally {
+  // 위치 받아오기
+  useEffect(() => {
+    const getLocation = async () => {
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
+        setError(t('위치 권한이 필요합니다.'));
         setLoading(false);
+        return;
       }
+      Geolocation.getCurrentPosition(
+        position => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        error => {
+          setError(t('위치 정보를 가져오지 못했습니다.'));
+          setLoading(false);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
     };
-
-    fetchHospitals();
-  }, [selectedDepartment]);
+    getLocation();
+  }, []);
 
   const onHospitalSelect = async hospitalId => {
     try {

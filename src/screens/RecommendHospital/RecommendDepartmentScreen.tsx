@@ -9,14 +9,14 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RecommendHospital/RecommendDepartmentStyles';
 
 const API_URL = 'http://52.78.79.53:8081/api/v1/department';
 
 const RecommendDepartmentScreen = () => {
   const navigation = useNavigation();
-  const {t} = useTranslation(); // ✅ 번역 훅 추가
+  const {t} = useTranslation();
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
