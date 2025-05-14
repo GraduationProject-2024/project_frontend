@@ -179,9 +179,9 @@ const ChooseDetailSymptomScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>
-        선택하신 신체 부위에 주로 발생하는 증상입니다{'\n'}
-        정확한 사전문진을 위해서 아래 증상 중 해당하는 사항이 있다면
-        선택해주세요
+        {t(
+          '선택하신 신체 부위에 주로 발생하는 증상입니다\n정확한 사전문진을 위해서 아래 증상 중 해당하는 사항이 있다면 선택해주세요',
+        )}
       </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (

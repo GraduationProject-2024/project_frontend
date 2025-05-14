@@ -9,19 +9,11 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/AIHistoryTaking/PainDurationStyles';
 
 const SYMPTOM_DURATION_API_URL =
   'http://52.78.79.53:8081/api/v1/symptom/duration';
-
-const TIME_UNIT_MAP = {
-  분: 'MINUTE',
-  시간: 'HOUR',
-  일: 'DAY',
-  주: 'WEEK',
-  달: 'MONTH',
-  년: 'YEAR',
-};
 
 const WheelPicker = ({options, selectedIndex, onChange}) => {
   const flatListRef = React.useRef(null);
@@ -88,6 +80,7 @@ const WheelPicker = ({options, selectedIndex, onChange}) => {
 };
 
 const PainDurationScreen = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -104,7 +97,16 @@ const PainDurationScreen = () => {
   }
 
   const numbers = Array.from({length: 11}, (_, i) => (i + 1) * 5).map(String);
-  const units = ['분', '시간', '일', '주', '달', '년'];
+  const units = [t('분'), t('시간'), t('일'), t('주'), t('달'), t('년')];
+
+  const TIME_UNIT_MAP = {
+    [t('분')]: 'MINUTE',
+    [t('시간')]: 'HOUR',
+    [t('일')]: 'DAY',
+    [t('주')]: 'WEEK',
+    [t('달')]: 'MONTH',
+    [t('년')]: 'YEAR',
+  };
 
   const handleScrollChange = () => {
     setIsNextButtonActive(true);
@@ -170,8 +172,7 @@ const PainDurationScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.question}>통증은 어느 정도 지속되나요?</Text>
-
+      <Text style={styles.question}>{t('통증은 어느 정도 지속되나요?')}</Text>
       <View style={styles.centeredPickerWrapper}>
         <WheelPicker
           options={numbers}
@@ -201,7 +202,7 @@ const PainDurationScreen = () => {
         {loading ? (
           <ActivityIndicator size="small" color="white" />
         ) : (
-          <Text style={styles.nextButtonText}>다음</Text>
+          <Text style={styles.nextButtonText}>{t('다음')}</Text>
         )}
       </TouchableOpacity>
     </View>
