@@ -15,15 +15,17 @@ import {
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/AIHistoryTaking/AdditionalInformationStyles';
 
 const AdditionalInformationScreen = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
   const symptomId = route.params?.symptomId;
 
   if (!symptomId) {
-    Alert.alert('Error', '증상 ID가 없습니다.');
+    Alert.alert(t('Error'), t('증상 ID가 없습니다.'));
     return null;
   }
 
@@ -41,7 +43,7 @@ const AdditionalInformationScreen = () => {
 
   const pickImage = async () => {
     if (images.length >= 10) {
-      Alert.alert('최대 10장까지만 업로드할 수 있습니다.');
+      Alert.alert(t('최대 10장까지만 업로드할 수 있습니다.'));
       return;
     }
     launchImageLibrary(
@@ -66,7 +68,7 @@ const AdditionalInformationScreen = () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
-        Alert.alert('Error', '로그인이 필요합니다.');
+        Alert.alert(t('Error'), t('로그인이 필요합니다.'));
         return;
       }
 
@@ -93,7 +95,7 @@ const AdditionalInformationScreen = () => {
       );
 
       if (!response.ok) {
-        throw new Error('이미지 업로드 실패');
+        throw new Error(t('이미지 업로드 실패'));
       }
 
       const responseData = await response.json();
@@ -102,7 +104,10 @@ const AdditionalInformationScreen = () => {
         JSON.stringify(responseData, null, 2),
       );
     } catch (error) {
-      Alert.alert('Error', `이미지 업로드 중 오류 발생: ${error.message}`);
+      Alert.alert(
+        t('Error'),
+        `${t('이미지 업로드 중 오류 발생')}: ${error.message}`,
+      );
     }
   };
 
@@ -110,7 +115,7 @@ const AdditionalInformationScreen = () => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       if (!token) {
-        Alert.alert('Error', '로그인이 필요합니다.');
+        Alert.alert(t('Error'), t('로그인이 필요합니다.'));
         return;
       }
 
@@ -127,7 +132,7 @@ const AdditionalInformationScreen = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`추가 정보 저장 실패: ${response.status}`);
+        throw new Error(`${t('추가 정보 저장 실패')}: ${response.status}`);
       }
 
       const responseData = await response.json();
@@ -138,7 +143,10 @@ const AdditionalInformationScreen = () => {
 
       navigation.navigate('AIHistoryTakingReport', {symptomId});
     } catch (error) {
-      Alert.alert('Error', `추가 정보 저장 중 오류 발생: ${error.message}`);
+      Alert.alert(
+        t('Error'),
+        `${t('추가 정보 저장 중 오류 발생')}: ${error.message}`,
+      );
     }
   };
 
@@ -153,13 +161,11 @@ const AdditionalInformationScreen = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <Text style={styles.headerText}>
-            증상에 대해 추가적으로
-            {'\n'}
-            전달하고 싶은 사항을 알려주세요
+            {t('증상에 대해 추가적으로\n 전달하고 싶은 사항을 알려주세요')}
           </Text>
 
           <View style={styles.imageUploadContainer}>
-            <Text style={styles.labelText}>증상 관련 이미지 추가</Text>
+            <Text style={styles.labelText}>{t('증상 관련 이미지 추가')}</Text>
             <ScrollView horizontal>
               <TouchableOpacity
                 style={styles.imageUploadButton}
@@ -183,11 +189,15 @@ const AdditionalInformationScreen = () => {
           </View>
 
           <View style={styles.additionalInfoContainer}>
-            <Text style={styles.labelText}>증상 관련 추가 사항 작성</Text>
+            <Text style={styles.labelText}>
+              {t('증상 관련 추가 사항 작성')}
+            </Text>
             <TextInput
               style={styles.textInput}
               multiline
-              placeholder="증상에 대해 추가적으로 전달하고 싶은 사항을 작성해주세요"
+              placeholder={t(
+                '증상에 대해 추가적으로 전달하고 싶은 사항을 작성해주세요',
+              )}
               placeholderTextColor="#B1B1B1"
               value={additionalInfo}
               onChangeText={text => {
@@ -212,7 +222,7 @@ const AdditionalInformationScreen = () => {
           navigation.navigate('AIHistoryTakingReport', {symptomId})
         }>
         <Text style={styles.skipButtonText}>
-          {isButtonActive ? 'AI 사전문진 확인하기' : '건너뛰기'}
+          {isButtonActive ? t('AI 사전문진 확인하기') : t('건너뛰기')}
         </Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

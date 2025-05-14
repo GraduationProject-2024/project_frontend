@@ -194,7 +194,7 @@ const ChooseDetailBodyScreen = () => {
     <View style={styles.container}>
       <Text style={styles.titleText}>
         {t(
-          '선택하신 주요 신체 부위의 세부 신체 부위입니다\n치료가 필요하신 부위를 선택해주세요',
+          '먼저 통증을 느끼는 신체 부위를 선택해주세요\n신체 부위는 최대 두 군데를 선택할 수 있습니다',
         )}
       </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>

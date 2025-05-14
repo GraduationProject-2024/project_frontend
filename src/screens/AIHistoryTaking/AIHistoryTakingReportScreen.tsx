@@ -190,7 +190,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                 {/* 환자 기본 정보 */}
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>
-                    {t('📌 환자의 기본 정보입니다')}
+                    📌 {t('환자의 기본 정보입니다')}
                   </Text>
                   <Text style={styles.sectionContent}>
                     <Text style={styles.labelText}>{t('성별')}</Text> {'  '}
@@ -210,7 +210,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                 {/* 환자 건강 정보 */}
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>
-                    {t('📌 환자의 건강 정보입니다')}
+                    📌 {t('환자의 건강 정보입니다')}
                   </Text>
                   <Text style={styles.sectionContent}>
                     <Text style={styles.labelText}>{t('과거 병력')}</Text>{' '}
@@ -234,7 +234,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                 {/* 신체 부위 */}
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>
-                    {t('📌 통증을 느끼는 신체 부위입니다')}
+                    📌 {t('통증을 느끼는 신체 부위입니다')}
                   </Text>
                   <Text style={styles.sectionContent}>
                     <Text style={styles.labelText}>{t('주요 신체 부위')}</Text>
@@ -257,7 +257,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                 {/* 세부 증상 */}
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>
-                    {t('📌 통증 관련한 세부적인 증상입니다')}
+                    📌 {t('통증 관련한 세부적인 증상입니다')}
                   </Text>
                   <Text style={styles.sectionContent}>
                     <Text style={styles.labelText}>{t('강도')}</Text>
@@ -285,7 +285,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                 {/* 예상 질병 */}
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>
-                    {t('📌 예상되는 환자의 질병입니다')}
+                    📌 {t('예상되는 환자의 질병입니다')}
                   </Text>
                   {reportData.doctor.possible_conditions?.length > 0 ? (
                     reportData.doctor.possible_conditions.map((item, i) => (
@@ -302,7 +302,9 @@ const AIHistoryTakingReportScreen = ({route}) => {
 
                 {/* 이미지 업로드 */}
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{t('이미지 업로드')}</Text>
+                  <Text style={styles.sectionTitle}>
+                    📌 {t('이미지 업로드')}
+                  </Text>
                   {reportData.doctor.image_info?.length > 0 ? (
                     reportData.doctor.image_info
                       .filter(img => img.imgUrl) // undefined 또는 null 값 필터링
@@ -316,7 +318,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                       ))
                   ) : (
                     <Text style={styles.sectionContent}>
-                      {t('이미지 없음')}
+                      {t('데이터 없음')}
                     </Text>
                   )}
                 </View>
