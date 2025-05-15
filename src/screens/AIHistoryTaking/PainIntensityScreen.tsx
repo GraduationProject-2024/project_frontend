@@ -218,7 +218,7 @@ const PainIntensityScreen = () => {
         {loading ? (
           <ActivityIndicator size="small" color="white" />
         ) : (
-          <Text style={styles.nextButtonText}>다음</Text>
+          <Text style={styles.nextButtonText}>{t('다음')}</Text>
         )}
       </TouchableOpacity>
     </View>
