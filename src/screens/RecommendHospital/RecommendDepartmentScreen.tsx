@@ -21,7 +21,6 @@ const RecommendDepartmentScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ✅ API에서 진료과 리스트 가져오기
   const fetchDepartments = async () => {
     setLoading(true);
     try {

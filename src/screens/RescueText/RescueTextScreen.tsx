@@ -51,7 +51,6 @@ const RescueTextScreen = () => {
     setSelectedEmergencyType(selectedValue);
   };
 
-  // 위치 권한 요청 함수
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
@@ -94,7 +93,7 @@ const RescueTextScreen = () => {
       try {
         responseBody = await response.json();
       } catch (jsonError) {
-        responseBody = await response.text(); // JSON 파싱이 실패하면 텍스트 그대로 출력
+        responseBody = await response.text();
       }
 
       console.log('📨 사용자 데이터 응답 바디:', responseBody);
@@ -163,7 +162,6 @@ const RescueTextScreen = () => {
         });
       });
 
-      // 🔹 FormData가 제대로 생성되었는지 확인
       console.log('📌 수정된 FormData 내용:');
 
       const response = await fetch(REPORT_API_URL, {
@@ -175,14 +173,13 @@ const RescueTextScreen = () => {
         body: formData,
       });
 
-      // 🔹 서버 응답 출력
       console.log('📌 서버 응답 상태 코드:', response.status);
 
       let responseBody;
       try {
         responseBody = await response.json();
       } catch (jsonError) {
-        responseBody = await response.text(); // JSON 파싱이 실패하면 텍스트 출력
+        responseBody = await response.text();
       }
 
       console.log('📨 서버 응답 바디:', responseBody);
@@ -200,7 +197,6 @@ const RescueTextScreen = () => {
     }
   };
 
-  // 도로명 주소 placeholder 클릭 시 위치 받아오기 + 주소 변환
   const handleAddressPlaceholderPress = async () => {
     if (isGettingLocation) {
       return;

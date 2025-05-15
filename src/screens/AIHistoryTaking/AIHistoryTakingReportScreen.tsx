@@ -42,9 +42,9 @@ const AIHistoryTakingReportScreen = ({route}) => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
           },
-          timeout: 100000, // 최대 15초까지 대기
-          maxContentLength: 50000000, // 최대 10MB 응답 허용
-          maxBodyLength: 50000000, // 최대 10MB 요청 허용
+          timeout: 100000,
+          maxContentLength: 50000000,
+          maxBodyLength: 50000000,
         });
 
         console.log('✅ 응답 데이터:', JSON.stringify(response.data, null, 2));
@@ -307,7 +307,7 @@ const AIHistoryTakingReportScreen = ({route}) => {
                   </Text>
                   {reportData.doctor.image_info?.length > 0 ? (
                     reportData.doctor.image_info
-                      .filter(img => img.imgUrl) // undefined 또는 null 값 필터링
+                      .filter(img => img.imgUrl)
                       .map((img, i) => (
                         <View key={i} style={styles.imageContainer}>
                           <Image

@@ -26,7 +26,6 @@ const RecommendPharmacyListScreen = () => {
   const [mapUrls, setMapUrls] = useState(null);
   const [location, setLocation] = useState({latitude: null, longitude: null});
 
-  // 위치 권한 요청 함수
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
@@ -41,11 +40,9 @@ const RecommendPharmacyListScreen = () => {
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     }
-    // iOS는 Info.plist에 권한 설명만 있으면 자동 요청됨
     return true;
   };
 
-  // 현재 위치 받아오기
   useEffect(() => {
     const getLocation = async () => {
       const hasPermission = await requestLocationPermission();
@@ -71,12 +68,10 @@ const RecommendPharmacyListScreen = () => {
     getLocation();
   }, []);
 
-  // 위치가 준비되면 약국 조회
   useEffect(() => {
     if (location.latitude && location.longitude) {
       fetchPharmacies(location.latitude, location.longitude);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const getAccessToken = async () => {

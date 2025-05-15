@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
+import {useTranslation} from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/AIHistoryTaking/PainIntensityStyles';
 
@@ -167,7 +167,6 @@ const PainIntensityScreen = () => {
         result,
       );
 
-      // ✅ symptomId를 다음 화면(PainDurationScreen)으로 전달
       navigation.navigate('PainDuration', {symptomId: result.symptomId});
     } catch (error) {
       console.error('❌ 저장 오류:', error);

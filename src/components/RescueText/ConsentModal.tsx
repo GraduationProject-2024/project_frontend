@@ -7,17 +7,16 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import {useTranslation} from 'react-i18next'; // ✅ 번역 적용
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/RescueText/ConsentModalStyles';
 
 const ConsentModal = ({visible, onClose}) => {
-  const {t, i18n} = useTranslation(); // ✅ 번역 훅 추가
+  const {t, i18n} = useTranslation();
   const [allChecked, setAllChecked] = useState(false);
   const [personalInfoChecked, setPersonalInfoChecked] = useState(false);
   const [locationInfoChecked, setLocationInfoChecked] = useState(false);
-  const [_, setForceUpdate] = useState(0); // 🔥 강제 리렌더링 추가
+  const [_, setForceUpdate] = useState(0);
 
-  // ✅ 언어 변경 감지 후 강제 리렌더링
   useEffect(() => {
     const languageChangedHandler = () => {
       setForceUpdate(prev => prev + 1);

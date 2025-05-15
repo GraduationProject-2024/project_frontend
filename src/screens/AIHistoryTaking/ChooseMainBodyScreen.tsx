@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTranslation} from 'react-i18next'; // ✅ i18n 추가
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/AIHistoryTaking/ChooseMainBodyStyles';
 import CheckIcon from '../../img/ChooseLanguage/Check.png';
 
@@ -19,7 +19,7 @@ const SAVE_API_URL = 'http://52.78.79.53:8081/api/v1/selected-mbp';
 const SUB_BODY_API_URL = 'http://52.78.79.53:8081/api/v1/sub-body';
 
 const ChooseMainBodyScreen: React.FC = () => {
-  const {t} = useTranslation(); // ✅ 다국어 번역 적용
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const [mainBodyParts, setMainBodyParts] = useState<

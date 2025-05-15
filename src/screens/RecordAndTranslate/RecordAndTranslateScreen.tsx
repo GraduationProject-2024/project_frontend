@@ -50,7 +50,6 @@ const RecordAndTranslateScreen = () => {
     getAccessToken();
   }, []);
 
-  // 🔹 마이크 권한 확인 및 요청
   useEffect(() => {
     const requestMicrophonePermission = async () => {
       try {
@@ -78,38 +77,36 @@ const RecordAndTranslateScreen = () => {
     requestMicrophonePermission();
   }, []);
 
-  // 🔹 AudioRecord 초기화
   useEffect(() => {
     try {
       console.log('🎤 AudioRecord 초기화 시작');
 
       AudioRecord.init({
-        sampleRate: 16000, // 🔹 16000 -> 44100 변경 (기기 호환 문제 해결)
+        sampleRate: 16000,
         channels: 1,
         bitsPerSample: 16,
         wavFile: 'recorded_audio.wav',
       });
 
-      setIsAudioInitialized(true); // 🔹 AudioRecord 초기화 완료 후 상태 변경
+      setIsAudioInitialized(true);
       console.log('✅ AudioRecord 초기화 완료');
     } catch (error) {
       console.error('❌ AudioRecord 초기화 실패:', error);
     }
   }, []);
 
-  // 🎯 녹음 중일 때 애니메이션 실행
   useEffect(() => {
     if (isRecording) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(scaleAnim, {
-            toValue: 1.2, // 🎯 버튼이 1.3배 커짐
+            toValue: 1.2,
             duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
           Animated.timing(scaleAnim, {
-            toValue: 1, // 🎯 원래 크기로 돌아옴
+            toValue: 1,
             duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
@@ -117,7 +114,7 @@ const RecordAndTranslateScreen = () => {
         ]),
       ).start();
     } else {
-      scaleAnim.setValue(1); // 🎯 녹음이 끝나면 애니메이션 멈추고 원래 크기로
+      scaleAnim.setValue(1);
     }
   }, [isRecording]);
 
@@ -205,13 +202,11 @@ const RecordAndTranslateScreen = () => {
 
       let translatedText = '';
 
-      // 조건별 번역문 설정
       if (isKoreanToEnglish && englishTranslation) {
         translatedText = englishTranslation;
       } else if (isEnglishToKorean && koreanTranslation) {
         translatedText = koreanTranslation;
       } else if (englishTranslation || koreanTranslation) {
-        // fallback: 명확한 언어 방향이 없어도 번역된 텍스트가 존재하면 표시
         translatedText = englishTranslation || koreanTranslation;
       }
 
@@ -231,7 +226,6 @@ const RecordAndTranslateScreen = () => {
     }
   };
 
-  // 🔹 AudioRecord 시작 시 초기화 완료 여부 확인
   const handleRecordPress = async () => {
     if (!isAudioInitialized) {
       console.log('🚨 AudioRecord가 아직 초기화되지 않았습니다!');
@@ -250,25 +244,22 @@ const RecordAndTranslateScreen = () => {
       console.log('🎙️ 녹음 시작');
       AudioRecord.start();
     } else {
-      // 🔹 녹음 중단 (한 번만 눌러도 즉시 종료되도록 변경)
       console.log('🛑 녹음 중단');
       setIsRecording(false);
-      setSessionId(null); // 🔹 즉시 UI 상태 변경을 반영 (버튼 변경)
+      setSessionId(null);
 
-      const filePath = await AudioRecord.stop(); // 🔹 즉시 중단
+      const filePath = await AudioRecord.stop();
       await sendAudioChunk(filePath);
       await endSession();
     }
   };
 
-  // 🎯 DoneButton (사용자 변경 및 일시 정지/재개)
   const handlePausePress = async () => {
     if (!sessionId || !isRecording) {
       return;
     }
 
     if (!isPaused) {
-      // 🎯 녹음 일시 정지
       const filePath = await AudioRecord.stop();
       await sendAudioChunk(filePath);
 
@@ -276,7 +267,6 @@ const RecordAndTranslateScreen = () => {
       setIsPaused(true);
       console.log('⏸️ 녹음 일시 정지됨');
     } else {
-      // 🎯 녹음 재개
       setIsPaused(false);
       setTimeout(() => {
         AudioRecord.start();
@@ -307,13 +297,11 @@ const RecordAndTranslateScreen = () => {
             key={index}
             style={[
               styles.messageBubble,
-              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB, // 영어 → 한국어 (오른쪽)
-              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft, // 위치 반전
+              msg.isEnglishToKorean ? styles.speakerA : styles.speakerB,
+              msg.isEnglishToKorean ? styles.alignRight : styles.alignLeft,
             ]}>
-            {/* 원본 문장 */}
             <Text style={styles.messageText}>{msg.text}</Text>
 
-            {/* 번역된 문장 (파란색) */}
             {msg.translation ? (
               <Text style={styles.translationText}>{msg.translation}</Text>
             ) : null}
@@ -333,7 +321,6 @@ const RecordAndTranslateScreen = () => {
             style={styles.icon}
           />
         </TouchableOpacity>
-        {/* 🎯 Animated.View로 감싸서 애니메이션 적용 */}
         <Animated.View style={{transform: [{scale: scaleAnim}]}}>
           <TouchableOpacity
             style={styles.recordButton}

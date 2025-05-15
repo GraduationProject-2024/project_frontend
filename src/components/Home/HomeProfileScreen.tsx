@@ -8,11 +8,11 @@ import {
   Easing,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTranslation} from 'react-i18next'; // ✅ 다국어 번역 추가
+import {useTranslation} from 'react-i18next';
 import styles from '../../styles/Home/HomeProfileStyles';
 
 const HomeProfileScreen = () => {
-  const {t} = useTranslation(); // ✅ 번역 함수 추가
+  const {t} = useTranslation();
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnim = useRef(new Animated.Value(0)).current;
 
